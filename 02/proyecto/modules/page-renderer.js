@@ -1,23 +1,23 @@
-const path = require('path');
-const { upperCase } = require('upper-case');
-const { buildMenu } = require('./menu');
-const { getWeatherData, renderWeatherWidget } = require('./modules-weather');
-const { renderCalculator } = require('./modules-maths');
-const { ROUTES, getRoute } = require('./routes');
-const { readFileUtf8 } = require('./file-service');
+import path from 'path';
+import { upperCase } from 'upper-case';
+import { buildMenu } from './menu.js';
+import { getWeatherData, renderWeatherWidget } from './modules-weather.js';
+import { renderCalculator } from './modules-maths.js';
+import { ROUTES, getRoute } from './routes.js';
+import { readFileUtf8 } from './file-service.js';
 
-const estimateReadingTime = (text) => {
+export const estimateReadingTime = (text) => {
     const wordsPerMinute = 200;
     const words = text.split(/\s+/).length;
     return Math.ceil(words / wordsPerMinute);
 };
 
-const renderTemplate = (template, replacements) => Object.entries(replacements).reduce(
+export const renderTemplate = (template, replacements) => Object.entries(replacements).reduce(
     (html, [key, value]) => html.replaceAll(`{{${key}}}`, value),
     template
 );
 
-const buildFeaturedCards = (entries, currentPath) => entries.map((entry) => `
+export const buildFeaturedCards = (entries, currentPath) => entries.map((entry) => `
     <div class="col-12 col-md-6 col-xl-4">
         <article class="card featured-card shadow-sm border-0 h-100 ${entry.path === currentPath ? 'border border-primary border-2' : ''}">
             <div class="card-body p-4 d-flex flex-column">
@@ -33,7 +33,7 @@ const buildFeaturedCards = (entries, currentPath) => entries.map((entry) => `
     </div>
 `).join('');
 
-const buildArticleLinks = (entries, currentPath) => entries.map((entry) => `
+export const buildArticleLinks = (entries, currentPath) => entries.map((entry) => `
     <a href="${entry.path}" class="list-group-item list-group-item-action py-3 ${entry.path === currentPath ? 'active' : ''}">
         <div class="d-flex w-100 justify-content-between align-items-start gap-3">
             <div>
@@ -45,7 +45,7 @@ const buildArticleLinks = (entries, currentPath) => entries.map((entry) => `
     </a>
 `).join('');
 
-const createPageRenderer = ({ pagesDir, articlesDir }) => {
+export const createPageRenderer = ({ pagesDir, articlesDir }) => {
     const loadArticles = async () => {
         const articles = await Promise.all(ROUTES.map(async (route) => {
             const content = await readFileUtf8(path.join(articlesDir, route.file));
@@ -103,8 +103,4 @@ const createPageRenderer = ({ pagesDir, articlesDir }) => {
     return {
         renderPage
     };
-};
-
-module.exports = {
-    createPageRenderer
 };

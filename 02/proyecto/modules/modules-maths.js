@@ -1,17 +1,17 @@
-function sumar(a, b) {
+export function sumar(a, b) {
     return a + b;
 }
-function restar(a, b) {
+export function restar(a, b) {
     return a - b;
 }
-function multiplicar(a, b) {
+export function multiplicar(a, b) {
     return a * b;
 }
-function dividir(a, b) {
+export function dividir(a, b) {
     return a / b;
 }
 
-const renderCalculator = () => `
+export const renderCalculator = () => `
     <section class="card shadow-sm border-0 h-100 calculator-widget">
         <div class="card-body p-4">
             <p class="section-kicker mb-2">Calculadora</p>
@@ -75,11 +75,3 @@ const renderCalculator = () => `
         </script>
     </section>
 `;
-
-module.exports = {
-   sumar,
-   restar,
-   multiplicar,
-   dividir,
-   renderCalculator
-};

@@ -5,7 +5,7 @@ const CONDITIONS = [
     { label: 'Lluvia ligera', icon: 'CloudRain', bootstrap: 'text-primary' }
 ];
 
-const getWeatherData = (city = 'Buenos Aires') => {
+export const getWeatherData = (city = 'Buenos Aires') => {
     const now = new Date();
     const hour = now.getHours();
     const condition = CONDITIONS[hour % CONDITIONS.length];
@@ -26,7 +26,7 @@ const getWeatherData = (city = 'Buenos Aires') => {
     };
 };
 
-const renderWeatherWidget = (weather) => `
+export const renderWeatherWidget = (weather) => `
     <section class="card shadow-sm border-0 h-100 weather-widget">
         <div class="card-body p-4">
             <p class="section-kicker mb-2">Modulo del clima</p>
@@ -57,8 +57,3 @@ const renderWeatherWidget = (weather) => `
         </div>
     </section>
 `;
-
-module.exports = {
-    getWeatherData,
-    renderWeatherWidget
-};

@@ -1,4 +1,4 @@
-const MENU_ITEMS = [
+export const MENU_ITEMS = [
     { href: '/', label: 'Inicio' },
     { href: '/politica', label: 'Politica' },
     { href: '/economia', label: 'Economia' },
@@ -9,7 +9,7 @@ const MENU_ITEMS = [
     { href: '/clima', label: 'Clima' }
 ];
 
-const buildMenu = (currentPath = '/') => {
+export const buildMenu = (currentPath = '/') => {
     const items = MENU_ITEMS.map((item) => {
         const isActive = item.href === currentPath;
         const activeClass = isActive ? ' active' : '';
@@ -37,9 +37,4 @@ const buildMenu = (currentPath = '/') => {
             </div>
         </nav>
     `;
-};
-
-module.exports = {
-    MENU_ITEMS,
-    buildMenu
 };

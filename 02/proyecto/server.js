@@ -1,10 +1,14 @@
-const http = require('http');
-const path = require('path');
-const url = require('url');
-const { MENU_ITEMS } = require('./modules/menu');
-const { getRoute } = require('./modules/routes');
-const { serveStatic } = require('./modules/file-service');
-const { createPageRenderer } = require('./modules/page-renderer');
+import http from 'http';
+import path from 'path';
+import url from 'url';
+import { fileURLToPath } from 'url';
+import { MENU_ITEMS } from './modules/menu.js';
+import { getRoute } from './modules/routes.js';
+import { serveStatic } from './modules/file-service.js';
+import { createPageRenderer } from './modules/page-renderer.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const INITIAL_PORT = Number(process.env.PORT) || 8080;
 const MAX_PORT_ATTEMPTS = 10;

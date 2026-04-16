@@ -1,8 +1,8 @@
-const fs = require('fs');
+import fs from 'fs';
 
-const readFileUtf8 = (filePath) => fs.promises.readFile(filePath, 'utf8');
+export const readFileUtf8 = (filePath) => fs.promises.readFile(filePath, 'utf8');
 
-const serveStatic = (res, filePath, contentType) => {
+export const serveStatic = (res, filePath, contentType) => {
     fs.readFile(filePath, (error, content) => {
         if (error) {
             res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -13,9 +13,4 @@ const serveStatic = (res, filePath, contentType) => {
         res.writeHead(200, { 'Content-Type': contentType });
         res.end(content);
     });
-};
-
-module.exports = {
-    readFileUtf8,
-    serveStatic
 };

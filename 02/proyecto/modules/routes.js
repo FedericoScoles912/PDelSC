@@ -1,4 +1,4 @@
-const ROUTES = [
+export const ROUTES = [
     {
         path: '/',
         label: 'Inicio',
@@ -65,9 +65,4 @@ const ROUTES = [
     }
 ];
 
-const getRoute = (pathname) => ROUTES.find((route) => route.path === pathname);
-
-module.exports = {
-    ROUTES,
-    getRoute
-};
+export const getRoute = (pathname) => ROUTES.find((route) => route.path === pathname);
