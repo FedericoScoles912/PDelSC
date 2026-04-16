@@ -1,0 +1,47 @@
+<section class="article-body">
+    <p class="section-kicker mb-2">Edicion central</p>
+    <h2 class="display-6 fw-bold mb-3">Un diario local, responsive y servido con Node.js</h2>
+    <p>
+        Esta portada concentra la experiencia completa del proyecto: una interfaz armada con Bootstrap 5,
+        un servidor local construido con modulos nativos de Node.js y una organizacion modular para que el
+        contenido del diario se mantenga legible, escalable y facil de mantener.
+    </p>
+    <p>
+        El objetivo principal fue eliminar la dependencia de media queries manuales para el layout y reemplazarla
+        por la grilla responsive de Bootstrap. El resultado es una portada que se adapta correctamente a celulares,
+        tablets y pantallas grandes sin duplicar logica visual.
+    </p>
+    <blockquote>
+        Todo el contenido queda dentro de la misma aplicacion: el servidor interpreta la ruta, lee un archivo HTML
+        local con `fs` y lo ensambla dentro del layout principal antes de enviarlo al navegador.
+    </blockquote>
+    <div class="accordion mt-4" id="homeHighlights">
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#highlightOne" aria-expanded="true" aria-controls="highlightOne">
+                    Que cambia con Bootstrap
+                </button>
+            </h3>
+            <div id="highlightOne" class="accordion-collapse collapse show" data-bs-parent="#homeHighlights">
+                <div class="accordion-body">
+                    El layout usa `container`, `row`, `col`, espaciados utilitarios, navbar responsive y cards.
+                    La interfaz queda mas consistente y mucho mas facil de mantener.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h3 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#highlightTwo" aria-expanded="false" aria-controls="highlightTwo">
+                    Como se sirven las noticias
+                </button>
+            </h3>
+            <div id="highlightTwo" class="accordion-collapse collapse" data-bs-parent="#homeHighlights">
+                <div class="accordion-body">
+                    Cada noticia se guarda como un archivo HTML local dentro de `pages/articles/`. El servidor usa
+                    `http`, `fs` y `url` para detectar la ruta solicitada, leer el archivo correcto y mostrarlo dentro
+                    del contenedor principal del diario.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

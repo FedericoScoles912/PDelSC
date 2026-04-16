@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{PAGE_TITLE}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    {{MENU}}
+
+    <main class="container py-4 py-lg-5">
+        <section class="hero-panel text-white p-4 p-lg-5 mb-4 shadow-sm">
+            <div class="row align-items-center g-4">
+                <div class="col-12 col-lg-8">
+                    <span class="badge rounded-pill text-bg-light text-primary px-3 py-2 mb-3">{{PAGE_KICKER}}</span>
+                    <h1 class="display-5 fw-bold mb-3">{{PAGE_HEADING}}</h1>
+                    <p class="lead mb-4">{{PAGE_LEAD}}</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge rounded-pill text-bg-dark px-3 py-2">{{UPPER_DATE}}</span>
+                        <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Bootstrap 5</span>
+                        <span class="badge rounded-pill text-bg-light text-dark px-3 py-2">Node.js Modular</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-3">
+                <div>
+                    <p class="section-kicker mb-2">Portada</p>
+                    <h2 class="h1 mb-0">Noticias destacadas</h2>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    {{NEWS_STATS}}
+                </div>
+            </div>
+            <div class="row g-4">
+                {{FEATURED_CARDS}}
+            </div>
+        </section>
+
+        <section class="row g-4">
+            <div class="col-12 col-xl-8">
+                <article class="article-shell p-4 p-lg-5">
+                    {{MAIN_CONTENT}}
+                </article>
+            </div>
+            <div class="col-12 col-xl-4">
+                <aside class="article-list-card card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <p class="section-kicker mb-2">Navegacion local</p>
+                        <h2 class="h4 mb-3">Lee todo sin salir del diario</h2>
+                        <div class="list-group list-group-flush">
+                            {{ARTICLE_LINKS}}
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-top bg-white">
+        <div class="container py-4 d-flex flex-column flex-md-row justify-content-between gap-3">
+            <p class="mb-0 fw-semibold">Diario Federal</p>
+            <p class="mb-0 footer-note">Sitio renderizado con `http`, `fs`, `url`, modulos reutilizables y Bootstrap.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

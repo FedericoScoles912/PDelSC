@@ -1,0 +1,105 @@
+body {
+    background: #f4f6fb;
+    color: #18202a;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+.newspaper-navbar {
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid rgba(24, 32, 42, 0.08);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-brand {
+    letter-spacing: 0.08em;
+}
+
+.hero-panel,
+.info-card,
+.article-shell,
+.article-list-card,
+.weather-widget {
+    border-radius: 1.5rem;
+}
+
+.hero-panel {
+    background: linear-gradient(135deg, #0d6efd 0%, #5ea6ff 100%);
+}
+
+.hero-panel .badge {
+    width: fit-content;
+}
+
+.section-kicker {
+    color: #0d6efd;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.featured-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.featured-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.1);
+}
+
+.article-shell {
+    background: #ffffff;
+    box-shadow: 0 1rem 2rem rgba(24, 32, 42, 0.06);
+}
+
+.article-shell h2,
+.article-shell h3 {
+    color: #0f172a;
+}
+
+.article-body p {
+    color: #475569;
+    font-size: 1.03rem;
+    line-height: 1.8;
+}
+
+.article-body blockquote {
+    border-left: 4px solid #0d6efd;
+    margin: 1.5rem 0;
+    padding: 0.75rem 0 0.75rem 1rem;
+    color: #334155;
+    background: #f8fbff;
+    border-radius: 0 1rem 1rem 0;
+}
+
+.weather-icon {
+    width: 42px;
+    height: 42px;
+}
+
+.weather-metric,
+.metric-chip {
+    background: #f8fafc;
+    border: 1px solid rgba(24, 32, 42, 0.06);
+}
+
+.article-list-card a {
+    color: inherit;
+}
+
+.article-list-card .list-group-item {
+    border-color: rgba(24, 32, 42, 0.06);
+}
+
+.article-list-card .list-group-item:hover {
+    background: #f8fbff;
+}
+
+.footer-note {
+    color: #64748b;
+    font-size: 0.95rem;
+}
