@@ -16,20 +16,24 @@ const projects = [
 ];
 
 projects.forEach(proj => {
+    // Iniciar cada proceso de servidor de forma independiente
     const child = spawn('node', [proj.script], {
         cwd: path.join(__dirname, proj.dir),
         shell: true
     });
 
+    // Capturar y mostrar la salida estándar
     child.stdout.on('data', (data) => {
         console.log(`[${proj.name}] ${data}`);
     });
 
+    // Capturar y mostrar errores
     child.stderr.on('data', (data) => {
         console.error(`[${proj.name}] Error: ${data}`);
     });
 
+    // Registrar cuando un servidor se detiene
     child.on('close', (code) => {
-        console.log(`[${proj.name}] exited with code ${code}`);
+        console.log(`[${proj.name}] finalizado con código ${code}`);
     });
 });

@@ -35,7 +35,7 @@ body {
     border-color: #4f46e5;
 }
 
-/* Card Styling */
+/* Estilo de las Tarjetas */
 .card {
     border: none;
     border-radius: 12px;
@@ -55,7 +55,7 @@ body {
     color: var(--secondary);
 }
 
-/* Labs Section Enhancements */
+/* Mejoras en la Sección de Laboratorios */
 #labs-section {
     background-color: #fff;
     padding: 4rem 0;
@@ -70,7 +70,7 @@ body {
     right: 20px;
 }
 
-/* News Section Enhancements */
+/* Mejoras en la Sección de Noticias */
 #news-portal .card-img-top {
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;

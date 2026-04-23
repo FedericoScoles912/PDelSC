@@ -1,4 +1,4 @@
-// News Portal Logic - Modal and Article Injection
+// Lógica del Portal de Noticias - Inyección de Artículos y Modal
 document.addEventListener('DOMContentLoaded', () => {
     const articleData = {
         '1': {
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('articleModalLabel');
     const modalBody = document.getElementById('article-modal-body');
 
-    // Add event listeners to all "Read More" buttons
+    // Añadir escuchadores de eventos a todos los botones "Leer más"
     document.body.addEventListener('click', (event) => {
         if (event.target.classList.contains('read-more')) {
             const articleId = event.target.getAttribute('data-article-id');
