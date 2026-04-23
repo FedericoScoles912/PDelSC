@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 5: InnerHTML</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; padding-top: 20px; }
+        .lab-module { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        #dynamic-injection-container { 
+            min-height: 250px; 
+            background: #f1f5f9; 
+            border-radius: 12px; 
+            padding: 2rem; 
+            margin-bottom: 2rem; 
+            border: 2px dashed #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <a href="http://localhost:3000" class="btn btn-link text-decoration-none mb-4 p-0">← Dashboard</a>
+        <div class="lab-module text-center">
+            <h3 class="fw-bold mb-4">05. Inyección InnerHTML</h3>
+
+            <!-- CONTAINER FIRST -->
+            <div id="dynamic-injection-container" class="d-flex align-items-center justify-content-center">
+                <p class="text-muted italic mb-0">Selecciona un componente para inyectar...</p>
+            </div>
+
+            <div class="d-flex justify-content-center gap-2">
+                <button id="btn-inject-table" class="btn btn-dark rounded-pill px-4">Tabla</button>
+                <button id="btn-inject-pricing" class="btn btn-dark rounded-pill px-4">Precios</button>
+                <button id="btn-clear-inner" class="btn btn-danger rounded-pill px-4">Limpiar</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

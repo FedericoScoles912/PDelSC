@@ -1,0 +1,25 @@
+:root {
+    --primary: #6366f1;
+    --bg: #f8fafc;
+}
+body { background-color: var(--bg); font-family: 'Inter', sans-serif; padding-top: 20px; }
+.lab-module { 
+    background: white; 
+    border-radius: 16px; 
+    border: none; 
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 2rem;
+}
+#module1-output { 
+    min-height: 200px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    background-color: #f1f5f9;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 2px dashed #cbd5e1;
+}
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-primary:hover { background-color: var(--primary); border-color: var(--primary); }

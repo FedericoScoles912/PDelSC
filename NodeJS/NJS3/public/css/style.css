@@ -1,0 +1,77 @@
+/* Modern Slate & Indigo Theme */
+:root {
+    --primary: #6366f1;
+    --secondary: #64748b;
+    --success: #10b981;
+    --bg-body: #f8fafc;
+    --text-main: #1e293b;
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+body {
+    padding-top: 70px;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.navbar {
+    background-color: #0f172a !important;
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    letter-spacing: 1px;
+    color: var(--primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+.card-header {
+    background-color: transparent;
+    border-bottom: 1px solid #e2e8f0;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+/* Labs Section Enhancements */
+#labs-section {
+    background-color: #fff;
+    padding: 4rem 0;
+}
+
+.lab-number {
+    font-size: 3rem;
+    font-weight: 900;
+    opacity: 0.15;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+
+/* News Section Enhancements */
+#news-portal .card-img-top {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}

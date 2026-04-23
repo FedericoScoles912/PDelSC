@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 1: Interacción Básica</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container my-5">
+        <a href="http://localhost:3000" class="btn btn-link text-decoration-none mb-4 p-0">← Dashboard</a>
+        <div class="lab-module">
+            <h3 class="fw-bold mb-4 text-dark">01. Interacción Básica</h3>
+            
+            <!-- OUTPUT FIRST -->
+            <div id="module1-output">
+                <p class="text-muted">El resultado aparecerá aquí</p>
+            </div>
+
+            <!-- CONTROLS SECOND -->
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <button id="btn-inject-h1" class="btn btn-outline-primary rounded-pill">Inyectar H1</button>
+                <button id="btn-update-h1" class="btn btn-outline-primary rounded-pill">Actualizar H1</button>
+                <button id="btn-change-color" class="btn btn-outline-primary rounded-pill">Cambiar Color</button>
+                <button id="btn-append-img" class="btn btn-outline-primary rounded-pill">Inyectar Imagen</button>
+                <button id="btn-swap-img" class="btn btn-outline-primary rounded-pill">Cambiar SRC</button>
+                <button id="btn-toggle-size" class="btn btn-outline-primary rounded-pill">Cambiar Tamaño</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>

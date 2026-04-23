@@ -1,0 +1,30 @@
+:root {
+    --primary: #6366f1;
+    --success: #10b981;
+    --bg: #f8fafc;
+}
+body { background-color: var(--bg); font-family: 'Inter', sans-serif; }
+.lab-module { 
+    background: white; 
+    border-radius: 20px; 
+    padding: 2.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+#profile-card-container { 
+    min-height: 150px;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #f1f5f9;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+}
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 0.6rem 1rem;
+}
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.btn-success { background-color: var(--success); border: none; padding: 0.8rem; border-radius: 8px; }
