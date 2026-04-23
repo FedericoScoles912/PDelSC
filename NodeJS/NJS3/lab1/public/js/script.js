@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.width = 200;
         img.height = 200;
         mod1Output.appendChild(img);
+        if (mod1Output.children.length > 1) pushError('Solo puedes agregar una imagen');
     });
 
     btnSwapImg.addEventListener('click', () => {
