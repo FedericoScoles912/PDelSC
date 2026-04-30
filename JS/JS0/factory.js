@@ -119,6 +119,9 @@ const projects = [
 projects.forEach(p => {
     const dir = path.join('c:/Users/fedes/OneDrive/Documentos/GitHub/PDelSC/JS/JS0/Projects', p.name);
     
+    // Si es el proyecto 'reverse', aplicamos estilos RTL
+    const isReverse = p.name === 'reverse';
+
     const htmlCode = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -135,6 +138,8 @@ projects.forEach(p => {
         .case-container { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
         .case-container:last-child { border-bottom: none; }
         .error-msg { color: #ff7675; font-size: 0.85rem; margin-top: 5px; font-weight: bold; }
+        /* Estilo RTL para Reverse */
+        .rtl-result { direction: rtl; text-align: right; }
     </style>
 </head>
 <body>
@@ -169,7 +174,7 @@ projects.forEach(p => {
                             </div>
                             <div class="col-md-12" id="res-container-${c.id}" style="display: none;">
                                 <span class="label">Resultado:</span>
-                                <div class="result-box"><span class="value" id="final-${c.id}"></span></div>
+                                <div class="result-box ${isReverse ? 'rtl-result' : ''}"><span class="value" id="final-${c.id}"></span></div>
                             </div>
                         </div>
                     </div>
