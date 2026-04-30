@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto 15: Decoder SECRETO</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; min-height: 100vh; padding: 20px; display: flex; align-items: center; justify-content: center; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 550px; }
+        .result-box { background: #2d3436; color: #fff; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.95rem; margin-top: 5px; }
+        .label { font-weight: bold; color: #636e72; font-size: 0.85rem; text-transform: uppercase; margin-top: 15px; display: block; }
+        .value { color: #00cec9; }
+        .error-msg { color: #ff7675; font-size: 0.85rem; margin-top: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="card p-4">
+        <h2 class="text-center text-primary mb-4">15. Decoder SECRETO</h2>
+        
+        <div class="mb-3">
+            <label class="label">Mensaje Codificado:</label>
+            <textarea id="inputMessage" class="form-control" rows="3" placeholder="Ej: Hoy (.sh 22 sal a) Marcelo."></textarea>
+            <div id="error-msg" class="error-msg" style="display: none;"></div>
+        </div>
+
+        <div class="d-grid gap-2 mb-3">
+            <button id="btn-decode" class="btn btn-primary" onclick="ejecutar()">Decodificar Mensaje</button>
+        </div>
+
+        <div id="res-container" style="display: none;">
+            <span class="label">Mensaje Decodificado:</span>
+            <div class="result-box"><span class="value" id="final"></span></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "js-arrays-master-14-projects",
+  "version": "1.0.0",
+  "description": "15 Proyectos independientes para cada método de array + Decoder",
+  "type": "module",
+  "scripts": {
+    "start:push": "node Projects/push/server.js",
+    "start:pop": "node Projects/pop/server.js",
+    "start:unshift": "node Projects/unshift/server.js",
+    "start:shift": "node Projects/shift/server.js",
+    "start:splice": "node Projects/splice/server.js",
+    "start:slice": "node Projects/slice/server.js",
+    "start:indexof": "node Projects/indexOf/server.js",
+    "start:includes": "node Projects/includes/server.js",
+    "start:foreach": "node Projects/forEach/server.js",
+    "start:map": "node Projects/map/server.js",
+    "start:filter": "node Projects/filter/server.js",
+    "start:reduce": "node Projects/reduce/server.js",
+    "start:sort": "node Projects/sort/server.js",
+    "start:reverse": "node Projects/reverse/server.js",
+    "start:decoder": "node Projects/decoder/server.js",
+    "start:all": "concurrently \"npm run start:push\" \"npm run start:pop\" \"npm run start:unshift\" \"npm run start:shift\" \"npm run start:splice\" \"npm run start:slice\" \"npm run start:indexof\" \"npm run start:includes\" \"npm run start:foreach\" \"npm run start:map\" \"npm run start:filter\" \"npm run start:reduce\" \"npm run start:sort\" \"npm run start:reverse\" \"npm run start:decoder\""
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "concurrently": "^8.2.1"
+  }
+}
