@@ -2,44 +2,74 @@ const ejecutar = (caseId) => {
     const btn = document.getElementById('btn-' + caseId);
     const resContainer = document.getElementById('res-container-' + caseId);
     const finalSpan = document.getElementById('final-' + caseId);
+    const errorDiv = document.getElementById('error-' + caseId);
 
-    let final;
-    switch(caseId) {
-        
-        case 1:
-            {
-                const initial = ["Perro", "Gato", "Loro"];
-                final = (() => {
-                    const copy = [...initial]; copy.pop(); return copy;
-                })();
+    // Obtener inputs
+    const inputs = [];
+    let i = 0;
+    while(document.getElementById('input-' + caseId + '-' + i)) {
+        const val = document.getElementById('input-' + caseId + '-' + i).value;
+        if(!val) {
+            if(errorDiv) {
+                errorDiv.innerText = "Completa todos los campos.";
+                errorDiv.style.display = 'block';
             }
-            break;
-        case 2:
-            {
-                const initial = ["Pan", "Leche", "Agua"];
-                final = (() => {
-                    const copy = [...initial]; const eliminado = copy.pop(); return { resultado: copy, eliminado };
-                })();
-            }
-            break;
-        case 3:
-            {
-                const initial = [1, 2, 3, 4, 5];
-                final = (() => {
-                    const copy = [...initial]; while(copy.length > 0) { copy.pop(); } return copy;
-                })();
-            }
-            break;
+            return;
+        }
+        inputs.push(val);
+        i++;
     }
 
-    finalSpan.innerText = JSON.stringify(final, null, 2);
-    resContainer.style.display = 'block';
-    
-    // Desactivar botón tras un solo uso
-    btn.disabled = true;
-    btn.innerText = "Ejecutado";
-    btn.classList.add('btn-secondary');
-    btn.classList.remove('btn-success');
+    let final;
+    try {
+        switch(caseId) {
+            
+            case 1:
+                {
+                    const initial = ["Perro", "Gato", "Loro"];
+                    final = (() => {
+                        const copy = [...initial]; const el = copy.pop(); return { resultado: copy, eliminado: el };
+                    })();
+                }
+                break;
+            case 2:
+                {
+                    const initial = ["Pan", "Leche", "Agua"];
+                    final = (() => {
+                        const copy = [...initial]; const el = copy.pop(); return { resultado: copy, eliminado: el };
+                    })();
+                }
+                break;
+            case 3:
+                {
+                    const initial = [1, 2, 3];
+                    final = (() => {
+                        const copy = [...initial]; while(copy.length > 0) copy.pop(); return copy;
+                    })();
+                }
+                break;
+        }
 
-    console.log("Caso " + caseId + " ejecutado:", final);
+        if(errorDiv) errorDiv.style.display = 'none';
+        finalSpan.innerText = JSON.stringify(final, null, 2);
+        resContainer.style.display = 'block';
+        
+        // Desactivar
+        btn.disabled = true;
+        btn.innerText = "Ejecutado";
+        btn.classList.add('btn-secondary');
+        btn.classList.remove('btn-success');
+        
+        let j = 0;
+        while(document.getElementById('input-' + caseId + '-' + j)) {
+            document.getElementById('input-' + caseId + '-' + j).disabled = true;
+            j++;
+        }
+
+    } catch (e) {
+        if(errorDiv) {
+            errorDiv.innerText = e;
+            errorDiv.style.display = 'block';
+        }
+    }
 };

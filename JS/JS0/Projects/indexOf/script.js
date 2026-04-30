@@ -2,44 +2,74 @@ const ejecutar = (caseId) => {
     const btn = document.getElementById('btn-' + caseId);
     const resContainer = document.getElementById('res-container-' + caseId);
     const finalSpan = document.getElementById('final-' + caseId);
+    const errorDiv = document.getElementById('error-' + caseId);
 
-    let final;
-    switch(caseId) {
-        
-        case 1:
-            {
-                const initial = ["gato", "perro", "pájaro"];
-                final = (() => {
-                    return initial.indexOf("perro");
-                })();
+    // Obtener inputs
+    const inputs = [];
+    let i = 0;
+    while(document.getElementById('input-' + caseId + '-' + i)) {
+        const val = document.getElementById('input-' + caseId + '-' + i).value;
+        if(!val) {
+            if(errorDiv) {
+                errorDiv.innerText = "Completa todos los campos.";
+                errorDiv.style.display = 'block';
             }
-            break;
-        case 2:
-            {
-                const initial = [10, 20, 50, 100];
-                final = (() => {
-                    return initial.indexOf(50);
-                })();
-            }
-            break;
-        case 3:
-            {
-                const initial = ["Paris", "Londres", "Madrid"];
-                final = (() => {
-                    const idx = initial.indexOf("Madrid"); return idx !== -1 ? idx : "No está";
-                })();
-            }
-            break;
+            return;
+        }
+        inputs.push(val);
+        i++;
     }
 
-    finalSpan.innerText = JSON.stringify(final, null, 2);
-    resContainer.style.display = 'block';
-    
-    // Desactivar botón tras un solo uso
-    btn.disabled = true;
-    btn.innerText = "Ejecutado";
-    btn.classList.add('btn-secondary');
-    btn.classList.remove('btn-primary');
+    let final;
+    try {
+        switch(caseId) {
+            
+            case 1:
+                {
+                    const initial = ["gato", "perro", "pájaro"];
+                    final = (() => {
+                        return initial.indexOf("perro");
+                    })();
+                }
+                break;
+            case 2:
+                {
+                    const initial = [10, 20, 50, 100];
+                    final = (() => {
+                        return initial.indexOf(50);
+                    })();
+                }
+                break;
+            case 3:
+                {
+                    const initial = ["Paris", "Londres", "Madrid", "Barcelona"];
+                    final = (() => {
+                        const idx = initial.indexOf("Madrid"); return idx !== -1 ? idx : "No está";
+                    })();
+                }
+                break;
+        }
 
-    console.log("Caso " + caseId + " ejecutado:", final);
+        if(errorDiv) errorDiv.style.display = 'none';
+        finalSpan.innerText = JSON.stringify(final, null, 2);
+        resContainer.style.display = 'block';
+        
+        // Desactivar
+        btn.disabled = true;
+        btn.innerText = "Ejecutado";
+        btn.classList.add('btn-secondary');
+        btn.classList.remove('btn-primary');
+        
+        let j = 0;
+        while(document.getElementById('input-' + caseId + '-' + j)) {
+            document.getElementById('input-' + caseId + '-' + j).disabled = true;
+            j++;
+        }
+
+    } catch (e) {
+        if(errorDiv) {
+            errorDiv.innerText = e;
+            errorDiv.style.display = 'block';
+        }
+    }
 };

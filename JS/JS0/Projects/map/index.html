@@ -13,6 +13,7 @@
         .value { color: #00cec9; }
         .case-container { border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
         .case-container:last-child { border-bottom: none; }
+        .error-msg { color: #ff7675; font-size: 0.85rem; margin-top: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -20,16 +21,19 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card p-4">
-                    <h2 class="text-center text-primary mb-4">.map() - 3 Casos</h2>
+                    <h2 class="text-center text-primary mb-4">.map() - Refinado</h2>
                     
                     
                     <div class="case-container">
                         <h5 class="mb-3">1. Multiplicar x3</h5>
                         <div class="row">
+                            
                             <div class="col-md-12">
                                 <span class="label">Array Inicial:</span>
                                 <div class="result-box mb-3"><span class="value">[1, 2, 3]</span></div>
                             </div>
+                            
+                            
                             <div class="col-md-12">
                                 <button id="btn-1" class="btn btn-sm btn-primary mb-3" onclick="ejecutar(1)">Ejecutar Caso 1</button>
                             </div>
@@ -43,10 +47,13 @@
                     <div class="case-container">
                         <h5 class="mb-3">2. Mayúsculas</h5>
                         <div class="row">
+                            
                             <div class="col-md-12">
                                 <span class="label">Array Inicial:</span>
                                 <div class="result-box mb-3"><span class="value">["fede", "gaston"]</span></div>
                             </div>
+                            
+                            
                             <div class="col-md-12">
                                 <button id="btn-2" class="btn btn-sm btn-primary mb-3" onclick="ejecutar(2)">Ejecutar Caso 2</button>
                             </div>
@@ -60,10 +67,13 @@
                     <div class="case-container">
                         <h5 class="mb-3">3. Precios + IVA</h5>
                         <div class="row">
+                            
                             <div class="col-md-12">
                                 <span class="label">Array Inicial:</span>
                                 <div class="result-box mb-3"><span class="value">[100, 200, 300]</span></div>
                             </div>
+                            
+                            
                             <div class="col-md-12">
                                 <button id="btn-3" class="btn btn-sm btn-primary mb-3" onclick="ejecutar(3)">Ejecutar Caso 3</button>
                             </div>
