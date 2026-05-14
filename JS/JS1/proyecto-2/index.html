@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto 2 - Análisis de Números</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="light-mode">
+    <header>
+        <h1>Análisis de Números</h1>
+        <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <main class="container">
+        <!-- Sección de subida -->
+        <section class="card upload-section">
+            <h2>Subir Archivo</h2>
+            <form id="upload-form">
+                <div class="form-group">
+                    <label for="file-input">Seleccione un archivo .txt:</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file-input" accept=".txt">
+                    </div>
+                    <span id="file-info" class="text-muted">No se ha seleccionado archivo</span>
+                    <span id="file-error" class="error-msg"></span>
+                </div>
+                <button type="submit" id="process-btn" class="btn-primary" disabled>Procesar Archivo</button>
+            </form>
+        </section>
+
+        <!-- Sección de resultados (inicialmente oculta) -->
+        <section id="results-section" class="results-container hidden">
+            <div class="card stats-card">
+                <h3>Estadísticas</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Total:</span>
+                        <span id="stat-total" class="stat-value">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Útiles:</span>
+                        <span id="stat-useful" class="stat-value success">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Descartados:</span>
+                        <span id="stat-discarded" class="stat-value danger">-</span>
+                    </div>
+                </div>
+                <div class="progress-section">
+                    <span class="stat-label">Porcentaje útil: <span id="stat-percent">-</span>%</span>
+                    <div class="progress-bar">
+                        <div id="stat-progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="download-action">
+                    <a id="download-link" href="#" class="btn-success hidden" download>Descargar Resultado TXT</a>
+                </div>
+            </div>
+
+            <div class="card filtered-card">
+                <h3>Inician y Terminan Igual</h3>
+                <div id="filtered-list" class="numbers-grid">
+                    <!-- Chips de números filtrados -->
+                </div>
+            </div>
+
+            <div class="card factorial-card">
+                <h3>Factoriales Detectados</h3>
+                <ul id="factorial-list" class="factorial-list">
+                    <!-- Lista de factoriales -->
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script type="module" src="scripts/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto 1 - Ingreso de Números</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="light-mode">
+    <header>
+        <h1>Ingreso de Números</h1>
+        <button id="theme-toggle" class="btn-icon" aria-label="Cambiar tema">
+            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+    </header>
+
+    <main class="container">
+        <section class="card input-section">
+            <form id="number-form">
+                <div class="form-group">
+                    <label for="number-input">Ingrese un número entero:</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="number-input" placeholder="Ej: 42" step="1">
+                        <button type="submit" id="add-btn" class="btn-primary">Agregar</button>
+                    </div>
+                    <span id="input-error" class="error-msg"></span>
+                </div>
+            </form>
+            
+            <div class="stats">
+                <p id="counter">0 / 20 números ingresados</p>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="clear-btn" class="btn-secondary">Limpiar Todo</button>
+                <button id="save-btn" class="btn-success" disabled title="Se requieren al menos 10 números">Guardar TXT</button>
+            </div>
+        </section>
+
+        <section class="card list-section">
+            <h2>Números Ingresados</h2>
+            <div id="numbers-list" class="numbers-grid">
+                <!-- Los números aparecerán aquí como chips -->
+                <p class="empty-msg">No hay números ingresados aún.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <!-- Modals Personalizados -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h3 id="modal-title">Confirmación</h3>
+            <p id="modal-message">¿Estás seguro?</p>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn-secondary">Cancelar</button>
+                <button id="modal-confirm" class="btn-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/app.js"></script>
+</body>
+</html>
