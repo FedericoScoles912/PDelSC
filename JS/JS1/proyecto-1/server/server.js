@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 // Configuración de rutas para ES Modules
@@ -38,6 +39,7 @@ app.post('/guardar', async (req, res) => {
         const timestamp = getTimestamp();
         const fileName = `numeros_${timestamp}.txt`;
         const filePath = path.join(rootDir, 'output', fileName);
+        const downloadsPath = path.join(os.homedir(), 'Downloads', fileName);
 
         // Contenido: un número por línea
         const content = numeros.join('\n');
@@ -45,7 +47,16 @@ app.post('/guardar', async (req, res) => {
         // Asegurar que la carpeta output existe
         await fs.mkdir(path.join(rootDir, 'output'), { recursive: true });
         
+        // Guardar en el directorio del proyecto
         await fs.writeFile(filePath, content, 'utf8');
+
+        // Guardar también en la carpeta de Descargas del sistema
+        try {
+            await fs.writeFile(downloadsPath, content, 'utf8');
+        } catch (downloadErr) {
+            console.error('No se pudo guardar en Descargas:', downloadErr);
+            // No bloqueamos la respuesta si falla el guardado en Descargas
+        }
 
         res.json({ ok: true, archivo: fileName });
     } catch (error) {

@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -75,6 +76,7 @@ app.post('/procesar', upload.single('archivo'), async (req, res) => {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
         const nombreResultado = `resultado_${timestamp}.txt`;
         const pathResultado = path.join(rootDir, 'output', nombreResultado);
+        const downloadsPath = path.join(os.homedir(), 'Downloads', nombreResultado);
 
         const txtContent = `=== RESULTADO DEL FILTRADO ===
 Fecha: ${new Date().toLocaleString()}
@@ -89,12 +91,23 @@ Porcentaje útil: ${porcentaje}%
 --- NÚMEROS FILTRADOS (ascendente) ---
 ${filtradosOrdenados.join('\n')}
 
+--- NÚMEROS DESCARTADOS (ascendente) ---
+${descartadosOrdenados.join('\n')}
 
 --- NÚMEROS FACTORIALES ---
 ${factoriales.map(f => `${f.num} = ${f.n}!`).join('\n')}`;
 
         await fs.mkdir(path.join(rootDir, 'output'), { recursive: true });
+        
+        // Guardar en el directorio del proyecto
         await fs.writeFile(pathResultado, txtContent, 'utf8');
+
+        // Guardar también en la carpeta de Descargas del sistema
+        try {
+            await fs.writeFile(downloadsPath, txtContent, 'utf8');
+        } catch (downloadErr) {
+            console.error('No se pudo guardar en Descargas:', downloadErr);
+        }
 
         // Limpiar archivo temporal
         await fs.unlink(req.file.path);
