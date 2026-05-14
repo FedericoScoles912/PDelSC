@@ -154,7 +154,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     display: grid;
     grid-template-columns: 350px 1fr;
     gap: 3rem;
-    max-width: 1600px;
+    max-width: 95%; /* Usar casi todo el ancho de la pantalla */
+    margin: 0 auto;
 }
 
 .container:has(.results-container:not(.hidden)) .upload-section {
@@ -166,28 +167,34 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     grid-column: 2 / 3;
     grid-row: 1 / 2;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Mitad y mitad exactas */
     grid-template-rows: auto auto auto;
+    gap: 2rem;
+    width: 100%;
 }
 
 .container:has(.results-container:not(.hidden)) .stats-card {
     grid-column: 1 / 3;
     grid-row: 1 / 2;
+    width: 100%;
 }
 
 .container:has(.results-container:not(.hidden)) .filtered-card {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
+    width: 100%;
 }
 
 .container:has(.results-container:not(.hidden)) .factorial-card {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
+    width: 100%;
 }
 
 .container:has(.results-container:not(.hidden)) .discarded-card {
     grid-column: 1 / 3;
     grid-row: 3 / 4;
+    width: 100%;
 }
 
 .stats-grid {

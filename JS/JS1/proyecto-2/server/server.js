@@ -66,11 +66,17 @@ app.post('/procesar', upload.single('archivo'), async (req, res) => {
 
         // Ordenar ascendente
         const filtradosOrdenados = [...utiles].sort((a, b) => a - b);
+        const descartadosOrdenados = [...descartadosList].sort((a, b) => a - b);
 
-        // Detectar factoriales
-        const factoriales = filtradosOrdenados
+        // Detectar factoriales en TODOS los números (válidos y descartados)
+        const factoriales = todosLosNumeros
             .map(num => ({ num, n: getFactorialN(num) }))
-            .filter(f => f.n !== null);
+            .filter(f => f.n !== null)
+            .sort((a, b) => a.num - b.num); // Ordenar por el número factorial
+
+        // Eliminar duplicados si los hay en la lista de factoriales
+        const factorialesUnicos = Array.from(new Set(factoriales.map(f => f.num)))
+            .map(num => factoriales.find(f => f.num === num));
 
         // Guardar resultado en TXT
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
@@ -94,8 +100,8 @@ ${filtradosOrdenados.join('\n')}
 --- NÚMEROS DESCARTADOS (ascendente) ---
 ${descartadosOrdenados.join('\n')}
 
---- NÚMEROS FACTORIALES ---
-${factoriales.map(f => `${f.num} = ${f.n}!`).join('\n')}`;
+--- NÚMEROS FACTORIALES (Detectados en todo el archivo) ---
+${factorialesUnicos.map(f => `${f.num} = ${f.n}!`).join('\n')}`;
 
         await fs.mkdir(path.join(rootDir, 'output'), { recursive: true });
         
@@ -116,9 +122,10 @@ ${factoriales.map(f => `${f.num} = ${f.n}!`).join('\n')}`;
             total: todosLosNumeros.length,
             utiles: utiles.length,
             descartados: descartadosList.length,
+            numerosDescartados: descartadosOrdenados,
             porcentaje,
             numerosFiltrados: filtradosOrdenados,
-            factoriales,
+            factoriales: factorialesUnicos,
             archivoResultado: nombreResultado
         });
 
