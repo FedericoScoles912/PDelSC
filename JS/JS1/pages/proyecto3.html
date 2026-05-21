@@ -1,0 +1,140 @@
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="mb-2"><i class="bi bi-person-vcard me-2 text-info"></i> Proyecto 3 - Personas</h1>
+        <p class="lead text-muted">Sistema completo de personas con localStorage y validaciones avanzadas</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-5 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>Datos de la Persona</h5>
+            </div>
+            <div class="card-body">
+                <div id="alerts-proyecto3"></div>
+                <form id="personForm">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" placeholder="Nombre">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="apellido" placeholder="Apellido">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Edad</label>
+                            <input type="number" class="form-control" name="edad" placeholder="Edad">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" name="fechaNacimiento">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Sexo</label>
+                            <select class="form-select" name="sexo">
+                                <option value="">Seleccione...</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Documento</label>
+                            <input type="text" class="form-control" name="documento" placeholder="DNI">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Estado Civil</label>
+                            <select class="form-select" name="estadoCivil">
+                                <option value="">Seleccione...</option>
+                                <option value="Soltero">Soltero</option>
+                                <option value="Casado">Casado</option>
+                                <option value="Divorciado">Divorciado</option>
+                                <option value="Viudo">Viudo</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nacionalidad</label>
+                            <input type="text" class="form-control" name="nacionalidad" placeholder="Nacionalidad">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" placeholder="Teléfono">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="mail" placeholder="email@ejemplo.com">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">¿Tiene Hijos?</label>
+                            <select class="form-select" name="hijos" id="hijos">
+                                <option value="">Seleccione...</option>
+                                <option value="si">Sí</option>
+                                <option value="no">No</option>
+                            </select>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="col-md-6" id="cantidadHijosDiv" style="display: none;">
+                            <label class="form-label">Cantidad de Hijos</label>
+                            <input type="number" class="form-control" name="cantidadHijos" id="cantidadHijos" placeholder="0">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" class="form-control" name="direccion" placeholder="Dirección">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" name="ciudad" placeholder="Ciudad">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-info text-white" id="personFormSubmit">
+                            <i class="bi bi-save me-2"></i>Guardar Persona
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-search me-2"></i>Buscador</h5>
+            </div>
+            <div class="card-body">
+                <input type="text" class="form-control" id="searchPerson" placeholder="Buscar por nombre, documento o email...">
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Listado de Personas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="peopleList"></div>
+            </div>
+        </div>
+    </div>
+</div>

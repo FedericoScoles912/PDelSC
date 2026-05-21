@@ -1,0 +1,156 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --card-bg: #ffffff;
+    --navbar-bg: #ffffff;
+    --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+[data-theme="dark"] {
+    --bg-primary: #0f0f23;
+    --bg-secondary: #1a1a3e;
+    --text-primary: #ffffff;
+    --text-secondary: #d0d0d0;
+    --border-color: #2d2d5a;
+    --card-bg: #1a1a3e;
+    --navbar-bg: #1a1a3e;
+    --shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.5);
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] * {
+    color: var(--text-primary);
+}
+
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s ease;
+}
+
+.navbar-brand,
+.nav-link {
+    color: var(--text-primary) !important;
+}
+
+.nav-link:hover {
+    color: var(--text-secondary) !important;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-subtitle,
+[data-theme="dark"] .card-text,
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .card-footer {
+    color: var(--text-primary) !important;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-primary);
+    border-color: #86b7fe;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .form-label {
+    color: var(--text-primary) !important;
+}
+
+.table {
+    color: var(--text-primary);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table {
+    --bs-table-color: var(--text-primary);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--border-color);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-striped-color: var(--text-primary);
+    --bs-table-active-bg: rgba(255, 255, 255, 0.1);
+    --bs-table-active-color: var(--text-primary);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+    --bs-table-hover-color: var(--text-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table th,
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table thead th {
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.075);
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-title,
+[data-theme="dark"] .modal-body,
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    color: var(--text-primary) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] div,
+[data-theme="dark"] small,
+[data-theme="dark"] .text-muted {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .lead {
+    color: var(--text-secondary) !important;
+}

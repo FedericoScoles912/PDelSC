@@ -1,0 +1,14 @@
+{
+    "ejemplos": [
+        {
+            "id": 1,
+            "nombre": "Ejemplo 1",
+            "descripcion": "Este es un ejemplo de dato en JSON"
+        },
+        {
+            "id": 2,
+            "nombre": "Ejemplo 2",
+            "descripcion": "Otro ejemplo de dato en JSON"
+        }
+    ]
+}
