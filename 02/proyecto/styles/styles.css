@@ -2,6 +2,12 @@ body {
     background: #f4f6fb;
     color: #18202a;
     font-family: Arial, Helvetica, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] body {
+    background: #0f172a;
+    color: #e2e8f0;
 }
 
 a {
@@ -12,6 +18,27 @@ a {
     background: rgba(255, 255, 255, 0.96);
     border-bottom: 1px solid rgba(24, 32, 42, 0.08);
     backdrop-filter: blur(12px);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] .newspaper-navbar {
+    background: rgba(15, 23, 42, 0.96);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+}
+
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .nav-link {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28226, 232, 240, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+[data-theme="dark"] #theme-toggle {
+    background-color: #334155;
+    border-color: #475569;
+    color: #e2e8f0;
 }
 
 .navbar-brand {
@@ -30,6 +57,10 @@ a {
     background: linear-gradient(135deg, #0d6efd 0%, #5ea6ff 100%);
 }
 
+[data-theme="dark"] .hero-panel {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
 .hero-panel .badge {
     width: fit-content;
 }
@@ -43,7 +74,21 @@ a {
 }
 
 .featured-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+}
+
+[data-theme="dark"] .featured-card {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .featured-card h3,
+[data-theme="dark"] .featured-card p {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .featured-card .text-secondary {
+    color: #94a3b8 !important;
 }
 
 .featured-card:hover {
@@ -54,6 +99,11 @@ a {
 .article-shell {
     background: #ffffff;
     box-shadow: 0 1rem 2rem rgba(24, 32, 42, 0.06);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] .article-shell {
+    background: #1e293b;
 }
 
 .article-shell h2,
@@ -61,10 +111,19 @@ a {
     color: #0f172a;
 }
 
+[data-theme="dark"] .article-shell h2,
+[data-theme="dark"] .article-shell h3 {
+    color: #f8fafc;
+}
+
 .article-body p {
     color: #475569;
     font-size: 1.03rem;
     line-height: 1.8;
+}
+
+[data-theme="dark"] .article-body p {
+    color: #cbd5e1;
 }
 
 .article-body blockquote {
@@ -74,6 +133,11 @@ a {
     color: #334155;
     background: #f8fbff;
     border-radius: 0 1rem 1rem 0;
+}
+
+[data-theme="dark"] .article-body blockquote {
+    background: #334155;
+    color: #e2e8f0;
 }
 
 .weather-icon {
@@ -87,19 +151,67 @@ a {
     border: 1px solid rgba(24, 32, 42, 0.06);
 }
 
+[data-theme="dark"] .weather-metric,
+[data-theme="dark"] .metric-chip {
+    background: #334155;
+    border-color: #475569;
+    color: #e2e8f0;
+}
+
+.article-list-card {
+    background: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+[data-theme="dark"] .article-list-card {
+    background: #1e293b;
+}
+
 .article-list-card a {
     color: inherit;
 }
 
 .article-list-card .list-group-item {
     border-color: rgba(24, 32, 42, 0.06);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] .article-list-card .list-group-item {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .article-list-card .list-group-item .text-secondary {
+    color: #94a3b8 !important;
 }
 
 .article-list-card .list-group-item:hover {
     background: #f8fbff;
 }
 
+[data-theme="dark"] .article-list-card .list-group-item:hover {
+    background: #334155;
+}
+
 .footer-note {
     color: #64748b;
     font-size: 0.95rem;
+}
+
+[data-theme="dark"] footer {
+    background-color: #0f172a !important;
+    border-color: #1e293b !important;
+}
+
+[data-theme="dark"] .footer-note {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .calculator-widget {
+    background-color: #1e293b;
+}
+
+[data-theme="dark"] .calculator-display {
+    background-color: #334155;
+    color: #e2e8f0;
 }

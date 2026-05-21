@@ -34,6 +34,9 @@ export const buildMenu = (currentPath = '/') => {
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         ${items}
                     </ul>
+                    <button id="theme-toggle" class="btn btn-outline-secondary ms-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i data-lucide="sun" id="theme-icon"></i>
+                    </button>
                 </div>
             </div>
         </nav>
