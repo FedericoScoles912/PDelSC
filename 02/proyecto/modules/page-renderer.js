@@ -4,7 +4,7 @@ import { buildMenu } from './menu.js';
 import { getWeatherData, renderWeatherWidget } from './modules-weather.js';
 import { renderCalculator } from './modules-maths.js';
 import { ROUTES, getRoute } from './routes.js';
-import { readFileUtf8 } from './file-service.js';
+import { readFileUtf8, getRandomFileFromDir } from './file-service.js';
 
 export const estimateReadingTime = (text) => {
     const wordsPerMinute = 200;
@@ -75,6 +75,17 @@ export const createPageRenderer = ({ pagesDir, articlesDir }) => {
             mainContent = renderCalculator();
         } else if (currentRoute.path === '/clima') {
             mainContent = renderWeatherWidget(weather);
+        } else if (currentRoute.path === '/aleatorio') {
+            const randomFileName = await getRandomFileFromDir(articlesDir);
+            const randomFileContent = await readFileUtf8(path.join(articlesDir, randomFileName));
+            const randomRoute = ROUTES.find(r => r.file === randomFileName);
+            mainContent = `
+                <div class="alert alert-info" role="alert">
+                    <i data-lucide="shuffle" class="me-2"></i>
+                    Artículo aleatorio seleccionado: <strong>${randomRoute ? randomRoute.title : randomFileName}</strong>
+                </div>
+                ${randomFileContent}
+            `;
         }
 
         const todayLabel = upperCase(

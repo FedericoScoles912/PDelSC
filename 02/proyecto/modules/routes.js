@@ -62,6 +62,14 @@ export const ROUTES = [
         category: 'Servicios',
         title: 'Pronostico del Tiempo',
         lead: 'Consulta el estado del clima y las previsiones para las proximas horas.'
+    },
+    {
+        path: '/aleatorio',
+        label: 'Aleatorio',
+        file: 'home.html', // We'll handle custom content in renderer
+        category: 'Herramientas',
+        title: 'Archivo Aleatorio',
+        lead: 'Lee un articulo aleatorio de nuestro diario.'
     }
 ];
 

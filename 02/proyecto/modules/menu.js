@@ -6,7 +6,8 @@ export const MENU_ITEMS = [
     { href: '/cultura', label: 'Cultura' },
     { href: '/deportes', label: 'Deportes' },
     { href: '/calculadora', label: 'Calculadora' },
-    { href: '/clima', label: 'Clima' }
+    { href: '/clima', label: 'Clima' },
+    { href: '/aleatorio', label: 'Aleatorio' }
 ];
 
 export const buildMenu = (currentPath = '/') => {
