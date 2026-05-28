@@ -1,14 +1,12 @@
 console.log('🎮 Jugador 1 script loaded');
 
 import { inicializarUI, actualizarInfoJugador, mostrarContador, ocultarContador, mostrarFinPartida } from '../modules/ui/ui-common.js';
-import { inicializarInput, manejarTeclado, manejarTactil } from '../modules/juego/input.js';
+import { inicializarInput, manejarTeclado, manejarTactil, manejarTouchStart, manejarTouchEnd } from '../modules/juego/input.js';
 import { crearJugador, generarComida, actualizarJuego } from '../modules/juego/motor.js';
 import { dibujarEscenario, dibujarComida, dibujarTren, obtenerTamanoCelda, inicializarImagenes } from '../modules/ui/renderizado.js';
 import { guardarPuntuacion } from '../modules/servicios/bd.js';
 
-const ANCHO_CANVAS = 400;
-const ALTO_CANVAS = 400;
-
+let ANCHO_CANVAS, ALTO_CANVAS;
 let canvas, ctx;
 let jugador;
 let comida;
@@ -20,8 +18,28 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializar();
 });
 
+function calcularDimensionesCanvas() {
+    const TAMANO_CELDA = obtenerTamanoCelda();
+    // Calcular espacio disponible teniendo en cuenta la UI (título, botones, etc.)
+    const headerHeight = 120;
+    const controlsHeight = 180;
+    const availableHeight = window.innerHeight - headerHeight - controlsHeight - 20;
+    
+    const maxAncho = Math.min(window.innerWidth - 20, 1200);
+    const maxAlto = Math.min(availableHeight, 800);
+    
+    // Redondear al múltiplo de TAMANO_CELDA más cercano
+    ANCHO_CANVAS = Math.floor(maxAncho / TAMANO_CELDA) * TAMANO_CELDA;
+    ALTO_CANVAS = Math.floor(maxAlto / TAMANO_CELDA) * TAMANO_CELDA;
+    
+    // Asegurar que al menos haya espacio para 10x10 celdas
+    ANCHO_CANVAS = Math.max(ANCHO_CANVAS, TAMANO_CELDA * 10);
+    ALTO_CANVAS = Math.max(ALTO_CANVAS, TAMANO_CELDA * 10);
+}
+
 function inicializar() {
     inicializarUI();
+    calcularDimensionesCanvas();
     inicializarCanvas();
     inicializarEventos();
     inicializarImagenes();
@@ -30,6 +48,14 @@ function inicializar() {
     jugador = crearJugador(1, 3, 3);
     jugador.nombre = nombre1;
     iniciarPartida();
+    
+    // Actualizar canvas al cambiar tamaño de ventana
+    window.addEventListener('resize', () => {
+        calcularDimensionesCanvas();
+        canvas.width = ANCHO_CANVAS;
+        canvas.height = ALTO_CANVAS;
+        dibujarTodo();
+    });
 }
 
 function inicializarCanvas() {
@@ -55,6 +81,17 @@ function inicializarEventos() {
     document.getElementById('btn-jugador-2').addEventListener('click', () => {
         window.location.href = 'jugador2.html';
     });
+    
+    // Eventos de deslizamiento (swipe)
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        manejarTouchStart(e);
+    }, { passive: false });
+    
+    canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        manejarTouchEnd(e);
+    }, { passive: false });
 }
 
 function iniciarPartida() {

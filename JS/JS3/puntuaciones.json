@@ -1,0 +1,98 @@
+[
+  {
+    "nombre": "MOM",
+    "puntaje": 30,
+    "tiempo": 71837,
+    "fecha": 1779993500945
+  },
+  {
+    "nombre": "FEF",
+    "puntaje": 17,
+    "tiempo": 36042,
+    "fecha": 1779993578667
+  },
+  {
+    "nombre": "ABA",
+    "puntaje": 6,
+    "tiempo": 9815,
+    "fecha": 1779992431810
+  },
+  {
+    "nombre": "MOM",
+    "puntaje": 6,
+    "tiempo": 11472,
+    "fecha": 1780008733094
+  },
+  {
+    "nombre": "NOM",
+    "puntaje": 4,
+    "tiempo": 17406,
+    "fecha": 1780009402802
+  },
+  {
+    "nombre": "PMP",
+    "puntaje": 2,
+    "tiempo": 5407,
+    "fecha": 1780009353399
+  },
+  {
+    "nombre": "TMT",
+    "puntaje": 1,
+    "tiempo": 1351,
+    "fecha": 1780009170010
+  },
+  {
+    "nombre": "MPM",
+    "puntaje": 1,
+    "tiempo": 1955,
+    "fecha": 1780009148484
+  },
+  {
+    "nombre": "ASA",
+    "puntaje": 1,
+    "tiempo": 2568,
+    "fecha": 1780009604131
+  },
+  {
+    "nombre": "MPM",
+    "puntaje": 0,
+    "tiempo": 452,
+    "fecha": 1780009377259
+  },
+  {
+    "nombre": "NPM",
+    "puntaje": 0,
+    "tiempo": 455,
+    "fecha": 1780008979809
+  },
+  {
+    "nombre": "AAA",
+    "puntaje": 0,
+    "tiempo": 1353,
+    "fecha": 1780009619456
+  },
+  {
+    "nombre": "PMP",
+    "puntaje": 0,
+    "tiempo": 2103,
+    "fecha": 1780008557564
+  },
+  {
+    "nombre": "NPM",
+    "puntaje": 0,
+    "tiempo": 2104,
+    "fecha": 1780008583649
+  },
+  {
+    "nombre": "NPM",
+    "puntaje": 0,
+    "tiempo": 2851,
+    "fecha": 1780009134733
+  },
+  {
+    "nombre": "NM",
+    "puntaje": 0,
+    "tiempo": 9901,
+    "fecha": 1780008996836
+  }
+]

@@ -8,13 +8,33 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3004;
-const ARCHIVO_PUNTUACIONES = path.join(__dirname, 'puntuaciones.txt');
+const ARCHIVO_PUNTUACIONES = path.join(__dirname, 'puntuaciones.json');
 
 app.use(express.json());
-app.use(express.static(__dirname));
+// Disable caching
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Surrogate-Control', 'no-store');
+  next();
+});
+app.use(express.static(__dirname, {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'index.html'));
+});
+
+// Servir páginas HTML desde la carpeta pages
+app.get('/*.html', (req, res) => {
+  const fileName = req.path;
+  res.sendFile(path.join(__dirname, 'pages', fileName));
 });
 
 app.get('/api/puntuaciones', async (req, res) => {
@@ -32,34 +52,35 @@ app.get('/api/puntuaciones', async (req, res) => {
 });
 
 app.post('/api/puntuaciones', async (req, res) => {
-  try {
-    const nuevaPuntuacion = req.body;
-    let puntuaciones = [];
-    
     try {
-      const contenido = await fs.readFile(ARCHIVO_PUNTUACIONES, 'utf-8');
-      puntuaciones = contenido.trim() ? JSON.parse(contenido) : [];
+        const nuevaPuntuacion = req.body;
+        let puntuaciones = [];
+        
+        try {
+            const contenido = await fs.readFile(ARCHIVO_PUNTUACIONES, 'utf-8');
+            puntuaciones = contenido.trim() ? JSON.parse(contenido) : [];
+        } catch (error) {
+            if (error.code !== 'ENOENT') {
+                console.error('Error reading scores file:', error);
+            }
+        }
+        
+        // Add new score and sort all scores (not just top 3 initially)
+        puntuaciones.push(nuevaPuntuacion);
+        puntuaciones.sort((a, b) => {
+            if (b.puntaje !== a.puntaje) {
+                return b.puntaje - a.puntaje;
+            }
+            return a.tiempo - b.tiempo;
+        });
+        
+        // Keep all scores, not just top 3
+        await fs.writeFile(ARCHIVO_PUNTUACIONES, JSON.stringify(puntuaciones, null, 2));
+        res.json(puntuaciones);
     } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
+        console.error('Error al guardar puntuación:', error);
+        res.status(500).json({ error: 'Error al guardar puntuación' });
     }
-    
-    puntuaciones.push(nuevaPuntuacion);
-    puntuaciones.sort((a, b) => {
-      if (b.puntaje !== a.puntaje) {
-        return b.puntaje - a.puntaje;
-      }
-      return a.tiempo - b.tiempo;
-    });
-    
-    const top3 = puntuaciones.slice(0, 3);
-    await fs.writeFile(ARCHIVO_PUNTUACIONES, JSON.stringify(top3, null, 2));
-    res.json(top3);
-  } catch (error) {
-    console.error('Error al guardar puntuación:', error);
-    res.status(500).json({ error: 'Error al guardar puntuación' });
-  }
 });
 
 app.listen(port, () => {

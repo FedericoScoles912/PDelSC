@@ -13,12 +13,13 @@
             <a href="index.html" class="btn btn-outline-secondary">← Volver al Menú</a>
             <div class="text-center">
                 <h3 id="nombre-jugador" class="mb-0"></h3>
-                <p id="puntaje-actual" class="mb-0">Puntaje: 0</p>
+                <p class="mb-0 fs-3">
+                    <span id="puntaje-actual">Puntaje: 0</span>
+                    <span class="mx-3 text-warning">|</span>
+                    <span class="text-warning">🎯 Puntaje a batir: <span id="puntaje-a-batir" class="fw-bold text-success">0</span></span>
+                </p>
             </div>
-            <div id="info-puntaje-a-batir" class="text-end">
-                <h5 class="mb-0">Puntaje a batir:</h5>
-                <p id="puntaje-a-batir" class="mb-0">0</p>
-            </div>
+            <div class="w-25"></div>
         </div>
 
         <canvas id="canvas-juego" class="border border-light"></canvas>

@@ -1,2 +1,5 @@
-console.log("Hola mundo desde Node.js");
-console.log("Fin");
+const ejercicio1Content = [
+  "Hola mundo desde Node.js",
+  "Fin"
+];
+export { ejercicio1Content };

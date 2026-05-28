@@ -1,4 +1,10 @@
-const TAMANO_CELDA = 20;
+// Tamaño de celda responsive: más pequeño en móviles, más grande en escritorio
+export function getTamanoCelda() {
+    if (window.innerWidth <= 768) {
+        return 25; // Móviles
+    }
+    return 40; // Escritorio y tablets grandes
+}
 
 const imagenes = {};
 
@@ -20,10 +26,11 @@ export function inicializarImagenes() {
 }
 
 export function obtenerTamanoCelda() {
-  return TAMANO_CELDA;
+  return getTamanoCelda();
 }
 
 export function dibujarEscenario(ctx, anchoCanvas, altoCanvas) {
+  const TAMANO_CELDA = getTamanoCelda();
   ctx.fillStyle = '#0a0a0a';
   ctx.fillRect(0, 0, anchoCanvas, altoCanvas);
   
@@ -50,6 +57,7 @@ export function dibujarEscenario(ctx, anchoCanvas, altoCanvas) {
 }
 
 export function dibujarComida(ctx, comida) {
+  const TAMANO_CELDA = getTamanoCelda();
   if (imagenes.botella.complete) {
     ctx.drawImage(imagenes.botella, comida.x * TAMANO_CELDA, comida.y * TAMANO_CELDA, TAMANO_CELDA, TAMANO_CELDA);
   } else {
@@ -59,6 +67,7 @@ export function dibujarComida(ctx, comida) {
 }
 
 export function dibujarTren(ctx, jugador) {
+  const TAMANO_CELDA = getTamanoCelda();
   jugador.tren.forEach((segmento, index) => {
     let imagen;
     if (jugador.equipo === 1) {

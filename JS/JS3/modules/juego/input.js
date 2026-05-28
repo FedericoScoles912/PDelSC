@@ -1,5 +1,7 @@
 let direccion = { x: 0, y: 0 };
 let ultimaDireccion = { x: 0, y: 0 };
+let touchStartX = 0;
+let touchStartY = 0;
 
 export function inicializarInput() {
   direccion = { x: 1, y: 0 };
@@ -37,6 +39,34 @@ export function manejarTactil(direccionTactil) {
     case 'derecha':
       if (ultimaDireccion.x !== -1) direccion = { x: 1, y: 0 };
       break;
+  }
+}
+
+export function manejarTouchStart(evento) {
+  touchStartX = evento.touches[0].clientX;
+  touchStartY = evento.touches[0].clientY;
+}
+
+export function manejarTouchEnd(evento) {
+  const touchEndX = evento.changedTouches[0].clientX;
+  const touchEndY = evento.changedTouches[0].clientY;
+  const diffX = touchEndX - touchStartX;
+  const diffY = touchEndY - touchStartY;
+
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    // Deslizamiento horizontal
+    if (diffX > 0) {
+      manejarTactil('derecha');
+    } else {
+      manejarTactil('izquierda');
+    }
+  } else {
+    // Deslizamiento vertical
+    if (diffY > 0) {
+      manejarTactil('abajo');
+    } else {
+      manejarTactil('arriba');
+    }
   }
 }
 

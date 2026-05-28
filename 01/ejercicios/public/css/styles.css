@@ -6,6 +6,8 @@
   --accent: #6c757d;
   --card-bg: #ffffff;
   --border-color: #dee2e6;
+  --dropdown-bg: #ffffff;
+  --table-stripe-bg: #f2f2f2;
 }
 
 [data-theme="dark"] {
@@ -16,6 +18,8 @@
   --accent: #adb5bd;
   --card-bg: #495057;
   --border-color: #6c757d;
+  --dropdown-bg: #343a40;
+  --table-stripe-bg: #3a3f44;
 }
 
 body {
@@ -31,6 +35,20 @@ body {
 
 .navbar-brand, .nav-link {
   color: var(--text-primary) !important;
+}
+
+.dropdown-menu {
+  background-color: var(--dropdown-bg);
+  border-color: var(--border-color);
+}
+
+.dropdown-item {
+  color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .card {
@@ -64,4 +82,9 @@ th {
 
 td {
   border-color: var(--border-color);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: var(--table-stripe-bg);
+  color: var(--text-primary);
 }
