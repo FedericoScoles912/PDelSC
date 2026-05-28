@@ -1,0 +1,10 @@
+.pixel-font {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+}
+
+#canvas-juego {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background-color: #0a0a0a;
+}

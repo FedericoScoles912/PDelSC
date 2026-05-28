@@ -1,0 +1,20 @@
+[
+  {
+    "nombre": "MOM",
+    "puntaje": 30,
+    "tiempo": 71837,
+    "fecha": 1779993500945
+  },
+  {
+    "nombre": "FEF",
+    "puntaje": 17,
+    "tiempo": 36042,
+    "fecha": 1779993578667
+  },
+  {
+    "nombre": "ABA",
+    "puntaje": 6,
+    "tiempo": 9815,
+    "fecha": 1779992431810
+  }
+]

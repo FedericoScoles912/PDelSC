@@ -1,0 +1,17 @@
+{
+  "name": "trensnake",
+  "version": "1.0.0",
+  "description": "Variante de Snake para 2 Jugadores",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["snake", "game", "2-player"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
