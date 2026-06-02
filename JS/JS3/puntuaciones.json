@@ -6,10 +6,46 @@
     "fecha": 1779993500945
   },
   {
+    "nombre": "JUJ",
+    "puntaje": 28,
+    "tiempo": 77037,
+    "fecha": 1780441592738
+  },
+  {
+    "nombre": "EEE",
+    "puntaje": 18,
+    "tiempo": 44542,
+    "fecha": 1780444245622
+  },
+  {
     "nombre": "FEF",
     "puntaje": 17,
     "tiempo": 36042,
     "fecha": 1779993578667
+  },
+  {
+    "nombre": "PAP",
+    "puntaje": 14,
+    "tiempo": 33993,
+    "fecha": 1780444136976
+  },
+  {
+    "nombre": "PAA",
+    "puntaje": 12,
+    "tiempo": 22272,
+    "fecha": 1780443138083
+  },
+  {
+    "nombre": "PAA",
+    "puntaje": 12,
+    "tiempo": 26492,
+    "fecha": 1780442536564
+  },
+  {
+    "nombre": "DAL",
+    "puntaje": 12,
+    "tiempo": 35902,
+    "fecha": 1780444195384
   },
   {
     "nombre": "ABA",
@@ -24,16 +60,52 @@
     "fecha": 1780008733094
   },
   {
+    "nombre": "FEF",
+    "puntaje": 6,
+    "tiempo": 11748,
+    "fecha": 1780442563874
+  },
+  {
+    "nombre": "PAA",
+    "puntaje": 4,
+    "tiempo": 13964,
+    "fecha": 1780443266217
+  },
+  {
+    "nombre": "DSA",
+    "puntaje": 4,
+    "tiempo": 14435,
+    "fecha": 1780441495125
+  },
+  {
     "nombre": "NOM",
     "puntaje": 4,
     "tiempo": 17406,
     "fecha": 1780009402802
   },
   {
+    "nombre": "JDD",
+    "puntaje": 2,
+    "tiempo": 4958,
+    "fecha": 1780443319843
+  },
+  {
     "nombre": "PMP",
     "puntaje": 2,
     "tiempo": 5407,
     "fecha": 1780009353399
+  },
+  {
+    "nombre": "ASP",
+    "puntaje": 2,
+    "tiempo": 7364,
+    "fecha": 1780442575072
+  },
+  {
+    "nombre": "NPM",
+    "puntaje": 2,
+    "tiempo": 10208,
+    "fecha": 1780444352471
   },
   {
     "nombre": "TMT",
@@ -68,6 +140,12 @@
   {
     "nombre": "AAA",
     "puntaje": 0,
+    "tiempo": 1204,
+    "fecha": 1780441465857
+  },
+  {
+    "nombre": "AAA",
+    "puntaje": 0,
     "tiempo": 1353,
     "fecha": 1780009619456
   },
@@ -88,6 +166,12 @@
     "puntaje": 0,
     "tiempo": 2851,
     "fecha": 1780009134733
+  },
+  {
+    "nombre": "PNN",
+    "puntaje": 0,
+    "tiempo": 3305,
+    "fecha": 1780443305458
   },
   {
     "nombre": "NM",

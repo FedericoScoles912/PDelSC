@@ -9,6 +9,28 @@ export function inicializarUI() {
     if (modalElement) {
         modal = new bootstrap.Modal(modalElement);
     }
+    
+    // Try to enter fullscreen on mobile automatically
+    if (window.innerWidth <= 768) {
+        solicitarPantallaCompleta();
+    }
+}
+
+export function solicitarPantallaCompleta() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => {
+            console.log('Error al entrar en pantalla completa:', err);
+        });
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen().catch(err => {
+            console.log('Error al entrar en pantalla completa:', err);
+        });
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen().catch(err => {
+            console.log('Error al entrar en pantalla completa:', err);
+        });
+    }
 }
 
 export function mostrarModalNombre(titulo, callback) {

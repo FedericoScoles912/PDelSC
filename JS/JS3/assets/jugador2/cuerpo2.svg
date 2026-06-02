@@ -1,8 +1,27 @@
-<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-  <rect x="3" y="1" width="14" height="8" fill="#8B4513"/>
-  <rect x="8" y="5" width="4" height="2" fill="#000"/>
-  <rect x="4" y="7" width="12" height="10" fill="#9932CC"/>
-  <rect x="6" y="9" width="8" height="2" fill="#800080"/>
-  <rect x="1" y="11" width="3" height="4" fill="#FFD700"/>
-  <rect x="16" y="11" width="3" height="4" fill="#FFD700"/>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cuerpo 2 jugador 2: maracas -->
+  <!-- Pelo largo marrón oscuro -->
+  <rect x="10" y="2" width="20" height="22" fill="#5D3A1A"/>
+  <rect x="6" y="10" width="6" height="14" fill="#5D3A1A"/>
+  <rect x="28" y="10" width="6" height="14" fill="#5D3A1A"/>
+  
+  <!-- Cara -->
+  <rect x="14" y="12" width="12" height="10" fill="#E8B896"/>
+  <rect x="16" y="14" width="2" height="2" fill="#000000"/>
+  <rect x="22" y="14" width="2" height="2" fill="#000000"/>
+  <rect x="18" y="18" width="4" height="2" fill="#FF8888"/>
+  
+  <!-- Camisa morada -->
+  <rect x="10" y="22" width="20" height="12" fill="#880088"/>
+  <rect x="12" y="24" width="16" height="8" fill="#770077"/>
+  
+  <!-- Maracas amarillas -->
+  <rect x="2" y="24" width="6" height="10" fill="#FFD700"/>
+  <rect x="32" y="24" width="6" height="10" fill="#FFD700"/>
+  <rect x="4" y="26" width="2" height="6" fill="#FFEE00"/>
+  <rect x="34" y="26" width="2" height="6" fill="#FFEE00"/>
+  
+  <!-- Pantalones negro -->
+  <rect x="10" y="34" width="8" height="6" fill="#222222"/>
+  <rect x="22" y="34" width="8" height="6" fill="#222222"/>
 </svg>

@@ -9,40 +9,40 @@
 </head>
 <body class="bg-dark text-light">
     <div class="container-fluid d-flex flex-column align-items-center pt-4">
-        <div class="w-100 d-flex justify-content-between px-4 mb-3">
-            <a href="index.html" class="btn btn-outline-secondary">← Volver al Menú</a>
-            <div class="text-center">
-                <h3 id="nombre-jugador" class="mb-0"></h3>
-                <p class="mb-0 fs-3">
-                    <span id="puntaje-actual">Puntaje: 0</span>
-                    <span class="mx-3 text-warning">|</span>
-                    <span class="text-warning">🎯 Puntaje a batir: <span id="puntaje-a-batir" class="fw-bold text-success">0</span></span>
+        <div class="w-100 d-flex justify-content-between align-items-center px-4 mb-3">
+            <a href="index.html" class="btn btn-lg" style="background: linear-gradient(135deg, #666666, #444444); color: white; border: none; border-radius: 10px;">← Menú</a>
+            <div class="text-center flex-grow-1">
+                <h3 id="nombre-jugador" class="mb-1"></h3>
+                <p class="mb-0 fs-4">
+                    <span id="puntaje-actual" class="fw-bold" style="color: #0066ff;">Puntaje: 0</span>
+                    <span class="mx-2 text-warning">|</span>
+                    <span class="text-warning">🎯 <span id="puntaje-a-batir" class="fw-bold" style="color: #00cc00;">0</span></span>
                 </p>
             </div>
-            <div class="w-25"></div>
+            <div style="width: 80px;"></div>
         </div>
 
         <canvas id="canvas-juego" class="border border-light"></canvas>
 
-        <div id="controles-tactiles" class="d-grid gap-2 mt-3 d-md-none" style="width: 150px;">
-            <button id="btn-arriba" class="btn btn-outline-light">↑</button>
+        <div id="controles-tactiles" class="d-grid gap-2 mt-3 d-md-none" style="width: 220px;">
+            <button id="btn-arriba" class="btn btn-lg" style="background: linear-gradient(135deg, #0066ff, #0033aa); color: white; border: none; border-radius: 10px;">↑</button>
             <div class="d-flex gap-2">
-                <button id="btn-izquierda" class="btn btn-outline-light flex-grow-1">←</button>
-                <button id="btn-abajo" class="btn btn-outline-light flex-grow-1">↓</button>
-                <button id="btn-derecha" class="btn btn-outline-light flex-grow-1">→</button>
+                <button id="btn-izquierda" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #0066ff, #0033aa); color: white; border: none; border-radius: 10px;">←</button>
+                <button id="btn-abajo" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #0066ff, #0033aa); color: white; border: none; border-radius: 10px;">↓</button>
+                <button id="btn-derecha" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #0066ff, #0033aa); color: white; border: none; border-radius: 10px;">→</button>
             </div>
         </div>
 
         <!-- Contador 3-2-1 -->
         <div id="contador-inicio" class="d-none position-fixed top-50 start-50 translate-middle">
-            <h1 class="display-1 pixel-font" id="numero-contador">3</h1>
+            <h1 class="display-1 pixel-font" id="numero-contador" style="color: #0066ff; text-shadow: 0 0 20px #0066ff;">3</h1>
         </div>
 
         <!-- Fin de Partida -->
         <div id="fin-partida" class="d-none text-center position-fixed top-50 start-50 translate-middle">
-            <h1 class="display-4 mb-4 pixel-font" id="titulo-fin-partida">Fin de la Partida!</h1>
+            <h1 class="display-4 mb-4 pixel-font" id="titulo-fin-partida" style="color: #9900ff;">Fin de la Partida!</h1>
             <p class="fs-3 mb-5" id="resultado-fin-partida"></p>
-            <a href="index.html" class="btn btn-outline-light btn-lg">Volver al Menú Principal</a>
+            <a href="index.html" class="btn btn-lg" style="background: linear-gradient(135deg, #9900ff, #6600cc); color: white; border: none; border-radius: 10px;">Volver al Menú</a>
         </div>
     </div>
 

@@ -9,36 +9,36 @@
 </head>
 <body class="bg-dark text-light">
     <div class="container-fluid d-flex flex-column align-items-center pt-4">
-        <div class="w-100 d-flex justify-content-between px-4 mb-3">
-            <a href="index.html" class="btn btn-outline-secondary">← Volver al Menú</a>
-            <div class="text-center">
-                <h3 id="nombre-jugador" class="mb-0"></h3>
-                <p id="puntaje-actual" class="mb-0">Puntaje: 0</p>
+        <div class="w-100 d-flex justify-content-between align-items-center px-4 mb-3">
+            <a href="index.html" class="btn btn-lg" style="background: linear-gradient(135deg, #666666, #444444); color: white; border: none; border-radius: 10px;">← Menú</a>
+            <div class="text-center flex-grow-1">
+                <h3 id="nombre-jugador" class="mb-1"></h3>
+                <p id="puntaje-actual" class="mb-0 fs-4 fw-bold" style="color: #00cc00;">Puntaje: 0</p>
             </div>
-            <div class="w-25"></div>
+            <div style="width: 80px;"></div>
         </div>
 
         <canvas id="canvas-juego" class="border border-light"></canvas>
 
-        <div id="controles-tactiles" class="d-grid gap-2 mt-3 d-md-none" style="width: 150px;">
-            <button id="btn-arriba" class="btn btn-outline-light">↑</button>
+        <div id="controles-tactiles" class="d-grid gap-2 mt-3 d-md-none" style="width: 220px;">
+            <button id="btn-arriba" class="btn btn-lg" style="background: linear-gradient(135deg, #00cc00, #009900); color: white; border: none; border-radius: 10px;">↑</button>
             <div class="d-flex gap-2">
-                <button id="btn-izquierda" class="btn btn-outline-light flex-grow-1">←</button>
-                <button id="btn-abajo" class="btn btn-outline-light flex-grow-1">↓</button>
-                <button id="btn-derecha" class="btn btn-outline-light flex-grow-1">→</button>
+                <button id="btn-izquierda" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #00cc00, #009900); color: white; border: none; border-radius: 10px;">←</button>
+                <button id="btn-abajo" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #00cc00, #009900); color: white; border: none; border-radius: 10px;">↓</button>
+                <button id="btn-derecha" class="btn btn-lg flex-grow-1" style="background: linear-gradient(135deg, #00cc00, #009900); color: white; border: none; border-radius: 10px;">→</button>
             </div>
         </div>
 
         <!-- Contador 3-2-1 -->
         <div id="contador-inicio" class="d-none position-fixed top-50 start-50 translate-middle">
-            <h1 class="display-1 pixel-font" id="numero-contador">3</h1>
+            <h1 class="display-1 pixel-font" id="numero-contador" style="color: #00cc00; text-shadow: 0 0 20px #00cc00;">3</h1>
         </div>
 
         <!-- Fin de Turno -->
         <div id="fin-partida" class="d-none text-center position-fixed top-50 start-50 translate-middle">
-            <h1 class="display-4 mb-4 pixel-font" id="titulo-fin-partida">Turno Terminado!</h1>
+            <h1 class="display-4 mb-4 pixel-font" id="titulo-fin-partida" style="color: #00cc00;">Turno Terminado!</h1>
             <p class="fs-3 mb-5" id="resultado-fin-partida"></p>
-            <button id="btn-jugador-2" class="btn btn-outline-primary btn-lg">Turno del Jugador 2 →</button>
+            <button id="btn-jugador-2" class="btn btn-lg" style="background: linear-gradient(135deg, #0066ff, #0033aa); color: white; border: none; border-radius: 10px;">Turno del Jugador 2 →</button>
         </div>
     </div>
 

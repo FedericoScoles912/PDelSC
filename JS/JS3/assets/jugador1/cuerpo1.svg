@@ -1,8 +1,22 @@
-<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-  <rect x="5" y="2" width="10" height="10" fill="#8B4513"/>
-  <rect x="3" y="3" width="2" height="2" fill="#FF0000"/>
-  <rect x="15" y="3" width="2" height="2" fill="#FF0000"/>
-  <rect x="8" y="6" width="4" height="2" fill="#000"/>
-  <rect x="4" y="8" width="12" height="8" fill="#FFD700"/>
-  <rect x="6" y="10" width="8" height="2" fill="#FFA500"/>
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cuerpo 1 jugador 1: peluca verde -->
+  <!-- Peluca verde -->
+  <rect x="8" y="2" width="24" height="18" fill="#00DD00"/>
+  <rect x="6" y="6" width="4" height="10" fill="#00DD00"/>
+  <rect x="30" y="6" width="4" height="10" fill="#00DD00"/>
+  <rect x="4" y="10" width="4" height="6" fill="#00DD00"/>
+  <rect x="32" y="10" width="4" height="6" fill="#00DD00"/>
+  
+  <!-- Cara -->
+  <rect x="14" y="14" width="12" height="10" fill="#E8B896"/>
+  <rect x="20" y="18" width="4" height="2" fill="#880000"/>
+  <rect x="16" y="16" width="2" height="2" fill="#000000"/>
+  
+  <!-- Camisa verde -->
+  <rect x="8" y="24" width="24" height="12" fill="#00AA00"/>
+  <rect x="10" y="26" width="20" height="8" fill="#009900"/>
+  
+  <!-- Pantalones negro -->
+  <rect x="10" y="36" width="8" height="4" fill="#222222"/>
+  <rect x="22" y="36" width="8" height="4" fill="#222222"/>
 </svg>

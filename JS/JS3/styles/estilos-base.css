@@ -8,21 +8,10 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-  background-color: #0a0a0a;
-  background-blend-mode: overlay;
-}
-
-#canvas-juego {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  background-color: #0a0a0a;
-}
-
-/* Prevenir scroll de la página pero permitir ver todo el contenido */
-body {
+  background-color: rgba(10, 10, 10, 0.85);
+  background-blend-mode: multiply;
   margin: 0;
   padding: 0;
-  touch-action: pan-y;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -34,18 +23,52 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 #canvas-juego {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 3px solid #9900ff;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(153, 0, 255, 0.5), 0 0 10px rgba(153, 0, 255, 0.3);
   max-width: 100%;
   height: auto;
 }
 
 #controles-tactiles {
-  width: 200px !important;
+  width: 220px !important;
+  margin-top: 15px;
 }
 
 #controles-tactiles button {
-  height: 50px;
-  font-size: 1.5rem;
+  height: 60px;
+  font-size: 1.8rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(153, 0, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+#controles-tactiles button:active {
+  background: rgba(153, 0, 255, 0.5);
+  transform: scale(0.95);
+  box-shadow: 0 0 15px rgba(153, 0, 255, 0.6);
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Fullscreen button styling if added later */
+.btn-fullscreen {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
 }
