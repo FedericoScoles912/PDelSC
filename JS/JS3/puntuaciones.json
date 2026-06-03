@@ -24,6 +24,12 @@
     "fecha": 1779993578667
   },
   {
+    "nombre": "DRF",
+    "puntaje": 15,
+    "tiempo": 40625,
+    "fecha": 1780445587008
+  },
+  {
     "nombre": "PAP",
     "puntaje": 14,
     "tiempo": 33993,
@@ -46,6 +52,12 @@
     "puntaje": 12,
     "tiempo": 35902,
     "fecha": 1780444195384
+  },
+  {
+    "nombre": "HJH",
+    "puntaje": 8,
+    "tiempo": 21497,
+    "fecha": 1780446785625
   },
   {
     "nombre": "ABA",
@@ -72,6 +84,12 @@
     "fecha": 1780443266217
   },
   {
+    "nombre": "ASA",
+    "puntaje": 4,
+    "tiempo": 14293,
+    "fecha": 1780492930146
+  },
+  {
     "nombre": "DSA",
     "puntaje": 4,
     "tiempo": 14435,
@@ -84,6 +102,12 @@
     "fecha": 1780009402802
   },
   {
+    "nombre": "FFF",
+    "puntaje": 3,
+    "tiempo": 13821,
+    "fecha": 1780445685639
+  },
+  {
     "nombre": "JDD",
     "puntaje": 2,
     "tiempo": 4958,
@@ -94,6 +118,12 @@
     "puntaje": 2,
     "tiempo": 5407,
     "fecha": 1780009353399
+  },
+  {
+    "nombre": "DEF",
+    "puntaje": 2,
+    "tiempo": 6325,
+    "fecha": 1780445532518
   },
   {
     "nombre": "ASP",

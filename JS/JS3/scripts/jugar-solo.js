@@ -78,6 +78,14 @@ function inicializarEventos() {
     if (btnIzquierda) btnIzquierda.addEventListener('click', () => manejarTactil('izquierda'));
     if (btnDerecha) btnDerecha.addEventListener('click', () => manejarTactil('derecha'));
     
+    document.getElementById('btn-volver-a-jugar').addEventListener('click', () => {
+        // Reset everything and start over
+        document.getElementById('fin-partida').classList.add('d-none');
+        document.getElementById('nombre-jugador').textContent = jugador.nombre;
+        document.getElementById('puntaje-actual').textContent = 'Puntaje: 0';
+        iniciarPartida();
+    });
+    
     // Eventos de deslizamiento (swipe)
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
