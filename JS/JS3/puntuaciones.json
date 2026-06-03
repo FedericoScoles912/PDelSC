@@ -6,10 +6,22 @@
     "fecha": 1779993500945
   },
   {
+    "nombre": "DAL",
+    "puntaje": 30,
+    "tiempo": 84482,
+    "fecha": 1780498453268
+  },
+  {
     "nombre": "JUJ",
     "puntaje": 28,
     "tiempo": 77037,
     "fecha": 1780441592738
+  },
+  {
+    "nombre": "DSA",
+    "puntaje": 18,
+    "tiempo": 38510,
+    "fecha": 1780498354007
   },
   {
     "nombre": "EEE",
@@ -112,6 +124,12 @@
     "puntaje": 2,
     "tiempo": 4958,
     "fecha": 1780443319843
+  },
+  {
+    "nombre": "EEE",
+    "puntaje": 2,
+    "tiempo": 5265,
+    "fecha": 1780498463619
   },
   {
     "nombre": "PMP",
