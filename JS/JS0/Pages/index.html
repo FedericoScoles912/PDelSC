@@ -4,30 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JS Arrays Master - Interactivo</title>
-    <!-- Bootstrap 5 CSS -->
+    <!-- Bootstrap 5 CSS para estilos predefinidos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <!-- Custom CSS (si es necesario) -->
     <link rel="stylesheet" href="../Styles/custom.css">
+    <style>
+        /* Variables CSS para modo claro y oscuro */
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --shadow-card: rgba(0,0,0,0.1);
+            --bg-footer: #ffffff;
+            --border-footer: #dee2e6;
+        }
+
+        /* Estilos generales del body */
+        body { background: var(--bg-body); color: var(--text-primary); min-height: 100vh; transition: all 0.3s ease; }
+
+        /* Navbar en modo claro/oscuro */
+        .navbar { transition: all 0.3s ease; }
+
+        /* Inputs y otros elementos en modo oscuro */
+        .dark-mode .form-control { background-color: #2d3436; color: #ffffff; border-color: #495057; }
+        .dark-mode .form-control:focus { background-color: #343a40; color: #ffffff; border-color: #00cec9; }
+
+        /* Estilos para títulos y texto */
+        h1, h2, h3, h4, h5, h6 { color: var(--text-primary); transition: color 0.3s ease; }
+    </style>
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark shadow-sm">
+    <!-- Barra de navegación superior -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm" id="main-navbar">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <strong>JS Arrays Master</strong>
             </a>
-            <span class="navbar-text text-white d-none d-md-inline">
-                Control de Servidores y Métodos
-            </span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="navbar-text text-white d-none d-md-inline">
+                    Control de Servidores y Métodos
+                </span>
+                <!-- Botón de modo claro/oscuro -->
+                <button id="theme-toggle" class="btn btn-light">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-text" class="d-none d-md-inline">Modo Oscuro</span>
+                </button>
+            </div>
         </div>
     </nav>
 
+    <!-- Contenedor principal de la página -->
     <main class="container my-5">
         <div class="row">
             <div class="col-12 text-center mb-5">
-                <h1 class="display-5 fw-bold text-primary">Consola de Métodos de Arrays</h1>
-                <p class="lead text-secondary">Haz clic en los botones para ejecutar y mostrar/ocultar los resultados.</p>
+                <!-- Título principal -->
+                <h1 class="display-5 fw-bold text-primary" id="main-title">Consola de Métodos de Arrays</h1>
+                <p class="lead mb-4" id="main-subtitle">Selecciona un método para ver sus ejercicios.</p>
                 
-                <!-- Panel de Botones -->
+                <!-- Sección de enlaces directos a todos los proyectos -->
+                <div class="row g-3 mt-5 justify-content-center" id="project-links">
+                    <div class="col-md-3">
+                        <a href="../Projects/push/" class="btn btn-outline-primary btn-lg w-100">.push()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/pop/" class="btn btn-outline-success btn-lg w-100">.pop()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/unshift/" class="btn btn-outline-info btn-lg w-100">.unshift()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/shift/" class="btn btn-outline-warning btn-lg w-100">.shift()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/splice/" class="btn btn-outline-danger btn-lg w-100">.splice()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/slice/" class="btn btn-outline-secondary btn-lg w-100">.slice()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/indexOf/" class="btn btn-outline-primary btn-lg w-100">.indexOf()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/includes/" class="btn btn-outline-success btn-lg w-100">.includes()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/forEach/" class="btn btn-outline-dark btn-lg w-100">.forEach()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/map/" class="btn btn-outline-primary btn-lg w-100">.map()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/filter/" class="btn btn-outline-success btn-lg w-100">.filter()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/reduce/" class="btn btn-outline-danger btn-lg w-100">.reduce()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/sort/" class="btn btn-outline-info btn-lg w-100">.sort()</a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="../Projects/reverse/" class="btn btn-outline-warning btn-lg w-100">.reverse()</a>
+                    </div>
+                </div>
+                
+                <!-- Separador horizontal -->
+                <hr class="w-50 mx-auto mt-5 border-secondary" id="main-hr">
+                
+                <!-- Panel de Botones (para la funcionalidad original) -->
                 <div class="d-flex flex-wrap justify-content-center gap-2 mt-4" id="buttons-panel">
                     <button class="btn btn-outline-primary active-toggle" data-category="pushPop">Push & Pop</button>
                     <button class="btn btn-outline-primary active-toggle" data-category="shiftUnshift">Shift & Unshift</button>
@@ -36,25 +120,149 @@
                     <button class="btn btn-outline-primary active-toggle" data-category="iterationMethods">Iteración</button>
                     <button class="btn btn-outline-primary active-toggle" data-category="transformMethods">Transformación</button>
                 </div>
-                <hr class="w-50 mx-auto mt-5 border-secondary">
             </div>
         </div>
 
-        <!-- Contenedor de Resultados -->
+        <!-- Contenedor de Resultados (para la funcionalidad original) -->
         <div id="results-container" class="row g-4 justify-content-center">
             <!-- Los resultados se inyectarán y controlarán desde main.js -->
         </div>
     </main>
 
-    <footer class="footer mt-auto py-3 bg-white border-top text-center">
+    <!-- Pie de página -->
+    <footer class="footer mt-auto py-3 border-top text-center" id="main-footer">
         <div class="container">
-            <span class="text-muted small">© 2026 JS Arrays Master - Modularidad Extrema.</span>
+            <span class="small" id="footer-text">© 2026 JS Arrays Master - Modularidad Extrema.</span>
         </div>
     </footer>
 
-    <!-- Bootstrap 5 Bundle with Popper -->
+    <!-- Bootstrap 5 Bundle with Popper (para componentes interactivos) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Main Script -->
+    <!-- Main Script (para la funcionalidad original) -->
     <script type="module" src="../Scripts/main.js"></script>
+    <!-- Script para modo claro/oscuro -->
+    <script>
+        // ======== Lógica del modo claro/oscuro ========
+        function initTheme() {
+            // Verificar preferencia guardada en localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                if (savedTheme === 'dark') {
+                    applyDarkMode();
+                } else {
+                    applyLightMode();
+                }
+            } else {
+                // Verificar preferencia del sistema
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    applyDarkMode();
+                }
+            }
+        }
+
+        function applyDarkMode() {
+            // Agregar clase dark-mode al body
+            document.body.classList.add('dark-mode');
+            // Actualizar variables CSS para modo oscuro
+            document.documentElement.style.setProperty('--bg-body', '#1a1a2e');
+            document.documentElement.style.setProperty('--bg-card', '#16213e');
+            document.documentElement.style.setProperty('--text-primary', '#eaeaea');
+            document.documentElement.style.setProperty('--text-secondary', '#adb5bd');
+            document.documentElement.style.setProperty('--shadow-card', 'rgba(0,0,0,0.3)');
+            document.documentElement.style.setProperty('--bg-footer', '#0f0f23');
+            document.documentElement.style.setProperty('--border-footer', '#343a40');
+            
+            // Actualizar botón y elementos
+            const toggleBtn = document.getElementById('theme-toggle');
+            const toggleIcon = document.getElementById('theme-icon');
+            const toggleText = document.getElementById('theme-text');
+            const navbar = document.getElementById('main-navbar');
+            const mainTitle = document.getElementById('main-title');
+            const mainSubtitle = document.getElementById('main-subtitle');
+            const mainHr = document.getElementById('main-hr');
+            const footer = document.getElementById('main-footer');
+            const footerText = document.getElementById('footer-text');
+            
+            toggleBtn.classList.remove('btn-light');
+            toggleBtn.classList.add('btn-dark');
+            toggleIcon.textContent = '☀️';
+            toggleText.textContent = 'Modo Claro';
+            
+            navbar.classList.remove('bg-dark', 'navbar-dark');
+            navbar.classList.add('bg-primary', 'navbar-light');
+            
+            mainSubtitle.classList.remove('text-secondary');
+            mainSubtitle.style.color = 'var(--text-secondary)';
+            
+            mainHr.classList.remove('border-secondary');
+            mainHr.style.borderColor = 'var(--border-footer)';
+            
+            footer.style.backgroundColor = 'var(--bg-footer)';
+            footer.style.borderColor = 'var(--border-footer)';
+            footerText.classList.remove('text-muted');
+            footerText.style.color = 'var(--text-secondary)';
+            
+            // Guardar en localStorage
+            localStorage.setItem('theme', 'dark');
+        }
+
+        function applyLightMode() {
+            // Quitar clase dark-mode del body
+            document.body.classList.remove('dark-mode');
+            // Restablecer variables CSS a modo claro
+            document.documentElement.style.setProperty('--bg-body', '#f8f9fa');
+            document.documentElement.style.setProperty('--bg-card', '#ffffff');
+            document.documentElement.style.setProperty('--text-primary', '#212529');
+            document.documentElement.style.setProperty('--text-secondary', '#6c757d');
+            document.documentElement.style.setProperty('--shadow-card', 'rgba(0,0,0,0.1)');
+            document.documentElement.style.setProperty('--bg-footer', '#ffffff');
+            document.documentElement.style.setProperty('--border-footer', '#dee2e6');
+            
+            // Actualizar botón y elementos
+            const toggleBtn = document.getElementById('theme-toggle');
+            const toggleIcon = document.getElementById('theme-icon');
+            const toggleText = document.getElementById('theme-text');
+            const navbar = document.getElementById('main-navbar');
+            const mainTitle = document.getElementById('main-title');
+            const mainSubtitle = document.getElementById('main-subtitle');
+            const mainHr = document.getElementById('main-hr');
+            const footer = document.getElementById('main-footer');
+            const footerText = document.getElementById('footer-text');
+            
+            toggleBtn.classList.remove('btn-dark');
+            toggleBtn.classList.add('btn-light');
+            toggleIcon.textContent = '🌙';
+            toggleText.textContent = 'Modo Oscuro';
+            
+            navbar.classList.remove('bg-primary', 'navbar-light');
+            navbar.classList.add('bg-dark', 'navbar-dark');
+            
+            mainSubtitle.classList.add('text-secondary');
+            mainSubtitle.style.color = '';
+            
+            mainHr.classList.add('border-secondary');
+            mainHr.style.borderColor = '';
+            
+            footer.style.backgroundColor = '';
+            footer.style.borderColor = '';
+            footerText.classList.add('text-muted');
+            footerText.style.color = '';
+            
+            // Guardar en localStorage
+            localStorage.setItem('theme', 'light');
+        }
+
+        // Event listener para el botón
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                applyLightMode();
+            } else {
+                applyDarkMode();
+            }
+        });
+
+        // Inicializar el tema al cargar la página
+        initTheme();
+    </script>
 </body>
 </html>

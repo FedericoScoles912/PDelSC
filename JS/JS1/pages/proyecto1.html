@@ -20,13 +20,27 @@
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su email">
+                        <label for="emailUsuario" class="form-label">Email</label>
+                        <div class="input-group email-group">
+                            <input type="text" class="form-control" id="emailUsuario" name="emailUsuario" placeholder="username">
+                            <span class="input-group-text">@</span>
+                            <input type="text" class="form-control" id="emailProveedor" name="emailProveedor" placeholder="mail">
+                            <span class="input-group-text">.</span>
+                            <select class="form-select" id="emailDominio" name="emailDominio">
+                                <option value="com">com</option>
+                                <option value="ar">ar</option>
+                                <option value="com.ar">com.ar</option>
+                                <option value="edu.ar">edu.ar</option>
+                                <option value="gov.ar">gov.ar</option>
+                                <option value="net">net</option>
+                                <option value="org">org</option>
+                            </select>
+                        </div>
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-3">
                         <label for="edad" class="form-label">Edad</label>
-                        <input type="number" class="form-control" id="edad" name="edad" placeholder="Ingrese su edad">
+                        <input type="text" class="form-control" id="edad" name="edad" placeholder="Ingrese su edad">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="d-grid">

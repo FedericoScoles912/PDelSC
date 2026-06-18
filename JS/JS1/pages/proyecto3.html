@@ -29,7 +29,7 @@
                     <div class="row g-2 mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Edad</label>
-                            <input type="number" class="form-control" name="edad" placeholder="Edad">
+                            <input type="text" class="form-control" name="edad" placeholder="Edad">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="col-md-6">
@@ -80,7 +80,21 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="mail" placeholder="email@ejemplo.com">
+                            <div class="input-group email-group">
+                                <input type="text" class="form-control" name="emailUsuario" id="emailUsuarioPersona" placeholder="username">
+                                <span class="input-group-text">@</span>
+                                <input type="text" class="form-control" name="emailProveedor" id="emailProveedorPersona" placeholder="mail">
+                                <span class="input-group-text">.</span>
+                                <select class="form-select" name="emailDominio" id="emailDominioPersona">
+                                    <option value="com">com</option>
+                                    <option value="ar">ar</option>
+                                    <option value="com.ar">com.ar</option>
+                                    <option value="edu.ar">edu.ar</option>
+                                    <option value="gov.ar">gov.ar</option>
+                                    <option value="net">net</option>
+                                    <option value="org">org</option>
+                                </select>
+                            </div>
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
@@ -96,7 +110,7 @@
                         </div>
                         <div class="col-md-6" id="cantidadHijosDiv" style="display: none;">
                             <label class="form-label">Cantidad de Hijos</label>
-                            <input type="number" class="form-control" name="cantidadHijos" id="cantidadHijos" placeholder="0">
+                            <input type="text" class="form-control" name="cantidadHijos" id="cantidadHijos" placeholder="0">
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>

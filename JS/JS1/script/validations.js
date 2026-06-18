@@ -44,8 +44,7 @@ const Validations = {
     },
 
     isValidPhone(phone) {
-        const phoneRegex = /^[0-9+\-\s()]{7,20}$/;
-        return phoneRegex.test(phone);
+        return this.isOnlyNumbers(phone);
     },
 
     isValidDocument(doc, type = 'DNI') {
@@ -53,6 +52,10 @@ const Validations = {
             return this.isOnlyNumbers(doc) && doc.length >= 7 && doc.length <= 10;
         }
         return !this.isEmpty(doc);
+    },
+
+    isInteger(value) {
+        return this.isOnlyNumbers(value) && Number.isInteger(parseFloat(value));
     },
 
     validateField(field, rules) {
@@ -76,6 +79,9 @@ const Validations = {
             } else if (rules.numbers && !this.isOnlyNumbers(value)) {
                 isValid = false;
                 message = 'Solo se permiten números';
+            } else if (rules.integer && !this.isInteger(value)) {
+                isValid = false;
+                message = 'Solo se permiten números enteros';
             } else if (rules.letters && !this.isOnlyLetters(value)) {
                 isValid = false;
                 message = 'Solo se permiten letras';
@@ -87,7 +93,7 @@ const Validations = {
                 message = `Edad debe estar entre ${rules.minAge || 0} y ${rules.maxAge || 120} años`;
             } else if (rules.phone && !this.isValidPhone(value)) {
                 isValid = false;
-                message = 'Ingrese un teléfono válido';
+                message = 'Ingrese un teléfono válido (solo números)';
             } else if (rules.document && !this.isValidDocument(value)) {
                 isValid = false;
                 message = 'Documento inválido';

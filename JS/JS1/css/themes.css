@@ -79,6 +79,32 @@ body {
     color: var(--text-primary) !important;
 }
 
+/* Fix dark mode input group styles */
+[data-theme="dark"] .input-group-text {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Fix dark mode validation feedback */
+[data-theme="dark"] .is-valid {
+    border-color: #198754 !important;
+    background-color: var(--bg-primary);
+}
+
+[data-theme="dark"] .is-invalid {
+    border-color: #dc3545 !important;
+    background-color: var(--bg-primary);
+}
+
+[data-theme="dark"] .valid-feedback {
+    color: #198754 !important;
+}
+
+[data-theme="dark"] .invalid-feedback {
+    color: #dc3545 !important;
+}
+
 .table {
     color: var(--text-primary);
 }

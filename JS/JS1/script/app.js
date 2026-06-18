@@ -101,13 +101,27 @@ const App = {
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="email" name="email" placeholder="Ingrese su email">
+                                    <label for="emailUsuario" class="form-label">Email</label>
+                                    <div class="input-group email-group">
+                            <input type="text" class="form-control" id="emailUsuario" name="emailUsuario" placeholder="username">
+                            <span class="input-group-text">@</span>
+                            <input type="text" class="form-control" id="emailProveedor" name="emailProveedor" placeholder="mail">
+                            <span class="input-group-text">.</span>
+                            <select class="form-select" id="emailDominio" name="emailDominio">
+                                <option value="com">com</option>
+                                <option value="ar">ar</option>
+                                <option value="com.ar">com.ar</option>
+                                <option value="edu.ar">edu.ar</option>
+                                <option value="gov.ar">gov.ar</option>
+                                <option value="net">net</option>
+                                <option value="org">org</option>
+                            </select>
+                        </div>
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="edad" class="form-label">Edad</label>
-                                    <input type="number" class="form-control" id="edad" name="edad" placeholder="Ingrese su edad">
+                                    <input type="text" class="form-control" id="edad" name="edad" placeholder="Ingrese su edad">
                                     <div class="invalid-feedback"></div>
                                 </div>
                                 <div class="d-grid">
@@ -149,8 +163,10 @@ const App = {
     handleUserForm(form) {
         const rules = {
             nombre: { required: true, minLength: 2, maxLength: 50, letters: true },
-            email: { required: true, email: true },
-            edad: { required: true, numbers: true }
+            emailUsuario: { required: true, minLength: 2 },
+            emailProveedor: { required: true, minLength: 2 },
+            emailDominio: { required: true },
+            edad: { required: true, integer: true }
         };
 
         if (!Validations.validateForm(form, rules)) {
@@ -159,13 +175,16 @@ const App = {
         }
 
         const nombre1 = Forms.getElementById(form, 'nombre');
-        const email2 = Forms.getQuerySelector(form, 'email');
+        const emailUsuario = document.getElementById('emailUsuario').value;
+        const emailProveedor = document.getElementById('emailProveedor').value;
+        const emailDominio = document.getElementById('emailDominio').value;
+        const emailCompleto = `${emailUsuario}@${emailProveedor}.${emailDominio}`;
         const data3 = Forms.getFormData(form);
 
         const user = {
             id: UI.generateId(),
             nombre: nombre1,
-            email: email2,
+            email: emailCompleto,
             edad: parseInt(data3.edad),
             fecha: new Date().toISOString()
         };
@@ -476,7 +495,7 @@ const App = {
                                 <div class="row g-2 mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Edad</label>
-                                        <input type="number" class="form-control" name="edad" placeholder="Edad">
+                                        <input type="text" class="form-control" name="edad" placeholder="Edad">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                     <div class="col-md-6">
@@ -527,7 +546,21 @@ const App = {
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Email</label>
-                                        <input type="email" class="form-control" name="mail" placeholder="email@ejemplo.com">
+                                        <div class="input-group email-group">
+                                <input type="text" class="form-control" name="emailUsuario" id="emailUsuarioPersona" placeholder="username">
+                                <span class="input-group-text">@</span>
+                                <input type="text" class="form-control" name="emailProveedor" id="emailProveedorPersona" placeholder="mail">
+                                <span class="input-group-text">.</span>
+                                <select class="form-select" name="emailDominio" id="emailDominioPersona">
+                                    <option value="com">com</option>
+                                    <option value="ar">ar</option>
+                                    <option value="com.ar">com.ar</option>
+                                    <option value="edu.ar">edu.ar</option>
+                                    <option value="gov.ar">gov.ar</option>
+                                    <option value="net">net</option>
+                                    <option value="org">org</option>
+                                </select>
+                            </div>
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -543,7 +576,7 @@ const App = {
                                     </div>
                                     <div class="col-md-6" id="cantidadHijosDiv" style="display: none;">
                                         <label class="form-label">Cantidad de Hijos</label>
-                                        <input type="number" class="form-control" name="cantidadHijos" id="cantidadHijos" placeholder="0">
+                                        <input type="text" class="form-control" name="cantidadHijos" id="cantidadHijos" placeholder="0">
                                         <div class="invalid-feedback"></div>
                                     </div>
                                 </div>
@@ -626,14 +659,16 @@ const App = {
         const rules = {
             nombre: { required: true, minLength: 2, maxLength: 50, letters: true },
             apellido: { required: true, minLength: 2, maxLength: 50, letters: true },
-            edad: { required: true, numbers: true },
+            edad: { required: true, integer: true },
             fechaNacimiento: { required: true, date: true, age: true, minAge: 0, maxAge: 120 },
             sexo: { required: true },
             documento: { required: true, document: true },
             estadoCivil: { required: true },
             nacionalidad: { required: true, minLength: 2, letters: true },
-            telefono: { required: true, phone: true },
-            mail: { required: true, email: true },
+            telefono: { required: true, numbers: true },
+            emailUsuario: { required: true, minLength: 2 },
+            emailProveedor: { required: true, minLength: 2 },
+            emailDominio: { required: true },
             hijos: { required: true },
             direccion: { required: true, minLength: 5 },
             ciudad: { required: true, minLength: 2, letters: true }
@@ -641,7 +676,7 @@ const App = {
 
         const hasHijos = form.querySelector('[name="hijos"]').value;
         if (hasHijos === 'si') {
-            rules.cantidadHijos = { required: true, numbers: true };
+            rules.cantidadHijos = { required: true, integer: true };
         }
 
         if (!Validations.validateForm(form, rules)) {
@@ -649,12 +684,18 @@ const App = {
             return;
         }
 
+        const emailUsuario = form.querySelector('[name="emailUsuario"]').value;
+        const emailProveedor = form.querySelector('[name="emailProveedor"]').value;
+        const emailDominio = form.querySelector('[name="emailDominio"]').value;
+        const emailCompleto = `${emailUsuario}@${emailProveedor}.${emailDominio}`;
+
         const data = Forms.getFormData(form);
         const personId = form.dataset.personId;
 
         const person = {
             id: personId || UI.generateId(),
             ...data,
+            mail: emailCompleto,
             edad: parseInt(data.edad),
             cantidadHijos: hasHijos === 'si' ? parseInt(data.cantidadHijos) : 0,
             fecha: new Date().toISOString()
@@ -752,6 +793,22 @@ const App = {
         Forms.fill(form, person);
         form.dataset.personId = id;
         document.getElementById('personFormSubmit').textContent = 'Actualizar Persona';
+
+        // Split email into user, proveedor, and dominio
+        if (person.mail) {
+            const emailParts = person.mail.split('@');
+            if (emailParts.length === 2) {
+                document.getElementById('emailUsuarioPersona').value = emailParts[0];
+                const domainParts = emailParts[1].split('.');
+                if (domainParts.length >= 2) {
+                    // Handle cases like "gmail.com" or "gmail.com.ar"
+                    const dominio = domainParts.slice(-2).join('.'); // Take last 2 parts for .com.ar, .edu.ar, etc.
+                    const proveedor = domainParts.slice(0, -2).join('.') || domainParts[0]; // If only 2 parts, first part is proveedor
+                    document.getElementById('emailProveedorPersona').value = proveedor;
+                    document.getElementById('emailDominioPersona').value = dominio;
+                }
+            }
+        }
 
         if (person.hijos === 'si') {
             document.getElementById('cantidadHijosDiv').style.display = 'block';

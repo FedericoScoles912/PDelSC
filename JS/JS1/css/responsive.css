@@ -16,6 +16,23 @@
         border-radius: 0.375rem !important;
         margin-bottom: 0.5rem;
     }
+
+    /* Make email input group stack on mobile */
+    .input-group.email-group {
+        flex-direction: column;
+    }
+    
+    .input-group.email-group .form-control,
+    .input-group.email-group .form-select,
+    .input-group.email-group .input-group-text {
+        width: 100% !important;
+        border-radius: 0.375rem !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-group.email-group .input-group-text {
+        display: none;
+    }
 }
 
 @media (max-width: 576px) {
