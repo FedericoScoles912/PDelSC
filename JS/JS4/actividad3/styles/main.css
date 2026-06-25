@@ -1,23 +1,25 @@
 :root {
-  --bg-color: #f5f7f0;
-  --text-color: #334155;
-  --card-bg: #fafdf8;
-  --accent-color: #5fb3a3;
-  --accent-hover: #4a9f8f;
-  --shadow-color: rgba(0, 0, 0, 0.08);
-  --table-border: #e2e8f0;
-  --table-alt: #f0f5ee;
+  /* Relaxing Light Mode: Pastel Green */
+  --bg-color: #e8f5e9;
+  --text-color: #2e7d32;
+  --card-bg: #c8e6c9;
+  --accent-color: #4caf50;
+  --accent-hover: #388e3c;
+  --shadow-color: rgba(46, 125, 50, 0.1);
+  --table-border: #a5d6a7;
+  --table-alt: #dcedc8;
 }
 
 [data-theme="dark"] {
-  --bg-color: #1a1a2e;
-  --text-color: #e0e0e0;
-  --card-bg: #16213e;
-  --accent-color: #5a9fd4;
-  --accent-hover: #6aafea;
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --table-border: #333;
-  --table-alt: #1f2a48;
+  /* Relaxing Dark Mode: Soft Blue */
+  --bg-color: #1e3a5f;
+  --text-color: #e3f2fd;
+  --card-bg: #2c5282;
+  --accent-color: #63b3ed;
+  --accent-hover: #90cdf4;
+  --shadow-color: rgba(99, 179, 237, 0.2);
+  --table-border: #4299e1;
+  --table-alt: #2b6cb0;
 }
 
 body {

@@ -20,9 +20,17 @@ let nextId = 3;
 // In-memory "database" for Actividad 4
 let alumnos = [
   { id: 1, nombre: "Carlos López", email: "carlos@example.com", curso: "5to Semestre" },
-  { id: 2, nombre: "Ana Martínez", email: "ana@example.com", curso: "6to Semestre" }
+  { id: 2, nombre: "Ana Martínez", email: "ana@example.com", curso: "6to Semestre" },
+  { id: 3, nombre: "Luis García", email: "luis@example.com", curso: "4to Semestre" },
+  { id: 4, nombre: "Sofía Rodríguez", email: "sofia@example.com", curso: "7mo Semestre" },
+  { id: 5, nombre: "Diego Hernández", email: "diego@example.com", curso: "3er Semestre" },
+  { id: 6, nombre: "Valentina Díaz", email: "valentina@example.com", curso: "8vo Semestre" },
+  { id: 7, nombre: "Mateo Sánchez", email: "mateo@example.com", curso: "2do Semestre" },
+  { id: 8, nombre: "Isabella Pérez", email: "isabella@example.com", curso: "1er Semestre" },
+  { id: 9, nombre: "Sebastián Gómez", email: "sebastian@example.com", curso: "5to Semestre" },
+  { id: 10, nombre: "Camila Ruiz", email: "camila@example.com", curso: "6to Semestre" }
 ];
-let nextAlumnoId = 3;
+let nextAlumnoId = 11;
 
 // Main page
 app.get('/', (req, res) => {

@@ -71,9 +71,14 @@ function showErrorMessage(message, container) {
  */
 async function handleFetchClick() {
   const container = document.getElementById('fetchResults');
+  const fetchBtn = document.getElementById('fetchBtn');
+  const axiosBtn = document.getElementById('axiosBtn');
+  
   try {
     const alumnos = await fetchAlumnosWithFetch();
     renderAlumnosTable(alumnos, container);
+    fetchBtn.disabled = true;
+    fetchBtn.textContent = 'Alumnos Cargados';
   } catch (error) {
     showErrorMessage(error.message, container);
   }
@@ -84,9 +89,14 @@ async function handleFetchClick() {
  */
 async function handleAxiosClick() {
   const container = document.getElementById('axiosResults');
+  const fetchBtn = document.getElementById('fetchBtn');
+  const axiosBtn = document.getElementById('axiosBtn');
+  
   try {
     const alumnos = await fetchAlumnosWithAxios();
     renderAlumnosTable(alumnos, container);
+    axiosBtn.disabled = true;
+    axiosBtn.textContent = 'Alumnos Cargados';
   } catch (error) {
     showErrorMessage(error.message, container);
   }
