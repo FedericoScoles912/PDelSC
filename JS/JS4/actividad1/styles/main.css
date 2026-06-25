@@ -1,12 +1,12 @@
 :root {
-  --bg-color: #f4f4ef;
+  --bg-color: #f5f7f0;
   --text-color: #334155;
-  --card-bg: #dde0db;
+  --card-bg: #fafdf8;
   --accent-color: #5fb3a3;
   --accent-hover: #4a9f8f;
   --shadow-color: rgba(0, 0, 0, 0.08);
   --table-border: #e2e8f0;
-  --table-alt: #e2e4e2;
+  --table-alt: #f0f5ee;
 }
 
 [data-theme="dark"] {
@@ -20,13 +20,6 @@
   --table-alt: #1f2a48;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-}
-
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -36,38 +29,23 @@ body {
 
 header {
   background-color: var(--card-bg);
-  padding: 1rem 2rem;
   box-shadow: 0 2px 5px var(--shadow-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
-header h1 {
-  font-size: 1.5rem;
+.navbar-brand {
+  color: var(--accent-color) !important;
+  font-weight: 700;
 }
 
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-nav a {
-  color: var(--accent-color);
-  text-decoration: none;
+.nav-link {
+  color: var(--accent-color) !important;
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: background-color 0.3s;
 }
 
-nav a:hover {
-  background-color: var(--accent-color);
-  color: #fff;
+.nav-link:hover {
+  color: #fff !important;
+  background-color: var(--accent-color) !important;
+  border-radius: 5px;
 }
 
 .theme-toggle {
@@ -84,25 +62,13 @@ nav a:hover {
   background-color: var(--accent-hover);
 }
 
-main {
-  padding: 2rem;
-}
-
 .hero {
   text-align: center;
-  margin-bottom: 2rem;
-}
-
-.activities-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
 }
 
 .activity-card {
   background-color: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: 10px;
+  border: none;
   box-shadow: 0 3px 8px var(--shadow-color);
   transition: transform 0.3s;
 }
@@ -111,33 +77,17 @@ main {
   transform: translateY(-5px);
 }
 
-.activity-card h3 {
+.activity-card .card-title {
   color: var(--accent-color);
-  margin-bottom: 0.5rem;
 }
 
-.activity-card p {
-  margin-bottom: 1rem;
-}
-
-.activity-card a {
-  display: inline-block;
+.activity-card .btn {
   background-color: var(--accent-color);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background-color 0.3s;
+  border: none;
 }
 
-.activity-card a:hover {
+.activity-card .btn:hover {
   background-color: var(--accent-hover);
-}
-
-.columns-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
 }
 
 .column {
@@ -152,31 +102,21 @@ main {
   color: var(--accent-color);
 }
 
-.btn {
+.btn-primary {
   background-color: var(--accent-color);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin: 0.5rem 0;
+  border-color: var(--accent-color);
 }
 
-.btn:hover {
+.btn-primary:hover {
   background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 input[type="text"],
 input[type="email"] {
-  width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
-  border: 1px solid var(--table-border);
-  border-radius: 5px;
   background-color: var(--card-bg);
   color: var(--text-color);
+  border: 1px solid var(--table-border);
 }
 
 .results-container {
@@ -231,16 +171,6 @@ input[type="email"] {
   background-color: #1a3d1a;
 }
 
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 500;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -261,15 +191,4 @@ table th {
 
 table tr:nth-child(even) {
   background-color: var(--table-alt);
-}
-
-@media (max-width: 768px) {
-  .columns-container {
-    grid-template-columns: 1fr;
-  }
-
-  header {
-    flex-direction: column;
-    text-align: center;
-  }
 }
