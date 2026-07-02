@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Alumnos</title>
+  <link rel="stylesheet" href="../styles/main.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <!-- Menú de navegación -->
+  <nav class="main-nav">
+    <ul>
+      <li><a href="alumnos.html" id="nav-alumnos">👥 Ver Alumnos</a></li>
+      <li><a href="formulario.html" id="nav-formulario">📝 Formulario CRUD</a></li>
+      <li><a href="../index.html" id="nav-home" class="nav-home">🏠 Inicio</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h1>Lista de Alumnos</h1>
+    <button id="theme-toggle" class="theme-toggle">🌙 Modo Oscuro</button>
+  </header>
+
+  <main class="container">
+    <div style="text-align: right; margin-bottom: 20px;">
+      <button id="reload-btn" class="btn btn-primary">🔄 Recargar</button>
+    </div>
+    <div id="loading" class="loading">Cargando...</div>
+    <div id="content-container"></div>
+  </main>
+
+  <script type="module" src="../scripts/alumnos.js"></script>
+</body>
+</html>

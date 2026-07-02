@@ -14,6 +14,8 @@
       --accent-color: #4caf50;
       --accent-hover: #388e3c;
       --shadow-color: rgba(46, 125, 50, 0.1);
+      --table-border: #a5d6a7;
+      --table-alt: #dcedc8;
     }
     [data-theme="dark"] {
       /* Relaxing Dark Mode: Soft Blue */
@@ -23,10 +25,31 @@
       --accent-color: #63b3ed;
       --accent-hover: #90cdf4;
       --shadow-color: rgba(99, 179, 237, 0.2);
+      --table-border: #4299e1;
+      --table-alt: #2b6cb0;
     }
     body {
       background-color: var(--bg-color);
       color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    header {
+      background-color: var(--card-bg);
+      box-shadow: 0 2px 5px var(--shadow-color);
+    }
+    .navbar-brand {
+      color: var(--accent-color) !important;
+      font-weight: 700;
+    }
+    .nav-link {
+      color: var(--accent-color) !important;
+      font-weight: 500;
+    }
+    .nav-link:hover {
+      color: #fff !important;
+      background-color: var(--accent-color) !important;
+      border-radius: 5px;
     }
     .card {
       background-color: var(--card-bg);
@@ -51,14 +74,36 @@
   </style>
 </head>
 <body>
-  <header class="navbar navbar-expand-lg mb-4">
+  <header class="navbar navbar-expand-lg">
     <div class="container">
-      <h1 class="navbar-brand mb-0">Proyecto de Integración de APIs</h1>
-      <button id="themeToggle" class="btn btn-outline ms-auto" style="background-color: var(--accent-color); color: white;">Modo Oscuro</button>
+      <a class="navbar-brand" href="index.html">Proyecto de Integración de APIs</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.html">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="actividad1/index.html">Actividad 1</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="actividad2/index.html">Actividad 2</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="actividad3/index.html">Actividad 3</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="actividad4/index.html">Actividad 4</a>
+          </li>
+        </ul>
+        <button id="themeToggle" class="theme-toggle" style="background-color: var(--accent-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Modo Oscuro</button>
+      </div>
     </div>
   </header>
 
-  <main class="container">
+  <main class="container py-5">
     <section class="text-center mb-5">
       <h2 class="display-4 fw-bold mb-3">Explora las Actividades</h2>
       <p class="lead">Haz clic en cualquier tarjeta para ir a la actividad correspondiente</p>
@@ -90,7 +135,7 @@
           <div class="card-body">
             <h3 class="card-title">Actividad 3</h3>
             <p class="card-text">Buscador de usuarios en tiempo real</p>
-            <a href="actividad-3/index.html" class="btn btn-primary w-100">Ver Actividad</a>
+            <a href="actividad3/index.html" class="btn btn-primary w-100">Ver Actividad</a>
           </div>
         </div>
       </div>

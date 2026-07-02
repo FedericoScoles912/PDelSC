@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Alumnos</title>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <header class="header">
+    <h1>Gestión de Alumnos</h1>
+    <button id="theme-toggle" class="theme-toggle">🌙 Modo Oscuro</button>
+  </header>
+
+  <main class="container">
+    <section class="form-section card">
+      <h2 id="form-title">Agregar Alumno</h2>
+      <form id="alumno-form">
+        <input type="hidden" id="alumno-id">
+        
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Ingrese el nombre">
+          <span class="field-error" id="nombre-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido</label>
+          <input type="text" id="apellido" name="apellido" placeholder="Ingrese el apellido">
+          <span class="field-error" id="apellido-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="edad">Edad</label>
+          <input type="number" id="edad" name="edad" placeholder="Ingrese la edad" min="1" max="120">
+          <span class="field-error" id="edad-error"></span>
+        </div>
+
+        <div class="form-buttons">
+          <button type="submit" id="submit-btn" class="btn btn-primary">Guardar</button>
+          <button type="button" id="cancel-btn" class="btn btn-secondary" style="display: none;">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="table-section card">
+      <h2>Lista de Alumnos</h2>
+      <div id="loading" class="loading">Cargando...</div>
+      <div id="table-container"></div>
+    </section>
+  </main>
+
+  <script src="/scripts/main.js"></script>
+</body>
+</html>

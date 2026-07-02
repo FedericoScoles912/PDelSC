@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Alumnos</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div id="toast-container"></div>
+
+  <!-- Menú de navegación -->
+  <nav class="main-nav">
+    <ul>
+      <li><a href="pages/alumnos.html" id="nav-alumnos">👥 Ver Alumnos</a></li>
+      <li><a href="pages/formulario.html" id="nav-formulario">📝 Formulario CRUD</a></li>
+      <li><a href="index.html" id="nav-home" class="nav-home">🏠 Inicio</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h1>Gestión de Alumnos</h1>
+    <button id="theme-toggle" class="theme-toggle">🌙 Modo Oscuro</button>
+  </header>
+
+  <main class="container-home">
+    <div class="card card-home">
+      <h2>Ver Alumnos</h2>
+      <p>Consulta la lista de todos los alumnos en formato de tarjetas.</p>
+      <a href="pages/alumnos.html" class="btn btn-primary">Ir a la lista</a>
+    </div>
+
+    <div class="card card-home">
+      <h2>Formulario CRUD</h2>
+      <p>Crea, edita y elimina alumnos usando Fetch API.</p>
+      <a href="pages/formulario.html" class="btn btn-primary">Ir al formulario</a>
+    </div>
+  </main>
+
+  <script type="module">
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeButton(savedTheme);
+    }
+
+    function updateThemeButton(theme) {
+      const themeToggle = document.getElementById('theme-toggle');
+      themeToggle.textContent = theme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeButton(newTheme);
+    }
+
+    function setActiveNav() {
+      const currentPath = window.location.pathname;
+      const links = {
+        'index.html': 'nav-home',
+        'pages/alumnos.html': 'nav-alumnos',
+        'pages/formulario.html': 'nav-formulario',
+        'pages/fetch.html': 'nav-fetch',
+        'pages/axios.html': 'nav-axios'
+      };
+      
+      for (const [path, id] of Object.entries(links)) {
+        const el = document.getElementById(id);
+        if (el && currentPath.includes(path)) {
+          el.classList.add('active');
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      setActiveNav();
+      document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    });
+  </script>
+</body>
+</html>

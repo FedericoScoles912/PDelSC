@@ -1,0 +1,19 @@
+{
+  "name": "proyecto-backend",
+  "version": "1.0.0",
+  "description": "Backend API REST con Node.js, Express y MySQL",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["nodejs", "express", "mysql", "api-rest"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mysql2": "^3.6.5"
+  }
+}
