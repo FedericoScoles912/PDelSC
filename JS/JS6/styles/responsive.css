@@ -1,0 +1,190 @@
+/* =============================================
+   RESPONSIVE — Breakpoints Bootstrap
+   ≤1200px: Ajustes generales
+   ≤992px : Tablet — layout 2 columnas
+   ≤768px : Tablet pequeño
+   ≤576px : Mobile — 1 columna, scroll
+   ============================================= */
+
+@media (max-width: 1200px) {
+  :root {
+    --header-height: 64px;
+    --footer-height: 48px;
+  }
+
+  .brand-title { font-size: 1.35rem; }
+  .brand-subtitle { font-size: 0.85rem; }
+  .brand-icon { font-size: 1.6rem; }
+
+  .word-letter {
+    width: 42px;
+    height: 56px;
+    font-size: 1.9rem;
+  }
+
+  .kb-key {
+    width: 42px;
+    height: 42px;
+    font-size: 1.05rem;
+  }
+
+  .info-value { font-size: 1.2rem; }
+  .panel-title { font-size: 1.05rem; }
+}
+
+@media (max-width: 992px) {
+  body { overflow: auto; }
+
+  .game-main {
+    height: auto;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+  }
+
+  .game-main > .container-fluid > .row {
+    flex-direction: column;
+  }
+
+  .left-panel,
+  .right-panel,
+  .game-center {
+    height: auto !important;
+  }
+
+  .left-panel  { order: 2; }
+  .game-center { order: 1; }
+  .right-panel { order: 3; }
+
+  .left-panel .panel-card,
+  .right-panel .panel-card {
+    max-height: 500px;
+  }
+
+  .hangman-svg { max-width: 260px; }
+
+  .game-area-card { min-height: 380px; }
+}
+
+@media (max-width: 768px) {
+  .game-header .container-fluid,
+  .game-footer .container-fluid,
+  .game-main .container-fluid > .row {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .word-letter {
+    width: 36px;
+    height: 50px;
+    font-size: 1.6rem;
+    margin: 0 1px;
+  }
+
+  .kb-key {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+  }
+
+  .panel-card { padding: 1rem; }
+
+  .popup-box {
+    min-width: 0;
+    width: 92%;
+    max-width: 92%;
+    padding: 1.5rem 1.25rem 1rem 1.25rem;
+  }
+
+  .popup-title { font-size: 1.2rem; }
+  .popup-icon { font-size: 2.6rem; }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --header-height: 58px;
+    --footer-height: 44px;
+  }
+
+  body { overflow-x: hidden; }
+
+  .game-header .d-flex {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
+    flex-direction: column;
+    gap: 0;
+    line-height: 1.1;
+  }
+
+  .brand-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .brand-icon { font-size: 1.3rem; }
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .game-area-card {
+    padding: 0.75rem !important;
+  }
+
+  .svg-container { min-height: 240px; }
+  .hangman-svg { max-width: 220px; }
+
+  .game-info-col {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+    padding: 0.5rem;
+  }
+
+  .info-badge {
+    flex: 1 1 calc(50% - 0.25rem);
+    padding: 0.5rem 0.7rem;
+    min-width: 0;
+  }
+
+  .info-value { font-size: 1.05rem; }
+  .info-label { font-size: 0.65rem; }
+
+  .game-info-col #newGameBtn {
+    flex-basis: 100%;
+    margin-top: 0 !important;
+  }
+
+  .word-display { gap: 0.35rem 0.2rem; }
+
+  .word-letter {
+    width: 30px;
+    height: 44px;
+    font-size: 1.35rem;
+    padding-bottom: 2px;
+  }
+
+  .virtual-keyboard { gap: 5px; }
+  .kb-row { gap: 5px; }
+  .kb-key {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .game-footer {
+    font-size: 0.75rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.4rem 0 !important;
+  }
+
+  .game-footer .d-flex {
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem;
+  }
+}

@@ -1,0 +1,12 @@
+/* =============================================
+   main.css — Entry point de estilos
+   Importa todos los parciales en orden.
+   ============================================= */
+
+@import url('./variables.css');
+@import url('./layout.css');
+@import url('./game.css');
+@import url('./scoreboard.css');
+@import url('./modal.css');
+@import url('./darkmode.css');
+@import url('./responsive.css');

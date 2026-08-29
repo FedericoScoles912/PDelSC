@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="El Ahorcado — Palabras al Límite. Juego clásico del ahorcado con puntuaciones, cronómetro y modo oscuro.">
+  <title>El Ahorcado — Palabras al Límite</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- ========== HEADER: Nombre del juego + toggle dark/light mode ========== -->
+  <header class="game-header">
+    <div class="container-fluid h-100">
+      <div class="d-flex align-items-center justify-content-between h-100 px-4">
+        <div class="d-flex align-items-center gap-3">
+          <span class="brand-icon" aria-hidden="true">🎯</span>
+          <h1 class="brand-title m-0">El Ahorcado <span class="brand-subtitle">Palabras al Límite</span></h1>
+        </div>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar modo claro/oscuro">
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== MAIN: Layout de tres columnas ========== -->
+  <main class="game-main">
+    <div class="container-fluid h-100">
+      <div class="row g-4 h-100 px-4">
+
+        <!-- ========== PANEL IZQUIERDO: Tabla de posiciones ========== -->
+        <aside class="col-12 col-lg-3 game-panel left-panel d-flex flex-column">
+          <div class="panel-card h-100 d-flex flex-column">
+            <div class="panel-header">
+              <h2 class="panel-title">🏆 Tabla de Posiciones</h2>
+            </div>
+
+            <div class="scoreboard-wrapper flex-grow-1 overflow-auto" id="scoreboardContainer">
+              <table class="scoreboard-table w-100">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Pts</th>
+                    <th>Tiempo</th>
+                  </tr>
+                </thead>
+                <tbody id="scoreboardBody">
+                  <tr><td colspan="4" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="panel-actions d-grid gap-2 mt-auto pt-3">
+              <button id="saveScoreBtn" class="btn btn-primary game-btn game-btn-accent" type="button" disabled>
+                💾 Guardar mi Score
+              </button>
+              <button id="downloadPdfBtn" class="btn btn-outline-primary game-btn game-btn-outline" type="button">
+                📄 Descargar PDF
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ========== ÁREA CENTRAL DEL JUEGO ========== -->
+        <section class="col-12 col-lg-6 game-center d-flex flex-column">
+          <div class="row g-3 h-100">
+
+            <!-- Fila superior: SVG ahorcado + info -->
+            <div class="col-12 flex-grow-1 d-flex flex-column">
+              <div class="panel-card h-100 game-area-card">
+                <div class="row g-4 h-100">
+                  <div class="col-md-7 d-flex flex-column align-items-center justify-content-center svg-container">
+                    <div id="gameLoader" class="game-loader">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                      </div>
+                      <p class="mt-3 mb-0">Obteniendo palabra...</p>
+                    </div>
+                    <svg id="hangmanSvg" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" class="hangman-svg" aria-label="Dibujo del ahorcado">
+                      <g class="hangman-part stage-1 hangman-visible">
+                        <line x1="40"  y1="320" x2="180" y2="320" />
+                        <line x1="70"  y1="320" x2="70"  y2="30"  />
+                        <line x1="70"  y1="30"  x2="200" y2="30"  />
+                        <line x1="200" y1="30"  x2="200" y2="60"  />
+                      </g>
+                      <g class="hangman-part stage-2">
+                        <circle cx="200" cy="85" r="25" />
+                      </g>
+                      <g class="hangman-part stage-3">
+                        <line x1="200" y1="110" x2="200" y2="210" />
+                      </g>
+                      <g class="hangman-part stage-4">
+                        <line x1="200" y1="140" x2="155" y2="180" />
+                      </g>
+                      <g class="hangman-part stage-5">
+                        <line x1="200" y1="140" x2="245" y2="180" />
+                      </g>
+                      <g class="hangman-part stage-6">
+                        <line x1="200" y1="210" x2="160" y2="280" />
+                        <line x1="200" y1="210" x2="240" y2="280" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="col-md-5 d-flex flex-column justify-content-center gap-3 game-info-col">
+                    <div class="info-badge">
+                      <span class="info-label">Intentos</span>
+                      <span class="info-value"><span id="attemptsLeft">6</span> / 6</span>
+                    </div>
+                    <div class="info-badge">
+                      <span class="info-label">Tiempo</span>
+                      <span class="info-value" id="timerDisplay">00:00</span>
+                    </div>
+                    <div class="info-badge info-badge-category">
+                      <span class="info-label">Categoría</span>
+                      <span class="info-value" id="categoryDisplay">General</span>
+                    </div>
+                    <button id="newGameBtn" class="btn btn-primary game-btn game-btn-accent mt-2" type="button">
+                      🔄 Nueva Partida
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Guiones de la palabra -->
+            <div class="col-12">
+              <div class="panel-card word-display-card">
+                <div id="wordDisplay" class="word-display" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+
+            <!-- Teclado virtual -->
+            <div class="col-12">
+              <div class="panel-card keyboard-card">
+                <div id="keyboard" class="virtual-keyboard" role="group" aria-label="Teclado virtual A-Z"></div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ========== PANEL DERECHO: Letras y progreso ========== -->
+        <aside class="col-12 col-lg-3 game-panel right-panel d-flex flex-column">
+          <div class="panel-card h-100 d-flex flex-column">
+
+            <div class="panel-header">
+              <h2 class="panel-title">📝 Progreso</h2>
+            </div>
+
+            <div class="letter-bank mb-4">
+              <h3 class="bank-title correct-title">✅ Correctas</h3>
+              <div id="correctLetters" class="letter-list letter-list-correct">—</div>
+            </div>
+
+            <div class="letter-bank mb-4">
+              <h3 class="bank-title wrong-title">❌ Incorrectas</h3>
+              <div id="wrongLetters" class="letter-list letter-list-wrong">—</div>
+            </div>
+
+            <div class="word-progress flex-grow-1 d-flex flex-column">
+              <h3 class="bank-title">📊 Progreso de palabra</h3>
+              <div class="progress-stats mt-2">
+                <div class="progress-label d-flex justify-content-between mb-1">
+                  <span>Reveladas</span>
+                  <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress game-progress">
+                  <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+              <div class="mt-3 small text-muted" id="progressText">
+                0 de 0 letras reveladas
+              </div>
+            </div>
+
+            <div class="tip-box mt-auto pt-3">
+              <p class="mb-0"><strong>💡 Tip:</strong> También podés usar tu teclado físico para escribir las letras.</p>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER: Créditos ========== -->
+  <footer class="game-footer">
+    <div class="container-fluid h-100">
+      <div class="d-flex align-items-center justify-content-between h-100 px-4">
+        <span>© 2026 El Ahorcado — Palabras al Límite</span>
+        <span>Hecho con ☕ y vanilla JS</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== POPUP / NOTIFICACIÓN FLOTANTE (propio, no alert) ========== -->
+  <div id="popupOverlay" class="popup-overlay" hidden>
+    <div id="popupBox" class="popup-box" role="dialog" aria-modal="true" aria-labelledby="popupTitle">
+      <button id="popupClose" class="popup-close" type="button" aria-label="Cerrar">&times;</button>
+      <div id="popupIcon" class="popup-icon"></div>
+      <h3 id="popupTitle" class="popup-title"></h3>
+      <div id="popupBody" class="popup-body"></div>
+      <div class="popup-actions">
+        <button id="popupOkBtn" class="btn btn-primary game-btn game-btn-accent" type="button">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL BOOTSTRAP — Confirmaciones y victoria/derrota ========== -->
+  <div class="modal fade" id="gameModal" tabindex="-1" aria-labelledby="gameModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content game-modal-content">
+        <div class="modal-header game-modal-header">
+          <h5 class="modal-title" id="gameModalLabel">Título</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body game-modal-body" id="gameModalBody"></div>
+        <div class="modal-footer game-modal-footer" id="gameModalFooter"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/6nC99Lp2k0R8I3c7iWJn3qkYfO5uVQr4l1XaM3sLz8+Z2MvRQ2N9s8mS6xR4tG9v0JwP5f6yW3jH2y9nHk9w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="scripts/main.js"></script>
+</body>
+</html>

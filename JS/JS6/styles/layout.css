@@ -1,0 +1,251 @@
+/* =============================================
+   LAYOUT GENERAL — Aprovechamiento de 1920×1080
+   Tres zonas (header + main 3-col + footer)
+   ocupan 100vh sin scroll en desktop.
+   ============================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.5;
+  overflow: hidden;
+  transition: background var(--transition-base), color var(--transition-base);
+}
+
+/* ---------- HEADER ---------- */
+.game-header {
+  height: var(--header-height);
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: var(--z-card);
+}
+
+.brand-icon {
+  font-size: 2rem;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.1));
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.65rem;
+  color: var(--color-accent);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.brand-subtitle {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+/* Toggle modo claro/oscuro */
+.theme-toggle {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--bg-panel);
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: var(--color-accent);
+  color: var(--bg-card);
+  transform: rotate(15deg);
+  box-shadow: var(--shadow-md);
+}
+
+.theme-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.theme-toggle .icon-moon { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-sun  { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+/* ---------- MAIN ---------- */
+.game-main {
+  height: calc(100vh - var(--header-height) - var(--footer-height));
+  padding-top: var(--gutter-main);
+  padding-bottom: var(--gutter-main);
+}
+
+.game-panel {
+  height: 100%;
+}
+
+.left-panel .panel-card,
+.right-panel .panel-card {
+  height: 100%;
+}
+
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-base), border-color var(--transition-base);
+}
+
+.panel-header {
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 2px dashed var(--border-color);
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-accent);
+}
+
+/* ---------- FOOTER ---------- */
+.game-footer {
+  height: var(--footer-height);
+  background: var(--bg-panel);
+  border-top: 2px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* ---------- Botones generales ---------- */
+.game-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--border-radius-md);
+  padding: 0.7rem 1rem;
+  transition: all var(--transition-fast);
+  border-width: 2px;
+}
+
+.game-btn-accent {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.game-btn-accent:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.game-btn-accent:disabled {
+  background: var(--border-color) !important;
+  border-color: var(--border-color) !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.game-btn-outline {
+  background: transparent;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.game-btn-outline:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* ---------- Área central (juego) ---------- */
+.game-center {
+  gap: var(--gutter-main);
+}
+
+.game-area-card {
+  display: flex;
+  align-items: center;
+}
+
+.svg-container {
+  position: relative;
+  min-height: 280px;
+}
+
+.game-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  z-index: 10;
+  background: var(--bg-card);
+  border-radius: var(--border-radius-md);
+}
+
+.game-loader.hidden {
+  display: none;
+}
+
+.game-info-col {
+  padding: 1rem;
+}
+
+.info-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+}
+
+.info-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.info-value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.info-badge-category .info-value {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

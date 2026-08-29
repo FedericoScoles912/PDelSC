@@ -62,9 +62,12 @@ function showErrorMessage(message, container) {
  */
 async function handleFetchClick() {
   const container = document.getElementById('fetchResults');
+  const fetchBtn = document.getElementById('fetchBtn');
   try {
     const users = await fetchUsersWithFetch();
     renderUserCards(users, container);
+    fetchBtn.textContent = 'Usuarios cargados';
+    fetchBtn.disabled = true;
   } catch (error) {
     showErrorMessage(error.message, container);
   }
@@ -75,9 +78,12 @@ async function handleFetchClick() {
  */
 async function handleAxiosClick() {
   const container = document.getElementById('axiosResults');
+  const axiosBtn = document.getElementById('axiosBtn');
   try {
     const users = await fetchUsersWithAxios();
     renderUserCards(users, container);
+    axiosBtn.textContent = 'Usuarios cargados';
+    axiosBtn.disabled = true;
   } catch (error) {
     showErrorMessage(error.message, container);
   }

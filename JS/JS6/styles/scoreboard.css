@@ -1,0 +1,107 @@
+/* =============================================
+   TABLA DE POSICIONES — Panel izquierdo
+   Estilos propios, no clases bootstrap.
+   ============================================= */
+
+.scoreboard-wrapper {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+}
+
+.scoreboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.scoreboard-table thead {
+  position: sticky;
+  top: 0;
+  background: var(--bg-panel);
+  z-index: 2;
+}
+
+.scoreboard-table th {
+  padding: 0.7rem 0.6rem;
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-color);
+  background: var(--bg-panel);
+}
+
+.scoreboard-table th:first-child { text-align: center; width: 15%; }
+.scoreboard-table th:nth-child(3)  { text-align: right; width: 15%; }
+.scoreboard-table th:nth-child(4)  { text-align: right; width: 22%; }
+
+.scoreboard-table td {
+  padding: 0.65rem 0.6rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.scoreboard-table td:first-child {
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--color-accent);
+}
+
+.scoreboard-table td:nth-child(3),
+.scoreboard-table td:nth-child(4) {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.scoreboard-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.scoreboard-table tbody tr:hover {
+  background: var(--bg-panel);
+}
+
+.scoreboard-table tbody tr.score-current {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--bg-card));
+  border-left: 3px solid var(--color-accent);
+}
+
+.score-position-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.score-pos-1 { background: #FFD700; color: #6B4F00; }
+.score-pos-2 { background: #C0C0C0; color: #3B3B3B; }
+.score-pos-3 { background: #CD7F32; color: #FFF8E7; }
+
+.score-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.score-error {
+  padding: 1rem;
+  text-align: center;
+  color: var(--color-wrong);
+  font-size: 0.85rem;
+  background: color-mix(in srgb, var(--color-wrong) 10%, transparent);
+  border-radius: var(--border-radius-sm);
+}

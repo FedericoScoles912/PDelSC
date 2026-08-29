@@ -1,0 +1,61 @@
+/* =============================================
+   MODO OSCURO — Otoñal frío / nocturno
+   Activa al poner [data-theme="dark"] en <html>
+   ============================================= */
+
+html[data-theme="dark"] {
+  /* Fondos */
+  --bg-page:         #1E1A14;
+  --bg-panel:        #28211A;
+  --bg-card:         #332A20;
+
+  /* Textos */
+  --text-primary:    #E8D5BE;
+  --text-secondary:  #B89E82;
+  --text-muted:      #6B5A45;
+
+  /* Accentos */
+  --color-accent:       #D4733A;
+  --color-accent-hover: #E8883A;
+
+  /* Estado letras */
+  --color-correct:   #5C9E6B;
+  --color-wrong:     #A03535;
+  --color-neutral:   #4A3B2C;
+
+  /* SVG */
+  --color-ink:       #D4B896;
+
+  /* Bordes */
+  --border-color:    #4A3B2C;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.65);
+
+  color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .kb-key,
+html[data-theme="dark"] .kb-key::before {
+  background: var(--bg-card);
+}
+
+html[data-theme="dark"] .game-modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+html[data-theme="dark"] .name-input-wrapper input[type="text"] {
+  background: var(--bg-panel);
+  color: var(--text-primary);
+}
+
+html[data-theme="dark"] .popup-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
