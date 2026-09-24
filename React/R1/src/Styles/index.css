@@ -1,0 +1,65 @@
+@import "bootstrap/dist/css/bootstrap-grid.min.css";
+@import "bootstrap/dist/css/bootstrap-utilities.min.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn-primario {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200
+           bg-light-terracota text-light-crema
+           hover:bg-opacity-90 hover:shadow-md
+           dark:bg-dark-mostaza dark:text-dark-chocolate
+           dark:hover:bg-opacity-90;
+  }
+
+  .btn-secundario {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200
+           border-2 border-light-terracota text-light-terracota
+           hover:bg-light-terracota hover:text-light-crema
+           dark:border-dark-mostaza dark:text-dark-mostaza
+           dark:hover:bg-dark-mostaza dark:hover:text-dark-chocolate;
+  }
+
+  .input-base {
+    @apply w-full px-4 py-2 rounded-lg border-2 outline-none transition-all duration-200
+           bg-light-crema border-light-marron text-light-oliva
+           focus:border-light-terracota
+           dark:bg-dark-gris dark:border-dark-mostaza dark:text-dark-crema
+           dark:focus:border-dark-mostaza;
+  }
+
+  .card-base {
+    @apply rounded-xl shadow-lg transition-all duration-300
+           bg-light-crema border border-light-marron/30
+           dark:bg-dark-chocolate dark:border-dark-mostaza/30;
+  }
+
+  .texto-claro {
+    @apply text-light-oliva dark:text-dark-crema;
+  }
+
+  .titulo {
+    @apply text-2xl font-bold text-light-terracota dark:text-dark-mostaza;
+  }
+}

@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Tema claro por defecto */
+  html.light body {
+    background-color: #FAF6EC;
+    color: #3E2723;
+  }
+
+  html.dark body {
+    background-color: #3E2723;
+    color: #FAF6EC;
+  }
+}
+
+@layer components {
+  .btn-base {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .input-base {
+    @apply w-full px-4 py-2 rounded-lg border-2 transition-all duration-200 focus:outline-none focus:ring-2;
+  }
+
+  .card-base {
+    @apply rounded-xl shadow-md p-5 transition-all duration-200;
+  }
+
+  /* Tema claro */
+  html.light .card-tarea {
+    @apply bg-white border-2 border-otoño-claro-terracotaSuave hover:shadow-lg hover:-translate-y-1;
+  }
+
+  html.light .input-form {
+    @apply input-base bg-white border-otoño-claro-marron text-otoño-oscuro-chocolate focus:ring-otoño-claro-terracota focus:border-otoño-claro-terracota;
+  }
+
+  html.light .btn-primario {
+    @apply btn-base bg-otoño-claro-terracota text-white hover:bg-otoño-claro-terracotaSuave focus:ring-otoño-claro-terracota;
+  }
+
+  html.light .btn-secundario {
+    @apply btn-base bg-otoño-claro-oliva text-white hover:opacity-90 focus:ring-otoño-claro-oliva;
+  }
+
+  html.light .btn-ghost {
+    @apply btn-base bg-transparent text-otoño-oscuro-chocolate border-2 border-otoño-claro-marron hover:bg-otoño-claro-beige;
+  }
+
+  html.light .bg-layout {
+    background-color: #F5F1E8;
+  }
+
+  html.light .bg-navbar {
+    background-color: #A68A64;
+  }
+
+  /* Tema oscuro */
+  html.dark .card-tarea {
+    @apply bg-otoño-oscuro-chocolateSuave border-2 border-otoño-oscuro-mostazaApagado hover:shadow-lg hover:-translate-y-1;
+  }
+
+  html.dark .input-form {
+    @apply input-base bg-otoño-oscuro-grisCalido border-otoño-oscuro-mostazaApagado text-otoño-claro-crema focus:ring-otoño-oscuro-mostaza focus:border-otoño-oscuro-mostaza;
+  }
+
+  html.dark .btn-primario {
+    @apply btn-base bg-otoño-oscuro-mostaza text-otoño-oscuro-chocolate hover:bg-otoño-oscuro-mostazaApagado focus:ring-otoño-oscuro-mostaza;
+  }
+
+  html.dark .btn-secundario {
+    @apply btn-base bg-otoño-oscuro-borgoña text-otoño-claro-crema hover:opacity-90 focus:ring-otoño-oscuro-borgoña;
+  }
+
+  html.dark .btn-ghost {
+    @apply btn-base bg-transparent text-otoño-claro-crema border-2 border-otoño-oscuro-mostazaApagado hover:bg-otoño-oscuro-grisCalido;
+  }
+
+  html.dark .bg-layout {
+    background-color: #3E2723;
+  }
+
+  html.dark .bg-navbar {
+    background-color: #5D4037;
+  }
+}
+
+@layer utilities {
+  .scrollbar-smooth::-webkit-scrollbar {
+    width: 8px;
+  }
+  .scrollbar-smooth::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-smooth::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-otoño-claro-terracotaSuave dark:bg-otoño-oscuro-mostazaApagado;
+  }
+}

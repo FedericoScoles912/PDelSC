@@ -1,0 +1,9 @@
+.tema-claro {
+  background-color: #F5F0E1;
+  color: #6B705C;
+}
+
+.tema-claro ::selection {
+  background-color: #C97B63;
+  color: #FFF8E7;
+}
