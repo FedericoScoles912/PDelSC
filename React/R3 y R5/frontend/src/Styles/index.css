@@ -1,0 +1,101 @@
+@import './themes/tokens.css';
+@import './base/reset.css';
+@import './base/typography.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Combinación Bootstrap grid/flex utilidades (sistema responsive)
+   + Tailwind para diseños específicos. La clase .container y .row/.col
+   provienen de Bootstrap y se complementan con utilidades Tailwind. */
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md font-medium transition-all duration-150 border-0 cursor-pointer select-none;
+  }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--accent-primary);
+    color: #fff;
+    box-shadow: var(--shadow-card);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-warm);
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+
+  .btn-danger {
+    background: var(--accent-error);
+    color: #fff;
+  }
+
+  .input {
+    @apply block w-full px-3.5 py-2.5 rounded-md text-sm transition-colors duration-150;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 22%, transparent);
+  }
+  .input::placeholder { color: var(--text-muted); }
+
+  .input-error { border-color: var(--accent-error) !important; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .divider {
+    @apply my-5 h-px w-full;
+    background: linear-gradient(to right, transparent, var(--border-subtle), transparent);
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  .link {
+    @apply font-medium;
+    color: var(--accent-primary);
+  }
+  .link:hover { text-decoration: underline; }
+}
+
+/* Utilidades Bootstrap-like responsive */
+.d-none { display: none !important; }
+@media (min-width: 576px)  { .d-sm-block { display: block !important; } }
+@media (min-width: 768px)  { .d-md-block { display: block !important; } .d-md-flex { display: flex !important; } }
+@media (min-width: 992px)  { .d-lg-none  { display: none !important; } }
+
+.max-w-content { max-width: 1440px; margin-left: auto; margin-right: auto; }

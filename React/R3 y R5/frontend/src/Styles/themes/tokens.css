@@ -1,0 +1,65 @@
+/* =========================================================
+   TOKENS DE DISEÑO — PALETA OTOÑAL CÁLIDA
+   ========================================================= */
+:root {
+  /* Fondos — modo claro */
+  --bg-primary:      #FAF6F1;
+  --bg-secondary:    #F2E8DC;
+  --bg-tertiary:     #E8D9C5;
+  --surface:         #FFFFFF;
+  --surface-hover:   #F7EFDF;
+
+  /* Textos — modo claro */
+  --text-primary:    #3E2A1F;
+  --text-secondary:  #6B5344;
+  --text-muted:      #9C8B7A;
+
+  /* Acentos */
+  --accent-primary:  #B85C38;
+  --accent-secondary:#D4944A;
+  --accent-tertiary: #8B864E;
+  --accent-success:  #6B8E5A;
+  --accent-error:    #A04040;
+  --accent-warning:  #C9842E;
+
+  /* Bordes */
+  --border-subtle:   #E0D2BE;
+  --border-strong:   #C9B89E;
+
+  /* Radii y espaciado */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --shadow-warm: 0 10px 30px -12px rgba(128, 70, 40, 0.18);
+  --shadow-card: 0 2px 10px -2px rgba(60, 40, 20, 0.12);
+}
+
+/* =========================================================
+   MODO OSCURO
+   ========================================================= */
+[data-theme="dark"] {
+  --bg-primary:      #2A1F18;
+  --bg-secondary:    #35281E;
+  --bg-tertiary:     #403226;
+  --surface:         #3D2F24;
+  --surface-hover:   #4A3A2D;
+
+  --text-primary:    #F5EADB;
+  --text-secondary:  #D4C3AD;
+  --text-muted:      #A89680;
+
+  --accent-primary:  #E07A50;
+  --accent-secondary:#E8B060;
+  --accent-tertiary: #A8A160;
+  --accent-success:  #87B06F;
+  --accent-error:    #D06060;
+  --accent-warning:  #E8A548;
+
+  --border-subtle:   #544336;
+  --border-strong:   #6E5847;
+
+  --shadow-warm: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 14px -2px rgba(0, 0, 0, 0.4);
+}
