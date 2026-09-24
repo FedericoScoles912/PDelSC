@@ -1,0 +1,62 @@
+/* ============================================================
+   Styles/theme.css
+   Clases de utilidad específicas para los temas claro/oscuro.
+   Se cargan vía import en caso necesario (Styles/index.css ya
+   hace el grueso del trabajo).
+   ============================================================ */
+
+/* Fondo de secciones (variantes sutiles por sección) */
+.bg-section-cream {
+  background-color: #F5EFE6;
+}
+.bg-section-warm {
+  background-color: #F0E7DA;
+}
+html.dark .bg-section-cream {
+  background-color: #2B211B;
+}
+html.dark .bg-section-warm {
+  background-color: #322720;
+}
+
+/* Botones de paleta otoñal */
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg
+         bg-terracotta hover:bg-terracotta/90 text-cream
+         shadow-warm hover:shadow-lg transition-all duration-300
+         dark:bg-burntOrange dark:hover:bg-burntOrange/90
+         dark:text-deepBrown dark:shadow-warmDark
+         font-semibold;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg
+         bg-olive hover:bg-olive/90 text-cream
+         shadow-warm hover:shadow-lg transition-all duration-300
+         dark:bg-mustard/90 dark:hover:bg-mustard dark:text-deepBrown
+         font-semibold;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg
+         border-2 border-softBrown text-softBrown
+         hover:bg-softBrown hover:text-cream
+         transition-all duration-300
+         dark:border-mustard dark:text-mustard
+         dark:hover:bg-mustard dark:hover:text-deepBrown
+         font-semibold;
+}
+
+/* Enlaces de navegación */
+.nav-link {
+  @apply relative text-softBrown dark:text-mutedBeige
+         hover:text-terracotta dark:hover:text-burntOrange
+         transition-colors duration-300
+         font-medium;
+}
+
+.nav-link.active::after {
+  content: '';
+  @apply absolute -bottom-1 left-0 h-0.5 w-full
+         bg-terracotta dark:bg-burntOrange rounded;
+}

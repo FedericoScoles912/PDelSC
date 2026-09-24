@@ -1,0 +1,84 @@
+/* ============================================================
+   Styles/index.css
+   Punto de entrada global: Tailwind + Bootstrap (solo grid)
+   + reglas base reutilizables
+   ============================================================ */
+
+/* --- Importamos únicamente la GRID y BREAKPOINTS de Bootstrap
+      (no importamos el bundle entero de componentes) -------- */
+@import 'bootstrap/dist/css/bootstrap-grid.min.css';
+
+/* --- TailwindCSS ------------------------------------------------ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Variables CSS de fallback (se sincronizan con tailwind.config) */
+:root {
+  --color-cream: #F5EFE6;
+  --color-terracotta: #C97B4C;
+  --color-olive: #7C8B6C;
+  --color-soft-brown: #6B4F3B;
+  --color-deep-brown: #2B211B;
+  --color-burnt-orange: #B5651D;
+  --color-mustard: #C9A24B;
+  --color-muted-beige: #A69783;
+}
+
+/* --- Reset base / scroll suave --------------------------------- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* compensa navbar sticky */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-soft-brown);
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* --- Modo oscuro (se activa con class="dark" en <html>) -------- */
+html.dark body {
+  background-color: var(--color-deep-brown);
+  color: var(--color-muted-beige);
+}
+
+/* --- Scrollbar estilizado (solo webkit) ------------------------ */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-terracotta);
+  border-radius: 8px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-burnt-orange);
+}
+
+/* --- Utility: container fluido para desktop 1920 (complementa Bootstrap .container) */
+@layer components {
+  .section-container {
+    @apply max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-10 py-16 lg:py-24;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-display font-bold mb-10
+           text-softBrown dark:text-mustard
+           border-b-4 border-terracotta dark:border-burntOrange
+           inline-block pb-2;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full
+           px-3 py-1 text-xs md:text-sm font-medium
+           bg-terracotta/15 text-softBrown
+           dark:bg-burntOrange/20 dark:text-mustard;
+  }
+}
