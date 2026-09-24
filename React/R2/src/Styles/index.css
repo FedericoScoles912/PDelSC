@@ -11,10 +11,11 @@
 
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Tema claro por defecto */
   html.light body {
     background-color: #FAF6EC;
     color: #3E2723;
@@ -23,6 +24,25 @@
   html.dark body {
     background-color: #3E2723;
     color: #FAF6EC;
+  }
+
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 
@@ -36,10 +56,187 @@
   }
 
   .card-base {
-    @apply rounded-xl shadow-md p-5 transition-all duration-200;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    padding: 1.25rem;
+    transition: all 0.25s ease;
+  }
+  .card-base:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
   }
 
-  /* Tema claro */
+  /* ===== Tarjetas de tarea modernas ===== */
+  .tarea-card {
+    position: relative;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .tarea-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.18),
+                0 4px 10px -4px rgba(0, 0, 0, 0.08);
+  }
+  .tarea-card.is-completa .tarea-indicador {
+    opacity: 0.7;
+  }
+
+  .tarea-indicador {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    transition: opacity 0.2s ease;
+    z-index: 1;
+  }
+  html.light .tarea-indicador.claro {
+    background: linear-gradient(180deg, #C97B5E 0%, #D9A48C 100%);
+  }
+  html.dark .tarea-indicador.oscuro {
+    background: linear-gradient(180deg, #B8860B 0%, #A8882B 100%);
+  }
+  .tarea-card.is-completa .tarea-indicador.claro {
+    background: linear-gradient(180deg, #8A9A5B 0%, #A6B07C 100%);
+  }
+  .tarea-card.is-completa .tarea-indicador.oscuro {
+    background: linear-gradient(180deg, #6B8E23 0%, #556B2F 100%);
+  }
+
+  .tarea-content {
+    position: relative;
+    z-index: 0;
+    height: 100%;
+    border-radius: 14px;
+  }
+  html.light .tarea-content {
+    background-color: #ffffff;
+    border: 1px solid #EFE7D6;
+  }
+  html.dark .tarea-content {
+    background-color: #5D4037;
+    border: 1px solid rgba(168, 136, 43, 0.25);
+  }
+  .tarea-card:hover .tarea-content {
+    border-color: transparent;
+  }
+  html.light .tarea-card:hover .tarea-content {
+    box-shadow: inset 0 0 0 1px #D9A48C;
+  }
+  html.dark .tarea-card:hover .tarea-content {
+    box-shadow: inset 0 0 0 1px rgba(184, 134, 11, 0.5);
+  }
+
+  /* Checkbox inline */
+  .tarea-checkbox {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border-radius: 7px;
+    border: 2px solid;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+  }
+  .tarea-checkbox:hover {
+    transform: scale(1.08);
+  }
+  .tarea-checkbox.claro {
+    border-color: #A68A64;
+    color: #ffffff;
+  }
+  .tarea-checkbox.claro.checked {
+    background: linear-gradient(135deg, #8A9A5B 0%, #6B8E23 100%);
+    border-color: #8A9A5B;
+    box-shadow: 0 2px 6px rgba(138, 154, 91, 0.4);
+  }
+  .tarea-checkbox.oscuro {
+    border-color: #A8882B;
+    color: #3E2723;
+  }
+  .tarea-checkbox.oscuro.checked {
+    background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+    border-color: #B8860B;
+    box-shadow: 0 2px 6px rgba(184, 134, 11, 0.4);
+  }
+
+  /* Tachado sutil para tareas completas */
+  .tachado {
+    position: relative;
+    opacity: 0.55;
+  }
+  .tachado::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1.5px;
+    background: currentColor;
+    opacity: 0.5;
+    border-radius: 1px;
+    transform: translateY(-50%);
+  }
+
+  .tarea-ver-detalle {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .tarea-card:hover .tarea-ver-detalle {
+    transform: translateX(2px);
+    opacity: 1;
+  }
+
+  /* ===== Buscador ===== */
+  .buscador-input {
+    padding-left: 2.75rem !important;
+    padding-right: 2.75rem !important;
+  }
+  .buscador-input::placeholder {
+    font-weight: 400;
+  }
+  .buscador-input:focus {
+    box-shadow: 0 0 0 3px rgba(201, 123, 94, 0.15);
+  }
+  html.dark .buscador-input:focus {
+    box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.2);
+  }
+
+  /* ===== Chips de filtro ===== */
+  .filtro-chip {
+    position: relative;
+    user-select: none;
+  }
+  .filtro-chip:hover {
+    transform: translateY(-1px);
+  }
+  .filtro-chip:active {
+    transform: translateY(0);
+  }
+  .filtro-contador {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 1.75rem;
+    text-align: center;
+  }
+
+  /* ===== Select de orden ===== */
+  .orden-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 14px;
+    padding-right: 2.25rem !important;
+  }
+
+  /* Clásicos - compatibilidad */
   html.light .card-tarea {
     @apply bg-white border-2 border-otoño-claro-terracotaSuave hover:shadow-lg hover:-translate-y-1;
   }

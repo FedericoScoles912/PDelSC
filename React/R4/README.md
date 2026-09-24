@@ -48,7 +48,11 @@ cp .env.example .env          # Linux/Mac
 # -> Editá .env con tus credenciales de PostgreSQL
 
 # 3. Crear la base de datos
-psql -U postgres -c "CREATE DATABASE portfolio_db;"
+#    Abrí la consola de PostgreSQL (te pedirá la contraseña del usuario postgres):
+psql -U postgres
+#    Dentro de psql, ejecutá:
+#    CREATE DATABASE portfolio_db;
+#    Y salí con:  \q
 
 # 4. Ejecutar esquema + datos iniciales
 psql -U postgres -d portfolio_db -f Database/schema.sql

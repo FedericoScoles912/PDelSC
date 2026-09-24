@@ -26,9 +26,9 @@ export default function AboutMe() {
 
   // Párrafos descriptivos (reemplazar texto placeholder)
   const paragraphs = [
-    '¡Hola! Soy [Tu nombre], un/a [Tu Rol] apasionado/a por [área o tecnología que te apasiona]. Con [X años] de experiencia en [campo principal], me especializo en [especialidad o stack principal].',
-    'Me caracterizo por [cualidades personales: curiosidad, resolución de problemas, trabajo en equipo, etc.]. Disfruto enfrentar desafíos técnicos y colaborar en equipos multidisciplinarios para construir soluciones digitales que generen valor real.',
-    'En mi tiempo libre, me gusta [hobbies o actividades relacionadas o no con tech: contribuir a open-source, escribir artículos, fotografía, deportes, etc.]. Siempre estoy en búsqueda de aprender nuevas herramientas y mejorar mis habilidades constantemente.',
+    '¡Hola! Soy Federico Scoles, un Desarrollador de Programación Informática. Con 4 años de experiencia en Desarrollo Web y App Development, me especializo en Desarrollo Web.',
+    'Me caracterizo por mi pasión por la tecnología y mi compromiso con la calidad. Disfruto enfrentar desafíos técnicos y colaborar en equipos multidisciplinarios para construir soluciones digitales que generen valor real.',
+    'En mi tiempo libre, me gusta entrenar, programar, cantar y leer la palabra de Dios. Siempre estoy en búsqueda de aprender nuevas herramientas y mejorar mis habilidades constantemente.',
   ];
 
   return (

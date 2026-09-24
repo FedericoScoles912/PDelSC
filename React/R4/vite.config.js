@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
       sourcemap: false,
     },
     server: {
-      port: 5173,
+      port: 5179,
       proxy: {
         // Redirige las llamadas a la API al servidor Express en desarrollo
         '/api': {
