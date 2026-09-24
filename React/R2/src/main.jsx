@@ -5,6 +5,7 @@ import App from './App.jsx';
 import { ThemeProvider } from './Context/ThemeContext.jsx';
 import { TareasProvider } from './Context/TareasContext.jsx';
 import { ToastProvider } from './Context/ToastContext.jsx';
+import { ConfirmProvider } from './Context/ConfirmContext.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Styles/index.css';
 
@@ -14,7 +15,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <TareasProvider>
           <ToastProvider>
-            <App />
+            <ConfirmProvider>
+              <App />
+            </ConfirmProvider>
           </ToastProvider>
         </TareasProvider>
       </ThemeProvider>

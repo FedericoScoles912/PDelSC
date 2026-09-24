@@ -1,0 +1,9 @@
+.tema-oscuro {
+  background-color: #3E2723;
+  color: #D4A373;
+}
+
+.tema-oscuro ::selection {
+  background-color: #B08968;
+  color: #3E2723;
+}

@@ -2,32 +2,43 @@ import { useEffect } from 'react';
 import { useTheme } from '../Context/ThemeContext.jsx';
 
 /**
- * Modal/Toast reutilizable implementado sin bibliotecas externas (sin alert()).
- * Se muestra u oculta mediante una prop booleana. Soporta título, mensaje, tipo
- * y un callback al cerrar. Incluye cierre con botón, click en backdrop y tecla Escape.
+ * Modal/Toast reutilizable implementado sin bibliotecas externas (sin alert/confirm).
+ * Soporta UN botón (caso info/success/error/warning) o DOS botones (confirmación)
+ * cuando se provee `onConfirmar`. Cierre por botón, click en backdrop o Escape.
  *
  * @param {Object} props
- * @param {boolean} props.visible - Controla si el modal se muestra
- * @param {string} [props.titulo] - Título opcional del modal
- * @param {string|import('react').ReactNode} props.mensaje - Contenido principal
- * @param {'success'|'info'|'warning'|'error'} [props.tipo='info'] - Variante de color
- * @param {Function} props.onCerrar - Callback al cerrar () => void
- * @param {string} [props.textoBoton='Aceptar'] - Texto del botón de confirmación
+ * @param {boolean} props.visible
+ * @param {string} [props.titulo]
+ * @param {string|import('react').ReactNode} props.mensaje
+ * @param {'success'|'info'|'warning'|'error'|'confirm'} [props.tipo='info']
+ * @param {Function} props.onCerrar - () => void.
+ *   Si NO hay onConfirmar -> único botón "Aceptar".
+ *   Si SI hay onConfirmar -> onCerrar pasa a ser el botón "Cancelar" / dismiss.
+ * @param {string} [props.textoBoton='Aceptar']
+ * @param {Function} [props.onConfirmar] - () => void. Cuando se pasa, muestra 2 botones.
+ * @param {string} [props.textoBotonConfirmar='Confirmar']
  */
-export default function Modal({ visible, titulo, mensaje, tipo = 'info', onCerrar, textoBoton = 'Aceptar' }) {
+export default function Modal({
+  visible,
+  titulo,
+  mensaje,
+  tipo = 'info',
+  onCerrar,
+  textoBoton = 'Aceptar',
+  onConfirmar,
+  textoBotonConfirmar = 'Confirmar'
+}) {
   const { isDark } = useTheme();
+  const esConfirmacion = Boolean(onConfirmar);
 
   useEffect(() => {
     if (!visible) return;
-
     const onKey = (e) => {
       if (e.key === 'Escape') onCerrar?.();
     };
     window.addEventListener('keydown', onKey);
-
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-
     return () => {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
@@ -40,22 +51,27 @@ export default function Modal({ visible, titulo, mensaje, tipo = 'info', onCerra
     success: {
       icono: '✅',
       barra: isDark ? 'bg-green-800/70' : 'bg-green-600',
-      boton: isDark ? 'bg-green-800 hover:bg-green-700 text-dark-crema' : 'bg-green-600 hover:bg-green-700 text-white'
+      botonPrimario: isDark ? 'bg-green-800 hover:bg-green-700 text-dark-crema' : 'bg-green-600 hover:bg-green-700 text-white'
     },
     error: {
       icono: '❌',
       barra: isDark ? 'bg-dark-borgona' : 'bg-red-600',
-      boton: isDark ? 'bg-dark-borgona hover:bg-opacity-90 text-dark-crema' : 'bg-red-600 hover:bg-red-700 text-white'
+      botonPrimario: isDark ? 'bg-dark-borgona hover:bg-opacity-90 text-dark-crema' : 'bg-red-600 hover:bg-red-700 text-white'
     },
     warning: {
       icono: '⚠️',
       barra: isDark ? 'bg-dark-mostaza' : 'bg-yellow-500',
-      boton: isDark ? 'bg-dark-mostaza hover:bg-opacity-90 text-dark-chocolate' : 'bg-yellow-500 hover:bg-yellow-600 text-dark-chocolate'
+      botonPrimario: isDark ? 'bg-dark-mostaza hover:bg-opacity-90 text-dark-chocolate' : 'bg-yellow-500 hover:bg-yellow-600 text-dark-chocolate'
+    },
+    confirm: {
+      icono: '🗑️',
+      barra: isDark ? 'bg-dark-borgona' : 'bg-red-600',
+      botonPrimario: isDark ? 'bg-dark-borgona hover:bg-opacity-90 text-dark-crema' : 'bg-red-600 hover:bg-red-700 text-white'
     },
     info: {
       icono: 'ℹ️',
       barra: isDark ? 'bg-dark-mostaza/80' : 'bg-light-terracota',
-      boton: isDark ? 'bg-dark-mostaza hover:bg-opacity-90 text-dark-chocolate' : 'bg-light-terracota hover:bg-opacity-90 text-light-crema'
+      botonPrimario: isDark ? 'bg-dark-mostaza hover:bg-opacity-90 text-dark-chocolate' : 'bg-light-terracota hover:bg-opacity-90 text-light-crema'
     }
   };
 
@@ -70,20 +86,24 @@ export default function Modal({ visible, titulo, mensaje, tipo = 'info', onCerra
       }}
       role="dialog"
       aria-modal="true"
+      aria-labelledby={titulo ? 'modal-title' : undefined}
     >
       <div
-        className={`card-base w-100 overflow-hidden animate-fade-in`}
+        className="card-base w-100 overflow-hidden animate-fade-in"
         style={{ maxWidth: '460px' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`${est.barra} height-1`} style={{ height: '5px' }} />
+        <div className={est.barra} style={{ height: '5px' }} />
 
         <div className="p-4 p-md-5">
           <div className="d-flex align-items-start gap-3 mb-3">
             <span className="fs-3">{est.icono}</span>
             <div className="flex-grow-1">
               {titulo && (
-                <h3 className={`m-0 fs-4 fw-bold ${isDark ? 'text-dark-mostaza' : 'text-light-terracota'}`}>
+                <h3
+                  id="modal-title"
+                  className={`m-0 fs-4 fw-bold ${isDark ? 'text-dark-mostaza' : 'text-light-terracota'}`}
+                >
                   {titulo}
                 </h3>
               )}
@@ -93,13 +113,31 @@ export default function Modal({ visible, titulo, mensaje, tipo = 'info', onCerra
             </div>
           </div>
 
-          <div className="d-flex justify-content-end mt-4">
-            <button
-              onClick={() => onCerrar?.()}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 shadow-sm ${est.boton}`}
-            >
-              {textoBoton}
-            </button>
+          <div className={`d-flex gap-3 mt-4 ${esConfirmacion ? 'justify-content-between flex-row-reverse' : 'justify-content-end'}`}>
+            {esConfirmacion ? (
+              <>
+                <button
+                  onClick={() => onConfirmar?.()}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 shadow-sm ${est.botonPrimario}`}
+                  autoFocus
+                >
+                  {textoBotonConfirmar}
+                </button>
+                <button
+                  onClick={() => onCerrar?.()}
+                  className="btn-secundario px-4 py-2"
+                >
+                  {textoBoton}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => onCerrar?.()}
+                className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 shadow-sm ${est.botonPrimario}`}
+              >
+                {textoBoton}
+              </button>
+            )}
           </div>
         </div>
       </div>

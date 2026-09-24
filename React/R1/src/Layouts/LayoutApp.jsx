@@ -16,7 +16,7 @@ export default function LayoutApp({ children, ejercicioActivo, onSeleccionarEjer
 
   return (
     <div
-      className={`min-vh-100 w-100 d-flex flex-col transition-colors duration-300
+      className={`flex flex-col min-h-screen w-full transition-colors duration-300
         ${isDark ? 'tema-oscuro' : 'tema-claro'}`}
     >
       <Header
@@ -25,7 +25,7 @@ export default function LayoutApp({ children, ejercicioActivo, onSeleccionarEjer
         ejercicios={ejercicios}
       />
 
-      <main className="flex-grow-1 w-100 py-5">
+      <main className="flex-1 w-full py-5 md:py-8">
         <div className="container">
           <div className="row justify-content-center">
             <div className="col-12 col-xl-10 col-xxl-9 animate-fade-in" key={ejercicioActivo}>

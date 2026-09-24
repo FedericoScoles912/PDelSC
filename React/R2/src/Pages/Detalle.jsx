@@ -1,10 +1,11 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTareas } from '../Context/TareasContext.jsx';
 import BotonVolver from '../Components/BotonVolver.jsx';
 import EstadoBadge from '../Components/EstadoBadge.jsx';
 import { formatearFecha } from '../Scripts/utils.js';
 import { useTheme } from '../Context/ThemeContext.jsx';
 import { useToast } from '../Context/ToastContext.jsx';
+import { useConfirm } from '../Context/ConfirmContext.jsx';
 
 /**
  * Página de detalle de una tarea.
@@ -14,9 +15,11 @@ import { useToast } from '../Context/ToastContext.jsx';
  */
 function Detalle() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { obtenerTareaPorId, toggleCompleta, eliminarTarea } = useTareas();
   const { esOscuro } = useTheme();
   const { mostrarToast } = useToast();
+  const { confirmar } = useConfirm();
 
   const tarea = obtenerTareaPorId(id);
 
@@ -47,12 +50,18 @@ function Detalle() {
     });
   };
 
-  const handleEliminar = () => {
-    if (window.confirm === undefined) return;
-    const confirmar = confirmarEliminacion(tarea.titulo);
-    if (confirmar) {
+  const handleEliminar = async () => {
+    const ok = await confirmar({
+      titulo: 'Eliminar tarea',
+      mensaje: `¿Estás seguro que querés eliminar la tarea "${tarea.titulo}"?\n\nEsta acción no se puede deshacer.`,
+      textoAceptar: 'Sí, eliminar',
+      textoCancelar: 'Cancelar',
+      variante: 'peligro'
+    });
+    if (ok) {
       eliminarTarea(tarea.id);
       mostrarToast({ mensaje: 'Tarea eliminada correctamente', tipo: 'info' });
+      navigate('/');
     }
   };
 
@@ -125,19 +134,6 @@ function Detalle() {
       </article>
     </section>
   );
-}
-
-/**
- * Muestra un diálogo de confirmación nativo (no alert) para eliminar.
- * @param {string} titulo - Título de la tarea a eliminar
- * @returns {boolean} true si el usuario confirma
- */
-function confirmarEliminacion(titulo) {
-  const msj = `¿Estás seguro que querés eliminar la tarea "${titulo}"?\n\nEsta acción no se puede deshacer.`;
-  if (typeof window !== 'undefined' && window.confirm) {
-    return window.confirm(msj);
-  }
-  return true;
 }
 
 export default Detalle;

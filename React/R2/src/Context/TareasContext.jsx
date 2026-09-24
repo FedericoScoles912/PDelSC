@@ -61,6 +61,57 @@ export function TareasProvider({ children }) {
   };
 
   /**
+   * Elimina TODAS las tareas del estado global.
+   * @returns {number} Cantidad de tareas eliminadas
+   */
+  const eliminarTodas = () => {
+    const cantidad = tareas.length;
+    setTareas([]);
+    return cantidad;
+  };
+
+  /**
+   * Marca todas las tareas como completas o pendientes.
+   * @param {boolean} valor - true para completas, false para pendientes
+   * @returns {number} Cantidad de tareas modificadas
+   */
+  const marcarTodas = (valor) => {
+    let modificadas = 0;
+    setTareas((prev) =>
+      prev.map((t) => {
+        if (t.completa !== Boolean(valor)) modificadas++;
+        return { ...t, completa: Boolean(valor) };
+      })
+    );
+    return modificadas;
+  };
+
+  /**
+   * Elimina SOLO las tareas que estén marcadas como completas.
+   * @returns {number} Cantidad de tareas eliminadas
+   */
+  const eliminarCompletadas = () => {
+    let eliminadas = 0;
+    setTareas((prev) =>
+      prev.filter((t) => {
+        if (t.completa) {
+          eliminadas++;
+          return false;
+        }
+        return true;
+      })
+    );
+    return eliminadas;
+  };
+
+  /**
+   * Restaura el listado al array inicial de mock data.
+   */
+  const restaurarIniciales = () => {
+    setTareas([...tareasIniciales]);
+  };
+
+  /**
    * Exporta todas las tareas como un archivo JSON descargable.
    */
   const exportarJSON = () => {
@@ -85,6 +136,10 @@ export function TareasProvider({ children }) {
         obtenerTareaPorId,
         toggleCompleta,
         eliminarTarea,
+        eliminarTodas,
+        marcarTodas,
+        eliminarCompletadas,
+        restaurarIniciales,
         exportarJSON
       }}
     >
@@ -102,6 +157,10 @@ export function TareasProvider({ children }) {
  *   obtenerTareaPorId: Function,
  *   toggleCompleta: Function,
  *   eliminarTarea: Function,
+ *   eliminarTodas: Function,
+ *   marcarTodas: Function,
+ *   eliminarCompletadas: Function,
+ *   restaurarIniciales: Function,
  *   exportarJSON: Function
  * }}
  */

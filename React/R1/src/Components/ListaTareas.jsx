@@ -2,6 +2,7 @@ import { useState } from 'react';
 import EjercicioWrapper from './EjercicioWrapper.jsx';
 import FormularioTarea from './FormularioTarea.jsx';
 import TareaItem from './TareaItem.jsx';
+import Modal from './Modal.jsx';
 import { useTheme } from '../Context/ThemeContext.jsx';
 import { generarId } from '../Scripts/helpers.js';
 
@@ -9,9 +10,11 @@ import { generarId } from '../Scripts/helpers.js';
  * Ejercicio 4: Lista de tareas (Todo List).
  * Gestiona un array de objetos {id, texto, completada} mediante useState.
  * Divide la UI en FormularioTarea y TareaItem (subcomponentes atómicos).
+ * Antes de borrar una tarea, muestra un Modal de confirmación propio.
  *
  * Estado:
- *  - tareas: Array de tareas. Incluye 2 ejemplos iniciales.
+ *  - tareas: Array de tareas. Incluye 3 ejemplos iniciales.
+ *  - tareaAEliminar: tarea pendiente de confirmación para borrar (null = sin popup).
  */
 export default function ListaTareas() {
   const [tareas, setTareas] = useState([
@@ -19,6 +22,8 @@ export default function ListaTareas() {
     { id: generarId(), texto: 'Practicar componentes reutilizables', completada: false },
     { id: generarId(), texto: 'Probar el modo oscuro 🌙', completada: false }
   ]);
+
+  const [tareaAEliminar, setTareaAEliminar] = useState(null);
 
   const { isDark } = useTheme();
 
@@ -32,8 +37,22 @@ export default function ListaTareas() {
     );
   };
 
-  const eliminarTarea = (id) => {
-    setTareas((prev) => prev.filter((t) => t.id !== id));
+  const solicitarEliminar = (id) => {
+    const tarea = tareas.find((t) => t.id === id);
+    if (tarea) {
+      setTareaAEliminar(tarea);
+    }
+  };
+
+  const confirmarEliminar = () => {
+    if (tareaAEliminar) {
+      setTareas((prev) => prev.filter((t) => t.id !== tareaAEliminar.id));
+      setTareaAEliminar(null);
+    }
+  };
+
+  const cancelarEliminar = () => {
+    setTareaAEliminar(null);
   };
 
   const completadas = tareas.filter((t) => t.completada).length;
@@ -43,7 +62,7 @@ export default function ListaTareas() {
     <EjercicioWrapper
       numero={4}
       titulo="Lista de tareas"
-      descripcion="useState con array de objetos. Input + botón para agregar, click para tachar, botón para eliminar."
+      descripcion="useState con array de objetos. Input + botón para agregar, click para tachar, eliminar CON confirmación."
     >
       <FormularioTarea onAgregar={agregarTarea} />
 
@@ -65,7 +84,7 @@ export default function ListaTareas() {
                 key={t.id}
                 tarea={t}
                 onToggleCompletada={toggleCompletada}
-                onEliminar={eliminarTarea}
+                onSolicitarEliminar={solicitarEliminar}
               />
             ))}
           </ul>
@@ -81,6 +100,38 @@ export default function ListaTareas() {
           <p className="m-0">No hay tareas. ¡Agregá la primera!</p>
         </div>
       )}
+
+      <Modal
+        visible={tareaAEliminar !== null}
+        tipo="confirm"
+        titulo="Eliminar tarea"
+        mensaje={
+          tareaAEliminar ? (
+            <>
+              <p className="m-0 mb-2">
+                ¿Estás seguro de que querés eliminar esta tarea?
+              </p>
+              <p
+                className={`m-0 fw-medium px-3 py-2 rounded lh-base ${
+                  isDark
+                    ? 'bg-dark-gris/40 text-dark-crema border border-dark-mostaza/30'
+                    : 'bg-light-beige/60 text-light-marron border border-light-marron/30'
+                }`}
+                style={{ wordBreak: 'break-word' }}
+              >
+                {tareaAEliminar.texto}
+              </p>
+              <p className="m-0 mt-3 text-sm opacity-80">
+                Esta acción no se puede deshacer.
+              </p>
+            </>
+          ) : null
+        }
+        textoBoton="Cancelar"
+        textoBotonConfirmar="Eliminar"
+        onCerrar={cancelarEliminar}
+        onConfirmar={confirmarEliminar}
+      />
     </EjercicioWrapper>
   );
 }
