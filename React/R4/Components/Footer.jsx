@@ -4,7 +4,6 @@
 // - Fondo cálido: bg-section-warm
 // - Íconos sociales: GitHub / LinkedIn / Mail (links _blank)
 // - Copyright dinámico (año actual via new Date())
-// - Enlace placeholder al repositorio Git del proyecto
 // ============================================================
 import { motion } from 'framer-motion';
 import Icon from './Icon.jsx';
@@ -15,29 +14,23 @@ import Icon from './Icon.jsx';
  * el layout responsive.
  */
 export default function Footer() {
-  // Datos placeholder (reemplazar por valores reales)
-  const fullName = '[Tu nombre]';
+  const fullName = 'Federico Scoles';
   const currentYear = new Date().getFullYear();
 
-  // Enlace placeholder al repositorio Git del portfolio
-  const repoUrl = '[LINK_REPOSITORIO_GIT]';
-
-  // Redes sociales (mismos placeholders que HeroSection para
-  // mantener consistencia; reemplazar URLs reales)
   const socialLinks = [
     {
       name: 'github',
-      href: 'https://github.com/[TU_USUARIO_GITHUB]',
+      href: 'https://github.com/FedericoScoles912',
       label: 'Perfil de GitHub',
     },
     {
       name: 'linkedin',
-      href: 'https://linkedin.com/in/[TU_USUARIO_LINKEDIN]',
+      href: 'https://www.linkedin.com/in/federico-scoles-584a50378/',
       label: 'Perfil de LinkedIn',
     },
     {
       name: 'mail',
-      href: 'mailto:[TU_CORREO@EJEMPLO.COM]',
+      href: 'mailto:fedescoles2007@gmail.com',
       label: 'Enviar correo',
     },
   ];
@@ -76,7 +69,7 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* ===== Fila 2: Copyright + enlace al repositorio ===== */}
+          {/* ===== Fila 2: Copyright ===== */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4
                           text-sm text-softBrown/80 dark:text-mutedBeige">
             {/* Copyright con año dinámico */}
@@ -86,19 +79,6 @@ export default function Footer() {
               Todos los derechos reservados
             </p>
 
-            {/* Enlace al repositorio Git (placeholder) */}
-            <a
-              href={repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold
-                         text-terracotta dark:text-burntOrange
-                         hover:underline underline-offset-4
-                         transition-colors"
-            >
-              <Icon name="github" size={16} />
-              Repositorio
-            </a>
           </div>
         </div>
       </motion.section>

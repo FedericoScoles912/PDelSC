@@ -6,10 +6,21 @@
 // Cada tarjeta puede incluir un enlace al certificado (ghost).
 // ============================================================
 import { motion } from 'framer-motion';
-import useApiData from '../Scripts/useApiData.js';
 import { formatDate } from '../Scripts/utils.js';
 import Button from './Button.jsx';
 import Icon from './Icon.jsx';
+import ciscoCertificate from '../Assets/certificates/exploracion-iot-cisco-packet-tracer.pdf';
+
+const achievements = [
+  {
+    id: 'cisco-iot-2026',
+    title: 'Exploración de IoT con Cisco Packet Tracer',
+    issuer: 'Cisco Networking Academy',
+    date: '2026-04-24',
+    description: 'Certificación completada con éxito a través del programa Cisco Networking Academy.',
+    certificate_url: ciscoCertificate,
+  },
+];
 
 /**
  * Esquema esperado de cada logro (no tipado, solo referencia):
@@ -188,12 +199,6 @@ function AchievementCard({ item }) {
  * - Muestra loading / error / empty / grid según el estado
  */
 export default function AchievementsSection() {
-  // Llamada a la API (endpoint /api/achievements)
-  const { data, loading, error } = useApiData('/api/achievements');
-
-  // Normalizamos data: si es array lo usamos, si no, array vacío
-  const achievements = Array.isArray(data) ? data : [];
-
   return (
     <motion.section
       id="achievements"
@@ -222,23 +227,9 @@ export default function AchievementsSection() {
           viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {/* Estado: cargando */}
-          {loading && <LoadingSkeleton count={6} />}
-
-          {/* Estado: error */}
-          {!loading && error && <ErrorMessage message={error} />}
-
-          {/* Estado: vacío */}
-          {!loading && !error && achievements.length === 0 && <EmptyMessage />}
-
-          {/* Estado: éxito -> renderizamos tarjetas */}
-          {!loading && !error && achievements.length > 0 &&
-            achievements.map((item, idx) => (
-              <AchievementCard
-                key={item?.id || `achievement-${idx}`}
-                item={item}
-              />
-            ))}
+          {achievements.map((item) => (
+            <AchievementCard key={item.id} item={item} />
+          ))}
         </motion.div>
       </div>
     </motion.section>

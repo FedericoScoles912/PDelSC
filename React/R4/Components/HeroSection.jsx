@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import Avatar from './Avatar.jsx';
 import Button from './Button.jsx';
 import Icon from './Icon.jsx';
+import profilePhoto from '../Assets/profile/federico-scoles.jpg';
 
 /**
  * Variantes de Framer Motion para la animación stagger:
@@ -38,28 +39,26 @@ const itemVariants = {
  * Layout flex-col en móvil, flex-row en md+.
  */
 export default function HeroSection() {
-  // Datos personales placeholder (reemplazar por valores reales)
-  const fullName = '[Tu nombre]';
-  const role = '[Tu Rol]';
+  const fullName = 'Federico Scoles';
+  const role = 'Programador en desarrollo';
   const tagline =
-    '[Tagline / frase breve que te describa como profesional]';
-  const avatarSrc = '[URL_AVATAR_PLACEHOLDER]';
+    'Estudiante de informática interesado en Inteligencia Artificial, Machine Learning y desarrollo Front End.';
+  const avatarSrc = profilePhoto;
 
-  // Enlaces a redes sociales (placeholders, reemplazar URLs reales)
   const socialLinks = [
     {
       name: 'github',
-      href: 'https://github.com/[TU_USUARIO_GITHUB]',
+      href: 'https://github.com/FedericoScoles912',
       label: 'Perfil de GitHub',
     },
     {
       name: 'linkedin',
-      href: 'https://linkedin.com/in/[TU_USUARIO_LINKEDIN]',
+      href: 'https://www.linkedin.com/in/federico-scoles-584a50378/',
       label: 'Perfil de LinkedIn',
     },
     {
       name: 'mail',
-      href: 'mailto:[TU_CORREO@EJEMPLO.COM]',
+      href: 'mailto:fedescoles2007@gmail.com',
       label: 'Enviar correo',
     },
   ];
@@ -115,6 +114,14 @@ export default function HeroSection() {
           >
             {tagline}
           </motion.p>
+
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-2 text-softBrown/80 dark:text-mutedBeige"
+          >
+            <a className="hover:underline" href="tel:+542235811876">+54 223 581-1876</a>
+            <a className="hover:underline" href="mailto:fedescoles2007@gmail.com">fedescoles2007@gmail.com</a>
+          </motion.div>
 
           {/* Botones de acción: Descargar CV + Contacto */}
           <motion.div

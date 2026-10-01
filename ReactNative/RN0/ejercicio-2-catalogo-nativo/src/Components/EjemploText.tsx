@@ -1,0 +1,3 @@
+import { Text } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra Text para renderizar contenido tipográfico. @param props Paleta activa. */
+export default function EjemploText({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="Text" description="Renderiza texto y permite aplicar estilos tipográficos."><Text style={[s.demoText,{fontWeight:'700'}]}>Texto nativo con énfasis.</Text></SectionCard>; }

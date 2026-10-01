@@ -44,7 +44,7 @@ export default function Navbar() {
   ];
 
   // Iniciales que se muestran como logo a la izquierda
-  const initials = '[INICIALES]';
+  const initials = 'FS';
 
   return (
     <motion.nav

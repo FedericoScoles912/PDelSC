@@ -1,0 +1,5 @@
+import { StyleSheet } from 'react-native';
+/** Crea los estilos de la composición de tarjetas del segundo tab. */
+export const createSecondStyles = (colors, wide) => StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.accent }, content: { flex: 1, padding: wide ? 32 : 20, justifyContent: 'space-between' }, header: { marginTop: 20 }, eyebrow: { color: colors.surface, fontWeight: '800', letterSpacing: 2, fontSize: 12 }, title: { color: colors.surface, fontSize: wide ? 45 : 34, fontWeight: '800', marginTop: 8 }, cards: { gap: 12, flexDirection: wide ? 'row' : 'column', marginVertical: 28 }, card: { flex: 1, backgroundColor: colors.surface, borderRadius: 18, padding: 20, minHeight: 130, justifyContent: 'center' }, cardTitle: { color: colors.primary, fontSize: 19, fontWeight: '800' }, cardText: { color: colors.text, lineHeight: 21, marginTop: 8 }, toggle: { alignSelf: 'flex-start', backgroundColor: colors.primary, borderRadius: 22, paddingHorizontal: 18, paddingVertical: 12 }, toggleText: { color: colors.surface, fontWeight: '800' },
+});

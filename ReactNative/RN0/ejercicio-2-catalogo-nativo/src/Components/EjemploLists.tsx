@@ -1,0 +1,4 @@
+import { FlatList, ScrollView, Text, View } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+const items=['Manzana','Pera','Higo','Nuez'];
+/** Compara ScrollView con FlatList. @param props Paleta activa. */
+export default function EjemploLists({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="ScrollView vs FlatList" description="ScrollView renderiza todo; FlatList virtualiza listas extensas y es más eficiente."><View style={s.row}><ScrollView style={s.scrollSample}><Text style={s.demoText}>ScrollView:{'\n'}{items.join('\n')}</Text></ScrollView><View style={s.scrollSample}><FlatList data={items} keyExtractor={(item)=>item} renderItem={({item})=><Text style={s.listItem}>{item}</Text>}/></View></View></SectionCard>; }

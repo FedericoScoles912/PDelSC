@@ -1,0 +1,3 @@
+import { SafeAreaView, Text } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra SafeAreaView, que respeta zonas del sistema. @param props Paleta activa. */
+export default function EjemploSafeAreaView({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="SafeAreaView" description="Protege el contenido frente al notch y barras del sistema."><SafeAreaView style={{borderWidth:1,borderColor:colors.accent,padding:10,borderRadius:8}}><Text style={s.demoText}>Contenido en área segura.</Text></SafeAreaView></SectionCard>; }

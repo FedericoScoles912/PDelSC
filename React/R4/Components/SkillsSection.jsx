@@ -3,12 +3,21 @@
 // Muestra la grilla de habilidades obtenidas desde /api/skills.
 // Grid responsivo: 1 columna (sm:2, lg:3, xl:4).
 // ============================================================
-import useApiData from '../Scripts/useApiData.js';
 import { SkillCard } from './SkillCard.jsx';
 
-export function SkillsSection() {
-  const { data: skills, loading, error } = useApiData('/api/skills');
+const skills = [
+  { id: 'html', name: 'HTML', category: 'Desarrollo frontend' },
+  { id: 'css', name: 'CSS', category: 'Desarrollo frontend' },
+  { id: 'javascript', name: 'JavaScript', category: 'Desarrollo frontend' },
+  { id: 'react', name: 'ReactJS', category: 'Desarrollo frontend' },
+  { id: 'node', name: 'NodeJS', category: 'Desarrollo Backend' },
+  { id: 'python', name: 'Python', category: 'Desarrollo Backend' },
+  { id: 'sql', name: 'SQL', category: 'Base de Datos' },
+  { id: 'cpp', name: 'C++', category: 'Desarrollo de aplicaciones' },
+  { id: 'kotlin', name: 'Kotlin', category: 'Desarrollo de aplicaciones' },
+];
 
+export function SkillsSection() {
   return (
     <section
       id="skills"
@@ -21,34 +30,11 @@ export function SkillsSection() {
           Habilidades
         </h2>
 
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="h-32 rounded-2xl bg-softBrown/5 dark:bg-mutedBeige/10 animate-pulse"
-              />
-            ))}
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-10 text-softBrown/70 dark:text-mutedBeige">
-            <p className="font-semibold">No se pudieron cargar las habilidades.</p>
-            <p className="text-sm mt-1">Inténtalo nuevamente más tarde.</p>
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
-            {(skills || []).map((skill) => (
-              <SkillCard
-                key={skill.id}
-                {...skill}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+          {skills.map((skill) => (
+            <SkillCard key={skill.id} {...skill} />
+          ))}
+        </div>
       </div>
     </section>
   );

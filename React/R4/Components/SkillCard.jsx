@@ -11,7 +11,7 @@ import { Icon } from './Icon.jsx';
  * @param {Object} props
  * @param {Number} props.id
  * @param {String} props.name
- * @param {Number} props.level 0..100
+ * @param {Number} [props.level] 0..100; se omite si no se informa nivel
  * @param {String} [props.category]
  * @param {String} [props.icon_name='code']  key de Components/Icon.jsx
  */
@@ -22,7 +22,8 @@ export function SkillCard({
   category = 'General',
   icon_name = 'code',
 }) {
-  const safeLevel = Math.min(100, Math.max(0, Number(level) || 0));
+  const hasLevel = Number.isFinite(Number(level));
+  const safeLevel = hasLevel ? Math.min(100, Math.max(0, Number(level))) : 0;
 
   return (
     <motion.article
@@ -57,24 +58,25 @@ export function SkillCard({
         <Badge>{category}</Badge>
       </header>
 
-      {/* Barra de progreso animada */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-grow h-2.5 rounded-full overflow-hidden bg-softBrown/10 dark:bg-mutedBeige/15">
-          <motion.div
-            className="absolute inset-y-0 left-0 rounded-full
-              bg-gradient-to-r from-terracotta to-olive
-              dark:from-burntOrange dark:to-mustard"
-            initial={{ width: 0 }}
-            whileInView={{ width: `${safeLevel}%` }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: 'easeOut' }}
-            title={`Nivel ${safeLevel}%`}
-          />
+      {hasLevel && (
+        <div className="flex items-center gap-3">
+          <div className="relative flex-grow h-2.5 rounded-full overflow-hidden bg-softBrown/10 dark:bg-mutedBeige/15">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full
+                bg-gradient-to-r from-terracotta to-olive
+                dark:from-burntOrange dark:to-mustard"
+              initial={{ width: 0 }}
+              whileInView={{ width: `${safeLevel}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              title={`Nivel ${safeLevel}%`}
+            />
+          </div>
+          <span className="text-xs md:text-sm font-semibold text-softBrown/80 dark:text-mutedBeige/90 tabular-nums min-w-[3ch] text-right">
+            {safeLevel}%
+          </span>
         </div>
-        <span className="text-xs md:text-sm font-semibold text-softBrown/80 dark:text-mutedBeige/90 tabular-nums min-w-[3ch] text-right">
-          {safeLevel}%
-        </span>
-      </div>
+      )}
     </motion.article>
   );
 }

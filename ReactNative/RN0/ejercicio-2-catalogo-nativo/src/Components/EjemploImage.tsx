@@ -1,0 +1,3 @@
+import { Image } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra Image mediante una imagen remota de ejemplo. @param props Paleta activa. */
+export default function EjemploImage({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="Image" description="Muestra imágenes locales o remotas con tamaño controlado."><Image accessibilityLabel="Paisaje otoñal de ejemplo" source={{uri:'https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=700&q=70'}} style={s.image}/></SectionCard>; }

@@ -2,13 +2,14 @@
 // Components/AboutMe.jsx
 // Sección "Sobre mí". Cumple con la consigna de usar la GRID
 // de Bootstrap (.container / .row / .col-md-5 / .col-md-7).
-// Columna 5: avatar + imagen placeholder.
+// Columna 5: avatar.
 // Columna 7: título, párrafos descriptivos y badges.
 // ============================================================
 import { motion } from 'framer-motion';
 import Avatar from './Avatar.jsx';
 import Badge from './Badge.jsx';
 import Icon from './Icon.jsx';
+import profilePhoto from '../Assets/profile/federico-scoles.jpg';
 
 /**
  * AboutMe: sección descriptiva personal con layout Bootstrap.
@@ -16,19 +17,15 @@ import Icon from './Icon.jsx';
  * el layout de Tailwind.
  */
 export default function AboutMe() {
-  // Datos personales placeholder (reemplazar por información real)
-  const fullName = '[Tu nombre]';
-  const avatarSrc = '[URL_AVATAR_PLACEHOLDER]';
-  const profileImageSrc = '[URL_IMAGEN_PERFIL_PLACEHOLDER]';
-  const city = '[Tu ciudad]';
-  const availability = 'Disponible para proyectos';
-  const languages = ['Español (nativo)', 'Inglés (intermedio)'];
+  const fullName = 'Federico Scoles';
+  const avatarSrc = profilePhoto;
+  const city = 'Mar del Plata, Argentina';
+  const languages = ['Español (nativo)', 'Inglés (C1+)'];
 
-  // Párrafos descriptivos (reemplazar texto placeholder)
   const paragraphs = [
-    '¡Hola! Soy Federico Scoles, un Desarrollador de Programación Informática. Con 4 años de experiencia en Desarrollo Web y App Development, me especializo en Desarrollo Web.',
-    'Me caracterizo por mi pasión por la tecnología y mi compromiso con la calidad. Disfruto enfrentar desafíos técnicos y colaborar en equipos multidisciplinarios para construir soluciones digitales que generen valor real.',
-    'En mi tiempo libre, me gusta entrenar, programar, cantar y leer la palabra de Dios. Siempre estoy en búsqueda de aprender nuevas herramientas y mejorar mis habilidades constantemente.',
+    'Soy Federico Scoles, un programador en desarrollo que busca insertarse en el mundo laboral para adquirir experiencia profesional y desarrollo personal. Actualmente estudio el nivel secundario y estoy pensando en estudiar Ingeniería en Informática en la Facultad de Ingeniería de la UNMDP.',
+    'Me gusta todo lo que tiene que ver con la Inteligencia Artificial, Machine Learning y el Front End de páginas web.',
+    'Soy trabajador, comprometido y tengo excelente predisposición para aprender cosas nuevas. En mi tiempo libre disfruto del gimnasio, el arte enfocado en la música y el running.',
   ];
 
   return (
@@ -60,33 +57,6 @@ export default function AboutMe() {
                 size="lg"
               />
 
-              {/* Imagen placeholder adicional (foto ilustrativa) */}
-              <div className="w-full max-w-sm overflow-hidden rounded-2xl
-                              border-4 border-mustard/50 dark:border-burntOrange/50
-                              shadow-warm dark:shadow-warmDark">
-                <img
-                  src={profileImageSrc}
-                  alt={`Foto de perfil de ${fullName}`}
-                  onError={(e) => {
-                    // Fallback: si la imagen falla, mostramos un bloque
-                    // decorativo en lugar de una imagen rota
-                    e.currentTarget.style.display = 'none';
-                    const parent = e.currentTarget.parentElement;
-                    if (!parent.querySelector('.img-fallback')) {
-                      const fallback = document.createElement('div');
-                      fallback.className =
-                        'img-fallback w-full h-64 flex items-center justify-center ' +
-                        'bg-terracotta/15 dark:bg-burntOrange/20 ' +
-                        'text-softBrown/60 dark:text-mustard/70 ' +
-                        'text-sm font-medium';
-                      fallback.textContent = '[IMAGEN PLACEHOLDER]';
-                      parent.appendChild(fallback);
-                    }
-                  }}
-                  className="w-full h-64 object-cover"
-                  loading="lazy"
-                />
-              </div>
             </motion.div>
           </div>
 
@@ -108,20 +78,13 @@ export default function AboutMe() {
                 ))}
               </div>
 
-              {/* Badges: ubicación, disponibilidad, idiomas */}
+              {/* Badges: ubicación e idiomas */}
               <div className="flex flex-wrap gap-3">
                 <Badge
                   color="terracotta"
                   icon={<Icon name="location" size={14} />}
                 >
                   {city}
-                </Badge>
-
-                <Badge
-                  color="olive"
-                  icon={<Icon name="check" size={14} />}
-                >
-                  {availability}
                 </Badge>
 
                 {languages.map((lang) => (

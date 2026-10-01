@@ -1,16 +1,22 @@
 // ============================================================
 // Components/ExperienceTimeline.jsx  (Sección)
-// Línea de tiempo con la experiencia laboral cargada desde
-// /api/experiences. Cada item envuelve ExperienceItem en un
-// TimelineItem que alterna lados según el índice.
+// Línea de tiempo de experiencia laboral. Cada item envuelve
+// ExperienceItem en un TimelineItem que alterna lados según el índice.
 // ============================================================
-import useApiData from '../Scripts/useApiData.js';
 import { TimelineItem } from './TimelineItem.jsx';
 import { ExperienceItem } from './ExperienceItem.jsx';
 
-export function ExperienceTimeline() {
-  const { data: experiences, loading, error } = useApiData('/api/experiences');
+const experiences = [
+  {
+    id: 'pasante-repuestos-motor-2026',
+    role: 'Pasante',
+    company: 'Tienda de repuestos de motor',
+    period: 'Marzo 2026',
+    description: '• Cumplí un rol de ayudante bajo relación de dependencia.\n• Realicé actividades digitales y físicas: facturación, mantenimiento de stock y ofimática.\n• Referencia de contacto: Mariano Andrés Scoles (+54 223 456-8010).',
+  },
+];
 
+export function ExperienceTimeline() {
   return (
     <section
       id="experience"
@@ -22,33 +28,13 @@ export function ExperienceTimeline() {
           Experiencia laboral
         </h2>
 
-        {loading && (
-          <div className="flex flex-col gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="h-44 rounded-2xl bg-softBrown/5 dark:bg-mutedBeige/10 animate-pulse"
-              />
-            ))}
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-10 text-softBrown/70 dark:text-mutedBeige">
-            <p className="font-semibold">No se pudo cargar la experiencia laboral.</p>
-            <p className="text-sm mt-1">Inténtalo nuevamente más tarde.</p>
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="flex flex-col">
-            {(experiences || []).map((exp, i) => (
-              <TimelineItem key={exp.id || i} index={i}>
-                <ExperienceItem {...exp} />
-              </TimelineItem>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-col">
+          {experiences.map((exp, i) => (
+            <TimelineItem key={exp.id} index={i}>
+              <ExperienceItem {...exp} />
+            </TimelineItem>
+          ))}
+        </div>
       </div>
     </section>
   );

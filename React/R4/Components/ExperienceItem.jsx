@@ -14,6 +14,7 @@ import { formatDate } from '../Scripts/utils.js';
  * @param {String} props.role
  * @param {String|Date} props.start_date
  * @param {String|Date|null} [props.end_date]  null = actualmente
+ * @param {String} [props.period] Texto alternativo para el período
  * @param {String} [props.location]
  * @param {String} [props.description]
  */
@@ -23,11 +24,11 @@ export function ExperienceItem({
   role,
   start_date,
   end_date = null,
+  period,
   location,
   description,
 }) {
-  const startFmt = formatDate(start_date);
-  const endFmt = end_date ? formatDate(end_date) : 'Actualidad';
+  const dateRange = period || `${formatDate(start_date)} — ${end_date ? formatDate(end_date) : 'Actualidad'}`;
 
   return (
     <article
@@ -48,7 +49,7 @@ export function ExperienceItem({
         </div>
         <div className="text-right text-xs md:text-sm text-softBrown/70 dark:text-mutedBeige/90 tabular-nums">
           <div>
-            {startFmt} — {endFmt}
+            {dateRange}
           </div>
           {location && (
             <Badge className="mt-2" color="softBrown">

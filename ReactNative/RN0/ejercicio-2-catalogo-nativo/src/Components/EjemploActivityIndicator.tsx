@@ -1,0 +1,3 @@
+import { ActivityIndicator, View } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra un indicador de actividad para estados de carga. @param props Paleta activa. */
+export default function EjemploActivityIndicator({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="ActivityIndicator" description="Indica que una operación está en progreso."><View style={s.row}><ActivityIndicator size="large" color={colors.primary}/></View></SectionCard>; }

@@ -1,0 +1,3 @@
+import { TextInput } from 'react-native'; import { useState } from 'react'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra TextInput controlado por estado local. @param props Paleta activa. */
+export default function EjemploTextInput({ colors }: ExampleProps): React.JSX.Element { const [value,setValue]=useState(''); const s=makeStyles(colors,false); return <SectionCard colors={colors} title="TextInput" description="Permite ingresar y editar texto."><TextInput value={value} onChangeText={setValue} placeholder="Escribí algo" placeholderTextColor={colors.muted} style={s.input}/></SectionCard>; }

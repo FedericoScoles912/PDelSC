@@ -2,14 +2,22 @@
 // Components/ProjectsGallery.jsx  (Sección)
 // Galería de proyectos con flujo automático. Los proyectos
 // destacados (featured=true) ocupan md:col-span-2.
-// Datos desde /api/projects.
+// Datos de proyectos del portfolio.
 // ============================================================
-import useApiData from '../Scripts/useApiData.js';
 import { ProjectCard } from './ProjectCard.jsx';
 
-export function ProjectsGallery() {
-  const { data: projects, loading, error } = useApiData('/api/projects');
+const projects = [
+  {
+    id: 'iglesia-de-jesus',
+    title: 'Página web Iglesia de Jesús',
+    description: 'Página web oficial publicada a través de cPanel mediante una herramienta de gestión web.',
+    demo_url: 'https://iglesiadejesus.com.ar',
+    tags: ['cPanel', 'Gestor web'],
+    featured: true,
+  },
+];
 
+export function ProjectsGallery() {
   return (
     <section
       id="projects"
@@ -22,35 +30,11 @@ export function ProjectsGallery() {
           Proyectos
         </h2>
 
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 grid-flow-row-dense">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className={`aspect-[4/3] rounded-2xl bg-softBrown/5 dark:bg-mutedBeige/10 animate-pulse ${i === 0 ? 'md:col-span-2' : ''}`}
-              />
-            ))}
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-10 text-softBrown/70 dark:text-mutedBeige">
-            <p className="font-semibold">No se pudieron cargar los proyectos.</p>
-            <p className="text-sm mt-1">Inténtalo nuevamente más tarde.</p>
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 grid-flow-row-dense">
-            {(projects || []).map((project) => (
-              <ProjectCard
-                key={project.id}
-                className={project.featured ? 'md:col-span-2' : ''}
-                {...project}
-              />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6 grid-flow-row-dense">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} {...project} />
+          ))}
+        </div>
       </div>
     </section>
   );

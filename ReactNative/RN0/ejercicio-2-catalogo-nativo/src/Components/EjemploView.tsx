@@ -1,0 +1,3 @@
+import { Text, View } from 'react-native'; import type { ExampleProps } from '../Types/common'; import SectionCard from './SectionCard'; import { makeStyles } from '../Styles/catalogStyles';
+/** Demuestra View como contenedor que organiza elementos. @param props Paleta activa. */
+export default function EjemploView({ colors }: ExampleProps): React.JSX.Element { const s=makeStyles(colors,false); return <SectionCard colors={colors} title="View" description="Contenedor básico para distribuir y agrupar contenido."><View style={{ backgroundColor: colors.accent, borderRadius: 8, padding: 14 }}><Text style={[s.demoText,{color:colors.surface}]}>Estoy dentro de un View.</Text></View></SectionCard>; }
