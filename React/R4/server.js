@@ -10,6 +10,8 @@ import projectsRouter from './Routes/projects.js';
 import experiencesRouter from './Routes/experiences.js';
 import achievementsRouter from './Routes/achievements.js';
 import messagesRouter from './Routes/messages.js';
+import authRouter from './Routes/auth.js';
+import profileRouter from './Routes/profile.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +30,8 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/experiences', experiencesRouter);
 app.use('/api/achievements', achievementsRouter);
 app.use('/api/messages', messagesRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/profile', profileRouter);
 
 app.get('*', (req, res, next) => {
   if (fs.existsSync(indexHtmlPath)) {
@@ -37,6 +41,10 @@ app.get('*', (req, res, next) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+export default app;

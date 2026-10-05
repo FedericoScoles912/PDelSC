@@ -10,6 +10,7 @@ import Avatar from './Avatar.jsx';
 import Badge from './Badge.jsx';
 import Icon from './Icon.jsx';
 import profilePhoto from '../Assets/profile/federico-scoles.jpg';
+import { useProfile } from '../Scripts/ProfileContext.jsx';
 
 /**
  * AboutMe: sección descriptiva personal con layout Bootstrap.
@@ -17,16 +18,9 @@ import profilePhoto from '../Assets/profile/federico-scoles.jpg';
  * el layout de Tailwind.
  */
 export default function AboutMe() {
-  const fullName = 'Federico Scoles';
-  const avatarSrc = profilePhoto;
-  const city = 'Mar del Plata, Argentina';
-  const languages = ['Español (nativo)', 'Inglés (C1+)'];
-
-  const paragraphs = [
-    'Soy Federico Scoles, un programador en desarrollo que busca insertarse en el mundo laboral para adquirir experiencia profesional y desarrollo personal. Actualmente estudio el nivel secundario y estoy pensando en estudiar Ingeniería en Informática en la Facultad de Ingeniería de la UNMDP.',
-    'Me gusta todo lo que tiene que ver con la Inteligencia Artificial, Machine Learning y el Front End de páginas web.',
-    'Soy trabajador, comprometido y tengo excelente predisposición para aprender cosas nuevas. En mi tiempo libre disfruto del gimnasio, el arte enfocado en la música y el running.',
-  ];
+  const { profile } = useProfile();
+  const { full_name: fullName, city, languages = [], about_paragraphs: paragraphs = [], hobbies = [] } = profile;
+  const avatarSrc = profile.profile_image_url || profilePhoto;
 
   return (
     <motion.section
@@ -95,6 +89,9 @@ export default function AboutMe() {
                   >
                     {lang}
                   </Badge>
+                ))}
+                {hobbies.map((hobby) => (
+                  <Badge key={hobby} color="olive">{hobby}</Badge>
                 ))}
               </div>
             </motion.div>

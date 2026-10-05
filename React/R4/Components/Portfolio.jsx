@@ -18,7 +18,6 @@ import { SkillsSection } from './SkillsSection.jsx';
 import AchievementsSection from './AchievementsSection.jsx';
 import { ExperienceTimeline } from './ExperienceTimeline.jsx';
 import { ProjectsGallery } from './ProjectsGallery.jsx';
-import { ContactForm } from './ContactForm.jsx';
 import Footer from './Footer.jsx';
 
 // Variante reutilizable para animación de entrada por sección
@@ -85,13 +84,9 @@ export function Portfolio() {
             <ProjectsGallery />
           </Animated>
 
-          {/* 7. Contacto */}
-          <Animated amount={0.3}>
-            <ContactForm />
-          </Animated>
         </main>
 
-        {/* 8. Footer */}
+        {/* Footer */}
         <Footer />
       </div>
     </NotificationProvider>

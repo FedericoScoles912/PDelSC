@@ -13,18 +13,16 @@ export default {
   ],
   theme: {
     extend: {
-      // Paleta de colores relajada y cálida (no blanco/negro puros)
+      // Paleta minimalista de alto contraste
       colors: {
-        // Modo claro
-        cream: '#F5EFE6',       // fondo principal claro
-        terracotta: '#C97B4C',  // acento cálido principal
-        olive: '#7C8B6C',       // acento secundario verde
-        softBrown: '#6B4F3B',   // texto principal / contraste alto
-        // Modo oscuro
-        deepBrown: '#2B211B',   // fondo principal oscuro
-        burntOrange: '#B5651D', // acento cálido principal oscuro
-        mustard: '#C9A24B',     // acento mostaza
-        mutedBeige: '#A69783',  // texto suave / muted
+        cream: '#F8FAFC',
+        terracotta: '#0284C7',
+        olive: '#0F766E',
+        softBrown: '#0F172A',
+        deepBrown: '#020617',
+        burntOrange: '#38BDF8',
+        mustard: '#7DD3FC',
+        mutedBeige: '#CBD5E1',
       },
       fontFamily: {
         sans: [
@@ -35,11 +33,11 @@ export default {
           'Roboto',
           'sans-serif',
         ],
-        display: ['Georgia', 'serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        warm: '0 8px 24px -8px rgba(107,79,59,0.25)',
-        warmDark: '0 8px 24px -8px rgba(181,101,29,0.35)',
+        warm: '0 8px 24px -8px rgba(15,23,42,0.16)',
+        warmDark: '0 8px 24px -8px rgba(56,189,248,0.16)',
       },
       keyframes: {
         fadeInUp: {

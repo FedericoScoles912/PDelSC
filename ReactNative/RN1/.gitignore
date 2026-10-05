@@ -1,0 +1,45 @@
+# Dependencias
+node_modules/
+.pnp/
+.pnp.js
+
+# Entornos y secretos
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.cert
+
+# Expo y React Native
+.expo/
+dist/
+web-build/
+.expo-shared/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Cobertura y testing
+coverage/
+.nyc_output/
+
+# Editores y SO
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build nativo (si se llega a prebuild de Expo)
+android/
+ios/

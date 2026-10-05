@@ -33,11 +33,11 @@ router.post('/', async (req, res) => {
 
     // Insertar mensaje en la base de datos
     const result = await pool.query(
-      'INSERT INTO messages (name, email, body) VALUES ($1, $2, $3) RETURNING id',
+      'INSERT INTO messages (name, email, body) VALUES (?, ?, ?)',
       [name.trim(), email.trim(), body.trim()]
     );
 
-    res.status(201).json({ ok: true, id: result.rows[0].id });
+    res.status(201).json({ ok: true, id: result.insertId });
   } catch (err) {
     console.error('Error al crear mensaje:', err);
     res.status(500).json({ error: 'Error interno del servidor' });

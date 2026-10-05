@@ -1,26 +1,26 @@
 // =============================================
-// Módulo de conexión a base de datos PostgreSQL
-// Utiliza el driver oficial 'pg' con Pool de conexiones
+// Pool de conexiones MySQL mediante mysql2/promise.
 // =============================================
 
-import pg from 'pg';
-
-const { Pool } = pg;
+import mysql from 'mysql2/promise';
 
 // Configuración del pool de conexiones
 // Los valores se obtienen desde variables de entorno
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-});
+const pool = process.env.DATABASE_URL
+  ? mysql.createPool(process.env.DATABASE_URL)
+  : mysql.createPool({
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT || 3306),
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      waitForConnections: true,
+      connectionLimit: 10,
+    });
 
-// Manejo de errores en conexiones del pool
-pool.on('error', (err) => {
-    console.error('Error inesperado en el pool de conexiones PostgreSQL:', err);
-    process.exit(-1);
-});
+export async function query(sql, params = []) {
+  const [rows] = await pool.execute(sql, params);
+  return { rows, insertId: rows.insertId };
+}
 
-export default pool;
+export default { query };

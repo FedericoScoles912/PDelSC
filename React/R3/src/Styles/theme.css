@@ -1,0 +1,33 @@
+:root {
+  /* Modo Claro - Paleta Otoñal Relajada */
+  --color-bg-base: #FAF8F5;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-muted: #F5EFEB;
+  --color-border: #E8DFD5;
+  
+  --color-text-main: #3D2B1F;
+  --color-text-muted: #7A6556;
+  
+  --color-primary: #C85A32;       /* Terracota */
+  --color-primary-hover: #B44E27;
+  --color-secondary: #D49B27;     /* Mostaza */
+  --color-accent: #606C38;        /* Verde Oliva */
+  --color-danger: #BF360C;
+}
+
+.dark {
+  /* Modo Oscuro - Versión oscura de la paleta otoñal (no negro puro ni gris frío) */
+  --color-bg-base: #1E1916;       /* Warm espresso dark */
+  --color-bg-surface: #29221D;    /* Superficie otoñal profunda */
+  --color-bg-muted: #352D26;
+  --color-border: #4A3E35;
+  
+  --color-text-main: #F7F3EE;
+  --color-text-muted: #D6C8BC;
+  
+  --color-primary: #E07A5F;       /* Terracota cálido brillante */
+  --color-primary-hover: #EC8B72;
+  --color-secondary: #E9C46A;     /* Mostaza dorado */
+  --color-accent: #87986A;        /* Verde oliva suave */
+  --color-danger: #EF5350;
+}

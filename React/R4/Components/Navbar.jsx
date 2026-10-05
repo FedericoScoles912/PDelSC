@@ -26,7 +26,6 @@ export default function Navbar() {
     'achievements',
     'experience',
     'projects',
-    'contact',
   ];
 
   // ID de la sección actualmente visible en viewport
@@ -40,7 +39,6 @@ export default function Navbar() {
     { label: 'Logros', href: '#achievements' },
     { label: 'Experiencia', href: '#experience' },
     { label: 'Proyectos', href: '#projects' },
-    { label: 'Contacto', href: '#contact' },
   ];
 
   // Iniciales que se muestran como logo a la izquierda

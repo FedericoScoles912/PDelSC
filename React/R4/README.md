@@ -1,6 +1,6 @@
 # Portfolio Personal - React + Tailwind + SQL
 
-Portfolio personal full-stack: frontend en React (Vite) con estilos en Tailwind CSS + Bootstrap Grid, animaciones con Framer Motion, backend en Express y base de datos relacional en PostgreSQL. Incluye secciones de Hero, Sobre mí, Skills, Proyectos, Experiencia, Certificaciones y Formulario de contacto funcional.
+Portfolio personal full-stack: frontend en React (Vite), backend Express y base de datos MySQL. Incluye un portfolio público y un panel de administración para gestionar su contenido.
 
 > **Repositorio:** LINK_REPOSITORIO_GIT
 > **Despliegue en producción:** LINK_DESPLIEGUE_PRODUCCION
@@ -15,7 +15,7 @@ Portfolio personal full-stack: frontend en React (Vite) con estilos en Tailwind 
 | **Estilos** | Tailwind CSS 3 (utility-first) + Bootstrap 5 (solo sistema de grid) |
 | **Animaciones** | Framer Motion 11 (stagger, viewport triggers, springs) |
 | **Backend** | Node.js >= 18, Express 4, CORS, dotenv |
-| **Base de datos** | PostgreSQL 14+, node-postgres (`pg`) |
+| **Base de datos** | MySQL 8+, `mysql2` |
 | **Formato módulos** | ESM en todo el proyecto (`"type": "module"`) |
 
 ---
@@ -32,40 +32,118 @@ Portfolio personal full-stack: frontend en React (Vite) con estilos en Tailwind 
 
 ---
 
-## Instrucciones Rápidas
+## Ejecutar con MySQL
 
-> Si preferís la guía **paso a paso completa**, lee [Docs/02-instalacion-local.md](Docs/02-instalacion-local.md). Lo que sigue es un TL;DR.
+Este proyecto usa **MySQL** mediante `mysql2`. No requiere PostgreSQL, Turso ni SQLite.
 
-**Prerrequisitos:** tener Node.js >= 18 y PostgreSQL >= 14 instalados.
+### 1. Requisitos
 
-```bash
-# 1. Instalar dependencias
-npm install
+- Node.js 18 o superior.
+- MySQL 8 o superior, con el servicio en ejecución.
 
-# 2. Configurar variables de entorno
-cp .env.example .env          # Linux/Mac
-# Copy-Item .env.example .env # Windows PowerShell
-# -> Editá .env con tus credenciales de PostgreSQL
+Comprobá que la consola de MySQL esté disponible:
 
-# 3. Crear la base de datos
-#    Abrí la consola de PostgreSQL (te pedirá la contraseña del usuario postgres):
-psql -U postgres
-#    Dentro de psql, ejecutá:
-#    CREATE DATABASE portfolio_db;
-#    Y salí con:  \q
-
-# 4. Ejecutar esquema + datos iniciales
-psql -U postgres -d portfolio_db -f Database/schema.sql
-psql -U postgres -d portfolio_db -f Database/seed.sql
-
-# 5. Levantar el entorno de desarrollo (dos terminales)
-#    Terminal 1 (Vite):
-npm run dev                   # http://localhost:5173
-#    Terminal 2 (Express):
-npm run server:dev            # http://localhost:3001
+```powershell
+mysql --version
 ```
 
-Abrí `http://localhost:5173` en el navegador.
+### 2. Instalar y configurar
+
+Desde PowerShell, en la carpeta del proyecto:
+
+```powershell
+npm install
+Copy-Item .env.example .env
+```
+
+Editá `.env` con las credenciales de tu instalación local:
+
+```dotenv
+PORT=3001
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=portfolio_db
+DB_USER=root
+DB_PASSWORD=TU_CONTRASEÑA_DE_MYSQL
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+### 3. Crear e inicializar la base de datos
+
+```powershell
+mysql -u root -p -e "CREATE DATABASE portfolio_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p portfolio_db < Database/schema.sql
+mysql -u root -p portfolio_db < Database/seed.sql
+```
+
+> `schema.sql` elimina y vuelve a crear las tablas. No lo ejecutes sobre una base de datos con información que quieras conservar.
+
+Si tu usuario no es `root`, reemplazalo en los comandos y en `.env`.
+
+### 4. Iniciar el proyecto
+
+Abrí dos terminales en la raíz del proyecto:
+
+```powershell
+# Terminal 1: API Express + MySQL
+npm run server:dev
+
+# Terminal 2: frontend Vite
+npm run dev
+```
+
+Abrí [http://localhost:5179](http://localhost:5179). Vite redirige las solicitudes `/api` al servidor Express en `http://localhost:3001`.
+
+### Panel de administración
+
+El panel está disponible en [http://localhost:5179/admin](http://localhost:5179/admin). Permite editar el perfil, tecnologías, proyectos, experiencia y certificaciones; cada cambio se guarda en MySQL.
+
+En desarrollo, si todavía no definiste las variables de administrador, podés ingresar con:
+
+```text
+Usuario: admin
+Contraseña: admin123
+```
+
+Antes de publicar, reemplazá esas credenciales creando valores propios en `.env` y en las variables de entorno de Vercel.
+
+1. En `.env`, definí valores seguros para `ADMIN_USERNAME`, `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET`.
+2. Si ya tenías una base creada, aplicá la migración no destructiva:
+
+```powershell
+mysql -u root -p portfolio_db < Database/migration-admin.sql
+```
+
+3. Reiniciá `npm run server:dev` e ingresá a `/admin` con las credenciales configuradas.
+
+> Para reemplazar también los antiguos datos de ejemplo por el contenido actual del portfolio, ejecutá de nuevo `schema.sql` y `seed.sql`. Este reinicio elimina los registros existentes; después podrás gestionarlos desde `/admin`.
+
+## Publicar en Vercel + MySQL
+
+Vercel ejecuta el frontend y las rutas `/api`; MySQL debe ser una base gestionada accesible desde Internet (por ejemplo, PlanetScale, Railway, Aiven o DigitalOcean). No expongas una base MySQL local.
+
+1. Subí el repositorio a GitHub y creá una base MySQL gestionada. Copiá su cadena de conexión `mysql://...`.
+2. Desde tu computadora, cargá el esquema y los datos iniciales en esa base. En PowerShell:
+
+```powershell
+mysql -h TU_HOST -P 3306 -u TU_USUARIO -p TU_BASE < Database/schema.sql
+mysql -h TU_HOST -P 3306 -u TU_USUARIO -p TU_BASE < Database/seed.sql
+```
+
+3. En [Vercel](https://vercel.com/new), importá el repositorio. Detectará Vite; conservá `npm run build` como Build Command y `dist` como Output Directory.
+4. En **Settings → Environment Variables**, agregá para Production (y Preview si lo necesitás):
+
+```text
+DATABASE_URL=mysql://usuario:contraseña@host:3306/portfolio_db
+ADMIN_USERNAME=tu_usuario_unico
+ADMIN_PASSWORD=una_contraseña_larga_y_unica
+ADMIN_SESSION_SECRET=un_secreto_aleatorio_largo
+NODE_ENV=production
+```
+
+5. Hacé **Deploy**. Abrí tu dominio de Vercel y luego `https://tu-dominio.vercel.app/admin`.
+
+El archivo `vercel.json` ya dirige `/api/*` a la función serverless de Express y `/admin` a la aplicación React.
 
 ---
 
@@ -78,8 +156,8 @@ Toda la guía extendida vive en la carpeta [Docs/](Docs/):
 | Estructura de carpetas | [Docs/01-estructura-carpetas.md](Docs/01-estructura-carpetas.md) | Descripción de cada carpeta (`Scripts`, `Components`, `Styles`, `Assets`, `Database`, `Routes`, `Docs`) y archivos raíz (`server.js`, `package.json`) con su responsabilidad. |
 | Instalación local | [Docs/02-instalacion-local.md](Docs/02-instalacion-local.md) | Prerrequisitos, `npm install`, `.env`, creación de BD, carga de `schema.sql` + `seed.sql`, modo dev (2 terminales) y modo producción. |
 | Esquema de BD | [Docs/03-esquema-bd.md](Docs/03-esquema-bd.md) | Detalle de las 5 tablas (`skills`, `projects`, `experiences`, `achievements`, `messages`): columnas, tipos, constraints, PKs, índices y diagrama textual (desnormalizado, sin FK por ahora). |
-| Decisiones técnicas | [Docs/04-decisiones-tecnicas.md](Docs/04-decisiones-tecnicas.md) | Justificación del stack: PostgreSQL vs MySQL, Vite vs CRA, Framer Motion vs CSS puro, Bootstrap solo grid + Tailwind, ESM everywhere y tema otoñal. |
-| Despliegue | [Docs/05-despliegue.md](Docs/05-despliegue.md) | Opción A (Render monolítico: build `npm install && npm run build`, start `npm start`, vars de entorno) y Opción B (Vercel frontend + Railway backend/PostgreSQL con `VITE_API_BASE_URL`). |
+| Decisiones técnicas | [Docs/04-decisiones-tecnicas.md](Docs/04-decisiones-tecnicas.md) | Contexto de las decisiones iniciales del stack. |
+| Despliegue | [Docs/05-despliegue.md](Docs/05-despliegue.md) | Referencia histórica; la guía vigente para MySQL + Vercel está arriba. |
 
 ---
 
@@ -97,13 +175,13 @@ R4/
 │                            #   contexts (Tema, Notificaciones), apiClient, utils
 ├── Components/              # Portfolio, Navbar, HeroSection, AboutMe,
 │                            #   SkillsSection, ProjectsGallery, ExperienceTimeline,
-│                            #   AchievementsSection, ContactForm, Footer + atoms
+│                            #   AchievementsSection, AdminPanel, Footer + atoms
 ├── Styles/                  # index.css (Tailwind + Bootstrap grid + globals)
 │                            # theme.css (variables CSS del tema)
 ├── Assets/                  # Imágenes, SVG, favicon, fuentes locales
 ├── Database/
-│   ├── connection.js        # Pool de conexiones pg con variables .env
-│   ├── schema.sql           # DDL: 5 tablas + índices
+│   ├── connection.js        # Pool mysql2 con variables .env
+│   ├── schema.sql           # DDL MySQL: 6 tablas + índices
 │   └── seed.sql             # Datos iniciales de ejemplo
 ├── Routes/                  # Express Routers por recurso
 │   ├── skills.js            #   GET /api/skills
@@ -121,7 +199,7 @@ Descripción completa y responsabilidad por archivo: [Docs/01-estructura-carpeta
 
 ## Esquema de Base de Datos (resumen)
 
-Diseño **desnormalizado**: 5 tablas independientes, sin FKs explícitos en esta etapa. Motor: **PostgreSQL**.
+Diseño **desnormalizado**: 6 tablas independientes, sin FKs explícitos en esta etapa. Motor: **MySQL**.
 
 ```
 skills          projects        experiences     achievements    messages
@@ -147,7 +225,7 @@ Definidos en `package.json`:
 
 | Script | Qué hace |
 |--------|----------|
-| `npm run dev` | Levanta Vite en modo desarrollo (puerto 5173, HMR). |
+| `npm run dev` | Levanta Vite en modo desarrollo (puerto 5179, HMR). |
 | `npm run build` | Compila el frontend al directorio `dist/`. |
 | `npm run preview` | Sirve `dist/` localmente con Vite para revisar el build. |
 | `npm run server:dev` | Levanta Express con `--watch` (auto-restart al editar). |
@@ -169,8 +247,9 @@ Base URL:
 | `GET` | `/api/projects/:id` | Proyecto por ID |
 | `GET` | `/api/experiences` | Experiencia laboral (`ORDER BY start_date DESC`) |
 | `GET` | `/api/achievements` | Certificaciones/logros (`ORDER BY date_earned DESC`) |
-| `POST` | `/api/messages` | Crea un mensaje del formulario de contacto (`body: { name, email, body }`) |
-| `GET` | `/api/messages` | Lista mensajes recibidos (futuro panel admin) |
+| `GET` | `/api/profile` | Información pública del perfil. |
+| `PUT` | `/api/profile` | Actualiza el perfil (requiere sesión de administrador). |
+| `POST` | `/api/auth/login` | Inicia la sesión del panel de administración. |
 
 ---
 
@@ -184,7 +263,7 @@ Base URL:
 | Componentes principales (Hero, About, Skills, Projects, Experience, Achievements, Contact, Footer) | ✅ Listo |
 | Estilos (Tailwind + Bootstrap grid, tema otoñal) | ✅ Listo |
 | Animaciones Framer Motion | ✅ Listo |
-| Formulario de contacto con notificaciones | ✅ Listo |
+| Panel de administración protegido | ✅ Listo |
 | Hooks personalizados (useApiData, useScrollSpy) | ✅ Listo |
 | Documentación (Docs/ 1–5 + README) | ✅ Listo |
 | Pruebas locales de build y servidor | Pendiente |

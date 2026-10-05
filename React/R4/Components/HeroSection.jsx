@@ -9,6 +9,7 @@ import Avatar from './Avatar.jsx';
 import Button from './Button.jsx';
 import Icon from './Icon.jsx';
 import profilePhoto from '../Assets/profile/federico-scoles.jpg';
+import { useProfile } from '../Scripts/ProfileContext.jsx';
 
 /**
  * Variantes de Framer Motion para la animación stagger:
@@ -39,26 +40,24 @@ const itemVariants = {
  * Layout flex-col en móvil, flex-row en md+.
  */
 export default function HeroSection() {
-  const fullName = 'Federico Scoles';
-  const role = 'Programador en desarrollo';
-  const tagline =
-    'Estudiante de informática interesado en Inteligencia Artificial, Machine Learning y desarrollo Front End.';
-  const avatarSrc = profilePhoto;
+  const { profile } = useProfile();
+  const { full_name: fullName, role, tagline, email, phone, github_url, linkedin_url } = profile;
+  const avatarSrc = profile.profile_image_url || profilePhoto;
 
   const socialLinks = [
     {
       name: 'github',
-      href: 'https://github.com/FedericoScoles912',
+      href: github_url,
       label: 'Perfil de GitHub',
     },
     {
       name: 'linkedin',
-      href: 'https://www.linkedin.com/in/federico-scoles-584a50378/',
+      href: linkedin_url,
       label: 'Perfil de LinkedIn',
     },
     {
       name: 'mail',
-      href: 'mailto:fedescoles2007@gmail.com',
+      href: `mailto:${email}`,
       label: 'Enviar correo',
     },
   ];
@@ -119,11 +118,11 @@ export default function HeroSection() {
             variants={itemVariants}
             className="flex flex-wrap justify-center md:justify-start gap-x-5 gap-y-2 text-softBrown/80 dark:text-mutedBeige"
           >
-            <a className="hover:underline" href="tel:+542235811876">+54 223 581-1876</a>
-            <a className="hover:underline" href="mailto:fedescoles2007@gmail.com">fedescoles2007@gmail.com</a>
+            {phone && <a className="hover:underline" href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>}
+            <a className="hover:underline" href={`mailto:${email}`}>{email}</a>
           </motion.div>
 
-          {/* Botones de acción: Descargar CV + Contacto */}
+          {/* Botón de descarga */}
           <motion.div
             variants={itemVariants}
             className="flex flex-wrap items-center justify-center md:justify-start gap-4"
@@ -132,13 +131,6 @@ export default function HeroSection() {
               <Button variant="primary" size="lg">
                 <Icon name="download" size={20} />
                 Descargar CV
-              </Button>
-            </a>
-
-            <a href="#contact">
-              <Button variant="secondary" size="lg">
-                <Icon name="send" size={20} />
-                Contacto
               </Button>
             </a>
           </motion.div>

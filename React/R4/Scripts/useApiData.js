@@ -18,7 +18,7 @@ export default function useApiData(endpoint) {
         setLoading(true)
         setError(null)
 
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api'
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || ''
         const response = await fetch(baseUrl + endpoint)
 
         if (!response.ok) {

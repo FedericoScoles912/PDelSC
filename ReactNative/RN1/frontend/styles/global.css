@@ -1,0 +1,15 @@
+/* Estilos globales y reset para React Native Web */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+}

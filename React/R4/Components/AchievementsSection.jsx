@@ -10,17 +10,7 @@ import { formatDate } from '../Scripts/utils.js';
 import Button from './Button.jsx';
 import Icon from './Icon.jsx';
 import ciscoCertificate from '../Assets/certificates/exploracion-iot-cisco-packet-tracer.pdf';
-
-const achievements = [
-  {
-    id: 'cisco-iot-2026',
-    title: 'Exploración de IoT con Cisco Packet Tracer',
-    issuer: 'Cisco Networking Academy',
-    date: '2026-04-24',
-    description: 'Certificación completada con éxito a través del programa Cisco Networking Academy.',
-    certificate_url: ciscoCertificate,
-  },
-];
+import useApiData from '../Scripts/useApiData.js';
 
 /**
  * Esquema esperado de cada logro (no tipado, solo referencia):
@@ -127,10 +117,11 @@ function AchievementCard({ item }) {
     date = null,
     description = '[Descripción breve del logro o certificación]',
     certificate_url = null,
+    date_earned,
   } = item || {};
 
   // Formateamos la fecha solo si existe; si falla, mostramos placeholder
-  const formattedDate = date ? formatDate(date) : '[Fecha]';
+  const formattedDate = (date || date_earned) ? formatDate(date || date_earned) : '[Fecha]';
 
   return (
     <motion.article
@@ -199,6 +190,8 @@ function AchievementCard({ item }) {
  * - Muestra loading / error / empty / grid según el estado
  */
 export default function AchievementsSection() {
+  const { data, loading, error } = useApiData('/api/achievements');
+  const achievements = data || [];
   return (
     <motion.section
       id="achievements"
@@ -227,7 +220,10 @@ export default function AchievementsSection() {
           viewport={{ once: true, amount: 0.1 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {achievements.map((item) => (
+          {loading && <LoadingSkeleton count={3} />}
+          {!loading && error && <ErrorMessage message={error} />}
+          {!loading && !error && achievements.length === 0 && <EmptyMessage />}
+          {!loading && !error && achievements.map((item) => (
             <AchievementCard key={item.id} item={item} />
           ))}
         </motion.div>

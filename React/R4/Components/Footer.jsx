@@ -7,6 +7,7 @@
 // ============================================================
 import { motion } from 'framer-motion';
 import Icon from './Icon.jsx';
+import { useProfile } from '../Scripts/ProfileContext.jsx';
 
 /**
  * Footer: pie de página fijo al final del documento.
@@ -14,23 +15,24 @@ import Icon from './Icon.jsx';
  * el layout responsive.
  */
 export default function Footer() {
-  const fullName = 'Federico Scoles';
+  const { profile } = useProfile();
+  const fullName = profile.full_name;
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
     {
       name: 'github',
-      href: 'https://github.com/FedericoScoles912',
+      href: profile.github_url,
       label: 'Perfil de GitHub',
     },
     {
       name: 'linkedin',
-      href: 'https://www.linkedin.com/in/federico-scoles-584a50378/',
+      href: profile.linkedin_url,
       label: 'Perfil de LinkedIn',
     },
     {
       name: 'mail',
-      href: 'mailto:fedescoles2007@gmail.com',
+      href: `mailto:${profile.email}`,
       label: 'Enviar correo',
     },
   ];

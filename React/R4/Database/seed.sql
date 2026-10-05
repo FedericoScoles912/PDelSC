@@ -1,111 +1,15 @@
--- =============================================
--- Datos de prueba (seed) para Portfolio Personal
--- =============================================
+-- Datos iniciales MySQL para el portfolio.
+INSERT INTO profile (id, full_name, role, tagline, email, phone, city, github_url, linkedin_url, about_paragraphs, languages, hobbies) VALUES
+(1, 'Federico Scoles', 'Programador en desarrollo', 'Estudiante de informática interesado en Inteligencia Artificial, Machine Learning y desarrollo Front End.', 'fedescoles2007@gmail.com', '+54 223 581-1876', 'Mar del Plata, Argentina', 'https://github.com/FedericoScoles912', 'https://www.linkedin.com/in/federico-scoles-584a50378/', JSON_ARRAY('Soy Federico Scoles, un programador en desarrollo que busca insertarse en el mundo laboral para adquirir experiencia profesional y desarrollo personal. Actualmente estudio el nivel secundario y estoy pensando en estudiar Ingeniería en Informática en la Facultad de Ingeniería de la UNMDP.', 'Me gusta todo lo que tiene que ver con la Inteligencia Artificial, Machine Learning y el Front End de páginas web.', 'Soy trabajador, comprometido y tengo excelente predisposición para aprender cosas nuevas.'), JSON_ARRAY('Español (nativo)', 'Inglés (C1+)'), JSON_ARRAY('Gimnasio', 'Arte enfocado en la música', 'Running'));
 
--- =============================================
--- Insertar 5 habilidades (skills)
--- Categorías: Frontend, Backend, Tools
--- =============================================
 INSERT INTO skills (name, level, category, icon_name) VALUES
-    ('Skill 1: React', 90, 'Frontend', 'react-icon'),
-    ('Skill 2: Node.js', 85, 'Backend', 'nodejs-icon'),
-    ('Skill 3: TypeScript', 80, 'Frontend', 'typescript-icon'),
-    ('Skill 4: PostgreSQL', 75, 'Backend', 'postgres-icon'),
-    ('Skill 5: Git', 88, 'Tools', 'git-icon');
+('HTML', 0, 'Desarrollo frontend', 'code'), ('CSS', 0, 'Desarrollo frontend', 'code'), ('JavaScript', 0, 'Desarrollo frontend', 'code'), ('ReactJS', 0, 'Desarrollo frontend', 'code'), ('NodeJS', 0, 'Desarrollo Backend', 'code'), ('Python', 0, 'Desarrollo Backend', 'code'), ('SQL', 0, 'Base de Datos', 'code'), ('C++', 0, 'Desarrollo de aplicaciones', 'code'), ('Kotlin', 0, 'Desarrollo de aplicaciones', 'code');
 
--- =============================================
--- Insertar 4 proyectos (projects)
--- Uno destacado (featured = true)
--- =============================================
 INSERT INTO projects (title, description, repo_url, demo_url, image_url, tags, featured) VALUES
-    (
-        'Tu proyecto 1: E-Commerce',
-        'Descripción placeholder para Tu proyecto 1: Plataforma de comercio electrónico con carrito de compras, autenticación de usuarios y panel de administración.',
-        'https://github.com/tuusuario/proyecto1',
-        'https://proyecto1.demo.com',
-        'https://placehold.co/600x400/png?text=Proyecto+1',
-        ARRAY['React', 'Node.js', 'MongoDB', 'Stripe']::TEXT[],
-        TRUE
-    ),
-    (
-        'Tu proyecto 2: Gestor de Tareas',
-        'Descripción placeholder para Tu proyecto 2: Aplicación de gestión de tareas con drag-and-drop, etiquetas y colaboración en equipo.',
-        'https://github.com/tuusuario/proyecto2',
-        'https://proyecto2.demo.com',
-        'https://placehold.co/600x400/png?text=Proyecto+2',
-        ARRAY['Vue.js', 'Firebase', 'Tailwind']::TEXT[],
-        FALSE
-    ),
-    (
-        'Tu proyecto 3: Blog Personal',
-        'Descripción placeholder para Tu proyecto 3: Blog personal con sistema de artículos, comentarios y panel de administrador.',
-        'https://github.com/tuusuario/proyecto3',
-        'https://proyecto3.demo.com',
-        'https://placehold.co/600x400/png?text=Proyecto+3',
-        ARRAY['Next.js', 'PostgreSQL', 'Prisma']::TEXT[],
-        FALSE
-    ),
-    (
-        'Tu proyecto 4: Dashboard Analytics',
-        'Descripción placeholder para Tu proyecto 4: Panel de análisis con gráficos interactivos, métricas en tiempo real y exportación de reportes.',
-        'https://github.com/tuusuario/proyecto4',
-        'https://proyecto4.demo.com',
-        'https://placehold.co/600x400/png?text=Proyecto+4',
-        ARRAY['React', 'D3.js', 'Express', 'Chart.js']::TEXT[],
-        FALSE
-    );
+('Página web Iglesia de Jesús', 'Página web oficial publicada a través de cPanel mediante una herramienta de gestión web.', NULL, 'https://iglesiadejesus.com.ar', NULL, JSON_ARRAY('cPanel', 'Gestor web'), TRUE);
 
--- =============================================
--- Insertar 3 experiencias laborales (experiences)
--- =============================================
 INSERT INTO experiences (company, role, start_date, end_date, location, description) VALUES
-    (
-        'Empresa 1: Tech Solutions S.A.',
-        'Desarrollador Full Stack Senior',
-        '2023-01-15',
-        NULL,
-        'Buenos Aires, Argentina',
-        'Descripción placeholder Empresa 1: Liderazgo técnico en proyectos de desarrollo web, arquitectura de microservicios y mentoría a desarrolladores junior.'
-    ),
-    (
-        'Empresa 2: Digital Agency',
-        'Desarrollador Frontend',
-        '2021-03-01',
-        '2022-12-31',
-        'Remoto',
-        'Descripción placeholder Empresa 2: Desarrollo de interfaces modernas con React, integración con APIs REST y optimización de rendimiento web.'
-    ),
-    (
-        'Empresa 3: Startup Innovadora',
-        'Desarrollador Web Junior',
-        '2019-06-10',
-        '2021-02-28',
-        'Córdoba, Argentina',
-        'Descripción placeholder Empresa 3: Desarrollo de sitios web responsivos, mantenimiento de aplicaciones existentes y colaboración en equipo ágil.'
-    );
+('Tienda de repuestos de motor', 'Pasante', '2026-03-01', '2026-03-31', NULL, 'Cumplí un rol de ayudante bajo relación de dependencia. Realicé actividades digitales y físicas: facturación, mantenimiento de stock y ofimática. Referencia de contacto: Mariano Andrés Scoles (+54 223 456-8010).');
 
--- =============================================
--- Insertar 3 certificaciones/logros (achievements)
--- =============================================
 INSERT INTO achievements (title, issuer, date_earned, description, certificate_url) VALUES
-    (
-        'Certificación 1: AWS Certified Developer',
-        'Amazon Web Services',
-        '2024-05-20',
-        'Descripción placeholder Certificación 1: Certificación profesional en desarrollo de aplicaciones en la nube de AWS.',
-        'https://certificaciones.example.com/cert1'
-    ),
-    (
-        'Certificación 2: Meta Front-End Developer',
-        'Meta / Coursera',
-        '2023-11-10',
-        'Descripción placeholder Certificación 2: Programa especializado en desarrollo frontend moderno con React y herramientas del ecosistema Meta.',
-        'https://certificaciones.example.com/cert2'
-    ),
-    (
-        'Certificación 3: Scrum Master Certified',
-        'Scrum Alliance',
-        '2022-08-15',
-        'Descripción placeholder Certificación 3: Certificación en metodologías ágiles y gestión de proyectos Scrum.',
-        'https://certificaciones.example.com/cert3'
-    );
+('Exploración de IoT con Cisco Packet Tracer', 'Cisco Networking Academy', '2026-04-24', 'Certificación completada con éxito a través del programa Cisco Networking Academy.', NULL);
