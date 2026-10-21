@@ -1,0 +1,45 @@
+{
+  "name": "retenes-stock-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sistema de Control de Stock para distribuidor de retenes y sellos automotrices (EMIC) - Backend API REST",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "import:excel": "node BACKEND/import/importarExcel.js",
+    "import:excel:dry": "node BACKEND/import/importarExcel.js --dry-run",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "test": "node --test \"Tests/*.test.js\""
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.11.3",
+    "swagger-ui-express": "^5.0.1",
+    "xlsx": "^0.18.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.30.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3"
+  }
+}

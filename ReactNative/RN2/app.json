@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Sensores Hub",
+    "slug": "sensores-hub",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F5EBDD"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sensoreshub.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Sensores Hub requiere acceso a la cámara para tomar fotografías y escanear códigos QR y de barras.",
+        "NSLocationWhenInUseUsageDescription": "Sensores Hub requiere acceso a la ubicación para mostrar coordenadas GPS y geocodificación en tiempo real.",
+        "NSFaceIDUsageDescription": "Sensores Hub requiere autenticación biométrica para validar la identidad de forma segura."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F5EBDD"
+      },
+      "package": "com.sensoreshub.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permite a Sensores Hub acceder a la cámara para capturar fotos y escanear códigos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permite a Sensores Hub acceder a tu ubicación en tiempo real para lecturas GPS."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Permite a Sensores Hub validar tu identidad mediante biometría."
+        }
+      ]
+    ]
+  }
+}

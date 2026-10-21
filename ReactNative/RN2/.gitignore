@@ -1,0 +1,44 @@
+# Node / Dependencies
+node_modules/
+package-lock.json.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Mobile Builds / Native Output
+*.apk
+*.aab
+*.ipa
+android/
+ios/
+
+# Environment Variables
+.env
+.env.*.local
+
+# Logs
+*.log
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Testing & Coverage
+coverage/
+
+# Keystores & Credentials
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+credentials.json
