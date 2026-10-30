@@ -1,9 +1,3 @@
-/**
- * @file Perfil de compilación de EAS (APK de vista previa instalable).
- *       Ver Docs/Guia_APK.md para el procedimiento completo.
- * @module client/eas
- */
-
 {
   "cli": {
     "version": ">= 12.0.0",
@@ -16,6 +10,10 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://10.0.11.139:4000/api/v1",
+        "EXPO_PUBLIC_API_TIMEOUT": "20000"
+      },
       "android": {
         "buildType": "apk"
       }

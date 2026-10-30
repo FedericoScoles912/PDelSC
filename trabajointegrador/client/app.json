@@ -6,20 +6,37 @@
     "orientation": "default",
     "scheme": "retenesstock",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.emic.retenesstock"
     },
     "android": {
-      "package": "com.emic.retenesstock",
-      "edgeToEdgeEnabled": true
+      "package": "com.emic.retenesstock"
     },
     "web": {
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-secure-store", "expo-font"]
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "expo-status-bar"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "77ad2c15-b031-48aa-bff6-373bd0324f85"
+      }
+    }
   }
 }
