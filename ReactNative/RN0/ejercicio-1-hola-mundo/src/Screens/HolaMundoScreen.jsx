@@ -1,4 +1,5 @@
-import { SafeAreaView, Text, View, useWindowDimensions } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import TextoAnimado from '../Components/TextoAnimado';
 import ThemeToggle from '../Components/ThemeToggle';
 import { useTheme } from '../Context/ThemeContext';

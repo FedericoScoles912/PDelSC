@@ -9,7 +9,7 @@ import { Row } from '../components/grid/Row';
 import { Col } from '../components/grid/Col';
 import { Label } from '../components/atoms/Label';
 import { Icon } from '../components/atoms/Icon';
-import { InfoRow } from '../molecules/InfoRow';
+import { InfoRow } from '../components/molecules/InfoRow';
 
 /**
  * Pantalla WelcomeScreen:

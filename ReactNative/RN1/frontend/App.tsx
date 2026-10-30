@@ -16,7 +16,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} translucent />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <AppNavigator />
       {/* Modal global de pop-up accesible desde cualquier componente mediante usePopup() */}
       <PopupModal />

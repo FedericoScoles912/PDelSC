@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="description"
+      content="user-auth-system: sistema educativo de autenticación tradicional (email + contraseña) y OAuth 2.0 con dos frontends paralelos (React Router y useState) sobre una misma API REST."
+    />
+    <title>user-auth-system</title>
+    <script>
+      // Aplica el tema antes del primer paint para evitar el "flash" de tema claro.
+      (function () {
+        try {
+          var stored = localStorage.getItem('uas.theme');
+          var theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          var root = document.documentElement;
+          root.classList.toggle('dark', theme === 'dark');
+          root.dataset.theme = theme;
+          root.style.colorScheme = theme;
+        } catch (error) {
+          /* Sin localStorage: se usa el tema claro por defecto. */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
-import { SafeAreaView, Text, View, useWindowDimensions } from 'react-native';
+import { Text, View, useWindowDimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ThemeToggle from '../Components/ThemeToggle';
 import { useTheme } from '../Context/ThemeContext';
 import { createSecondStyles } from '../Styles/SegundoTabStyles';
