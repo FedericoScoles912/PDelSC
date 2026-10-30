@@ -1,0 +1,70 @@
+# ============================================================
+#  Blueprint de Render  --  Sistema de Control de Stock (Retenes EMIC)
+#
+#  Despliega la API REST (Node.js + Express) con HTTPS automático.
+#  Cómo usarlo:
+#    1. Render Dashboard -> New -> Blueprint -> elegir este repositorio.
+#    2. Indicar la ruta del archivo: trabajointegrador/render.yaml
+#    3. Completar las variables marcadas con `sync: false` (credenciales
+#       de TiDB Cloud). Los secretos JWT los genera Render solo.
+#  Ver Docs/Guia_Despliegue.md para el procedimiento completo.
+# ============================================================
+
+services:
+  - type: web
+    name: retenes-stock-api
+    runtime: node
+    plan: free
+    region: virginia
+    rootDir: trabajointegrador
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PREFIX
+        value: /api/v1
+
+      # --- Base de datos (TiDB Cloud) ---
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        value: retenes_stock
+      - key: DB_SSL
+        value: 'true'
+      - key: DB_POOL_LIMIT
+        value: '5'
+
+      # --- JWT (Render genera valores aleatorios) ---
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRES
+        value: 15m
+      - key: JWT_REFRESH_EXPIRES
+        value: 7d
+
+      # --- CORS (aplicaciones cliente autorizadas) ---
+      - key: CORS_ORIGINS
+        value: http://localhost:8081,http://localhost:19006
+
+      # --- Límite de peticiones ---
+      - key: RATE_LIMIT_WINDOW_MS
+        value: '900000'
+      - key: RATE_LIMIT_MAX
+        value: '300'
+
+      # --- Importación del Excel ---
+      - key: EXCEL_PATH
+        value: ./imports/Retenes_EMIC__Lista_de_Precios_-_Vigencia_01_Nov_2025.xlsx
+      - key: IMPORT_LOG_DIR
+        value: ./imports/logs

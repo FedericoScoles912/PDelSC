@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Retenes EMIC - Stock",
+    "slug": "retenes-emic-stock",
+    "version": "1.0.0",
+    "orientation": "default",
+    "scheme": "retenesstock",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.emic.retenesstock"
+    },
+    "android": {
+      "package": "com.emic.retenesstock",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-secure-store", "expo-font"]
+  }
+}

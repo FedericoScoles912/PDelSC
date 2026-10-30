@@ -1,0 +1,58 @@
+/**
+ * @file Hoja de estilos global. Define la paleta cálida otoñal mediante
+ *       variables CSS para los modos claro (raíz) y oscuro (clase `dark`).
+ *
+ * Las variables se declaran como tripletes RGB separados por espacios para
+ * poder combinarlas con el modificador de opacidad de Tailwind
+ * (`rgb(var(--x) / <alpha-value>)`).
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Fondos y superficies */
+  --color-fondo: 251 247 240;
+  --color-superficie: 255 255 255;
+  --color-superficie-alt: 245 237 225;
+  --color-borde: 232 221 204;
+
+  /* Texto */
+  --color-texto: 46 36 25;
+  --color-texto-suave: 122 106 87;
+
+  /* Marca (otoñal) */
+  --color-primario: 192 86 42;
+  --color-primario-suave: 224 122 69;
+  --color-acento: 224 163 62;
+
+  /* Estados */
+  --color-exito: 78 124 74;
+  --color-advertencia: 199 121 27;
+  --color-peligro: 179 38 30;
+  --color-info: 58 110 138;
+}
+
+.dark {
+  /* Fondos y superficies */
+  --color-fondo: 26 21 18;
+  --color-superficie: 36 29 24;
+  --color-superficie-alt: 46 37 30;
+  --color-borde: 59 47 38;
+
+  /* Texto */
+  --color-texto: 243 233 220;
+  --color-texto-suave: 185 167 149;
+
+  /* Marca (otoñal) */
+  --color-primario: 224 122 69;
+  --color-primario-suave: 233 147 100;
+  --color-acento: 233 183 92;
+
+  /* Estados */
+  --color-exito: 122 168 116;
+  --color-advertencia: 224 163 62;
+  --color-peligro: 226 106 96;
+  --color-info: 108 160 190;
+}

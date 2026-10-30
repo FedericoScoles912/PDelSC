@@ -1,0 +1,30 @@
+/**
+ * @file Perfil de compilación de EAS (APK de vista previa instalable).
+ *       Ver Docs/Guia_APK.md para el procedimiento completo.
+ * @module client/eas
+ */
+
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
