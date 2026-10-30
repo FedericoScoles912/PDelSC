@@ -1,9 +1,0 @@
-node_modules/
-client/
-imports/
-dist/
-coverage/
-export-check/
-.export-check/
-package-lock.json
-*.min.js
