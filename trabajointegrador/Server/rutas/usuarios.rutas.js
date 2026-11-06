@@ -48,11 +48,12 @@ const esquemaCrear = z.object({
   activo: z.boolean({ invalid_type_error: 'El estado activo debe ser verdadero o falso.' }).optional()
 });
 
-/** Cuerpo de actualización de usuario (no permite cambiar el email). */
+/** Cuerpo de actualización de usuario. */
 const esquemaActualizar = z.object({
-  nombre: z.string().min(1, 'El nombre no puede estar vacío.').optional(),
-  apellido: z.string().min(1, 'El apellido no puede estar vacío.').optional(),
-  telefono: z.string().min(1, 'El teléfono no puede estar vacío.').optional(),
+  email: z.string().trim().min(1, 'El email no puede estar vacío.').email('El email no es válido.').optional(),
+  nombre: z.string().trim().min(1, 'El nombre no puede estar vacío.').optional(),
+  apellido: z.string().trim().optional().nullable(),
+  telefono: z.string().trim().optional().nullable(),
   rol: z.string().min(1, 'El rol no puede estar vacío.').optional(),
   activo: z.boolean({ invalid_type_error: 'El estado activo debe ser verdadero o falso.' }).optional(),
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.').optional()

@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "10b5fcd2-9edf-4071-9481-a5ebe5b2d7a3"
+      }
+    },
+    "android": {
+      "package": "com.federicoscoles.stockerserver"
+    }
+  }
+}

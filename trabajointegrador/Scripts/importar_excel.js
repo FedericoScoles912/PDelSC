@@ -15,11 +15,60 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import mysql from 'mysql2/promise';
+
 import { env, resolverRuta, validarEntorno } from '../Server/config/env.js';
-import { cerrarPool, verificarConexion } from '../Server/config/db.js';
+import { cerrarPool, query, verificarConexion } from '../Server/config/db.js';
 import { leerExcel } from './lib/lector_excel.js';
 import { generarSeedProductos } from './lib/generador_sql.js';
 import { aplicarImportacion, generarPreview } from './lib/importador.js';
+
+/** Scripts base para inicializar el esquema si aún no existen las tablas. */
+const SCRIPTS_BASE = [
+  '01_schema.sql',
+  '02_tables.sql',
+  '03_indexes.sql',
+  '04_seed_roles_admin.sql',
+  '05_views.sql'
+];
+
+/**
+ * Verifica que las tablas del esquema existan; si la base está vacía (por ejemplo
+ * tras `npm run db:rollback`), ejecuta automáticamente los scripts 01 a 05.
+ */
+async function asegurarEsquema() {
+  const tablas = await query("SHOW TABLES LIKE 'categorias'");
+  if (Array.isArray(tablas) && tablas.length > 0) return;
+
+  console.log('  Esquema no encontrado: inicializando tablas base (01 -> 05)...');
+  const ssl = env.db.ssl ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined;
+  if (ssl && env.db.sslCa && env.db.sslCaExiste) {
+    ssl.ca = fs.readFileSync(env.db.sslCa);
+  }
+
+  const conexion = await mysql.createConnection({
+    host: env.db.host,
+    port: env.db.puerto,
+    user: env.db.usuario,
+    password: env.db.password,
+    database: env.db.nombre,
+    ssl,
+    multipleStatements: true,
+    connectTimeout: 15000,
+    charset: 'utf8mb4_general_ci'
+  });
+
+  try {
+    for (const archivo of SCRIPTS_BASE) {
+      const ruta = resolverRuta(path.join('SQL', archivo));
+      const sql = fs.readFileSync(ruta, 'utf8');
+      await conexion.query(sql);
+      console.log(`    [OK] ${archivo}`);
+    }
+  } finally {
+    await conexion.end();
+  }
+}
 
 /**
  * Interpreta los argumentos de la línea de comandos.
@@ -197,6 +246,7 @@ async function principal() {
     return;
   }
   console.log(`\n  Conectado a la base (${estado.version}).`);
+  await asegurarEsquema();
 
   const preview = await generarPreview(datos);
   imprimirPreview(preview);

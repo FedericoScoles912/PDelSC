@@ -55,6 +55,14 @@ export const MENU: readonly ItemMenu[] = [
     roles: TODOS
   },
   {
+    ruta: 'Deposito',
+    titulo: 'Depósito',
+    descripcion: 'Control de inventario físico, existencias en depósito y ajustes.',
+    icono: 'file-tray-stacked-outline',
+    grupo: 'Operación',
+    roles: ['admin', 'deposito']
+  },
+  {
     ruta: 'Stock',
     titulo: 'Movimientos',
     descripcion: 'Entradas, salidas y ajustes de stock con trazabilidad.',

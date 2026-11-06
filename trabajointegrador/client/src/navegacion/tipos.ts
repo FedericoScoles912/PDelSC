@@ -19,6 +19,8 @@ export type RutasApp = {
   Dashboard: undefined;
   /** Catálogo de productos. */
   Productos: undefined;
+  /** Stock físico en depósito (Admin y Encargado de depósito). */
+  Deposito: undefined;
   /** Movimientos de stock. */
   Stock: undefined;
   /** Listas de precios e historial. */

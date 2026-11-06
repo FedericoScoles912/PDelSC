@@ -373,16 +373,19 @@ export async function cambiarActivo(id, activo) {
 }
 
 /**
- * Baja lógica de un producto (no borra físicamente por las FK).
+ * Elimina un producto y sus registros dependientes (equivalencias, movimientos e historial de precios).
  * @param {number} id
- * @returns {Promise<{id:number, activo:number}>}
+ * @returns {Promise<{id:number, codigo:string, eliminado:boolean, activo:number}>}
  */
 export async function eliminar(id) {
-  const actual = await queryUna('SELECT `id` FROM `productos` WHERE `id` = ?', [id]);
+  const actual = await queryUna('SELECT `id`, `codigo` FROM `productos` WHERE `id` = ?', [id]);
   if (!actual) throw ApiError.noEncontrado('Producto no encontrado.');
 
-  await ejecutar('UPDATE `productos` SET `activo` = 0 WHERE `id` = ?', [id]);
-  return { id, activo: 0 };
+  await ejecutar('DELETE FROM `equivalencias` WHERE `producto_id` = ?', [id]);
+  await ejecutar('DELETE FROM `movimientos_stock` WHERE `producto_id` = ?', [id]);
+  await ejecutar('DELETE FROM `historial_precios` WHERE `producto_id` = ?', [id]);
+  await ejecutar('DELETE FROM `productos` WHERE `id` = ?', [id]);
+  return { id, codigo: actual.codigo, eliminado: true, activo: 0 };
 }
 
 /**

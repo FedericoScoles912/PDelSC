@@ -9,10 +9,61 @@
  * @module client/src/servicios/api
  */
 
+import Constants from 'expo-constants';
+
 import { CLAVES, eliminar, guardar, obtener } from './almacenamiento';
 
-/** URL base de la API. Se configura con `EXPO_PUBLIC_API_URL`. */
-export const URL_API: string = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
+/**
+ * Determina la URL base inicial de la API. Cuando corre dentro de Expo Go o un
+ * emulador conectado a Metro, toma automáticamente el host de Metro para que
+ * funcione aunque cambie la IP Wi-Fi de la PC.
+ */
+function resolverUrlApi(): string {
+  if (typeof window !== 'undefined' && window.location?.hostname === 'localhost') {
+    return 'http://localhost:4000/api/v1';
+  }
+  const configurada = process.env.EXPO_PUBLIC_API_URL;
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const host = hostUri.split(':')[0];
+    if (
+      host &&
+      (!configurada ||
+        /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.)/.test(configurada))
+    ) {
+      return `http://${host}:4000/api/v1`;
+    }
+  }
+  return configurada ?? 'http://192.168.100.142:4000/api/v1';
+}
+
+/** Lista de URLs candidatas para autodescubrimiento cuando cambia la red Wi-Fi o se usa emulador. */
+function obtenerUrlsCandidatas(): string[] {
+  const lista: string[] = [];
+  const agregar = (u?: string | null) => {
+    if (!u) return;
+    const limpia = u.replace(/\/+$/, '');
+    if (!lista.includes(limpia)) lista.push(limpia);
+  };
+
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    agregar(`http://${window.location.hostname}:4000/api/v1`);
+  }
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const host = hostUri.split(':')[0];
+    if (host) agregar(`http://${host}:4000/api/v1`);
+  }
+  agregar(process.env.EXPO_PUBLIC_API_URL);
+  agregar('http://192.168.100.142:4000/api/v1');
+  agregar('http://10.0.11.139:4000/api/v1');
+  agregar('http://10.0.2.2:4000/api/v1');
+  agregar('http://localhost:4000/api/v1');
+  return lista;
+}
+
+/** URL base activa de la API (se actualiza automáticamente si otra IP de la red responde). */
+export let URL_API: string = resolverUrlApi();
 
 /** Tiempo máximo (ms) de espera por respuesta. */
 const TIEMPO_LIMITE = Number(process.env.EXPO_PUBLIC_API_TIMEOUT ?? 20000);
@@ -138,7 +189,43 @@ function construirUrl(ruta: string, consulta?: Record<string, ValorConsulta>): s
 }
 
 /**
+ * Prueba en paralelo las URLs candidatas de la API y actualiza `URL_API` con la primera que responda.
+ */
+export async function descubrirUrlDisponible(incluirActual = false): Promise<string | null> {
+  const candidatas = obtenerUrlsCandidatas().filter((u) => incluirActual || u !== URL_API);
+  if (!candidatas.length) return URL_API;
+
+  const probarUna = async (base: string): Promise<string> => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000);
+    try {
+      const resp = await fetch(`${base}/health`, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        signal: ctrl.signal
+      });
+      if (resp.ok) return base;
+      throw new Error('No disponible');
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  try {
+    const ganadora = await Promise.any(candidatas.map((base) => probarUna(base)));
+    URL_API = ganadora;
+    return ganadora;
+  } catch {
+    return null;
+  }
+}
+
+// Autodescubrir el servidor activo apenas inicia la app en segundo plano.
+void descubrirUrlDisponible(true);
+
+/**
  * Ejecuta el fetch con tiempo límite y traduce los fallos de red.
+ * Si la URL activa no responde, autodescubre otra IP disponible del backend y reintenta.
  * @param url URL absoluta.
  * @param metodo Método HTTP.
  * @param cabeceras Cabeceras de la petición.
@@ -150,17 +237,41 @@ async function enviar(
   cabeceras: Record<string, string>,
   cuerpo: unknown
 ): Promise<Response> {
-  const controlador = new AbortController();
-  const temporizador = setTimeout(() => controlador.abort(), TIEMPO_LIMITE);
+  const ejecutarFetch = async (urlDestino: string, limiteMs: number): Promise<Response> => {
+    const controlador = new AbortController();
+    const temporizador = setTimeout(() => controlador.abort(), limiteMs);
+    try {
+      return await fetch(urlDestino, {
+        method: metodo,
+        headers: cabeceras,
+        body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
+        signal: controlador.signal
+      });
+    } finally {
+      clearTimeout(temporizador);
+    }
+  };
+
   try {
-    return await fetch(url, {
-      method: metodo,
-      headers: cabeceras,
-      body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
-      signal: controlador.signal
-    });
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
+    return await ejecutarFetch(url, Math.min(TIEMPO_LIMITE, 6000));
+  } catch (errorInicial) {
+    const urlAnterior = URL_API;
+    const nuevaBase = await descubrirUrlDisponible();
+    if (nuevaBase && url.startsWith(urlAnterior)) {
+      const urlReintento = `${nuevaBase}${url.slice(urlAnterior.length)}`;
+      try {
+        return await ejecutarFetch(urlReintento, TIEMPO_LIMITE);
+      } catch (errorReintento) {
+        if (errorReintento instanceof Error && errorReintento.name === 'AbortError') {
+          throw new ErrorApi(
+            0,
+            'TIEMPO_AGOTADO',
+            'La conexión tardó demasiado. Revisá tu red e intentá nuevamente.'
+          );
+        }
+      }
+    }
+    if (errorInicial instanceof Error && errorInicial.name === 'AbortError') {
       throw new ErrorApi(
         0,
         'TIEMPO_AGOTADO',
@@ -172,8 +283,6 @@ async function enviar(
       'SIN_CONEXION',
       'No se pudo conectar con el servidor. Verificá que el backend esté disponible.'
     );
-  } finally {
-    clearTimeout(temporizador);
   }
 }
 

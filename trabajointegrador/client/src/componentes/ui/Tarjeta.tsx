@@ -26,6 +26,8 @@ export function Tarjeta({ children, clase, style, compacta = false, ...resto }: 
     <View
       style={[
         {
+          backgroundColor: tokens.superficie,
+          borderColor: tokens.borde,
           shadowColor: tokens.sombra,
           shadowOpacity: 1,
           shadowRadius: 12,
@@ -73,13 +75,22 @@ export function EncabezadoTarjeta({
     <View className="mb-4 flex-row items-center justify-between gap-3">
       <View className="flex-1 flex-row items-center gap-3">
         {icono && (
-          <View className="h-10 w-10 items-center justify-center rounded-xl bg-superficie-alt">
+          <View
+            style={{ backgroundColor: tokens.superficieAlt }}
+            className="h-10 w-10 items-center justify-center rounded-xl bg-superficie-alt"
+          >
             <Ionicons name={icono} size={20} color={tokens.primario} />
           </View>
         )}
         <View className="flex-1">
-          <Text className="text-lg font-bold text-texto">{titulo}</Text>
-          {descripcion && <Text className="text-sm text-texto-suave">{descripcion}</Text>}
+          <Text style={{ color: tokens.texto }} className="text-lg font-bold text-texto">
+            {titulo}
+          </Text>
+          {descripcion && (
+            <Text style={{ color: tokens.textoSuave }} className="text-sm text-texto-suave">
+              {descripcion}
+            </Text>
+          )}
         </View>
       </View>
       {acciones && <View className="flex-row items-center gap-2">{acciones}</View>}

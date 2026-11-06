@@ -110,6 +110,11 @@ export const env = {
     callbackBaseUrl: process.env.OAUTH_CALLBACK_BASE_URL ?? 'http://localhost:4000'
   },
 
+  mail: {
+    appsScriptUrl: process.env.APPS_SCRIPT_MAIL_URL ?? '',
+    appsScriptSecret: process.env.APPS_SCRIPT_MAIL_SECRET ?? ''
+  },
+
   importacion: {
     excelPath: process.env.EXCEL_PATH ?? './imports/Retenes_EMIC__Lista_de_Precios_-_Vigencia_01_Nov_2025.xlsx',
     logDir: process.env.IMPORT_LOG_DIR ?? './imports/logs'

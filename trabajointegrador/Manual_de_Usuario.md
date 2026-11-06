@@ -1,6 +1,6 @@
-# Manual de Usuario — Sistema de Control de Stock (Retenes EMIC)
+# Manual de Usuario — Stocker (Sistema de Control de Stock)
 
-Bienvenido al **Manual de Usuario** del **Sistema de Control de Stock — Retenes EMIC**, una plataforma integral multiplataforma (**Web, Android e iOS**) diseñada para la gestión de inventario, catálogo técnico de retenes y sellos automotrices, listas de precios, movimientos de depósito, reportes y auditoría.
+Bienvenido al **Manual de Usuario** de **Stocker — Sistema de Control de Stock**, una plataforma integral multiplataforma (**Web, Android e iOS**) diseñada para la gestión de inventario, catálogo técnico de retenes y sellos automotrices, listas de precios, movimientos de depósito, reportes y auditoría.
 
 ---
 

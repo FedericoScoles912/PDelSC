@@ -113,7 +113,7 @@ const DURACION_AVISO = 3600;
 
 /** Provee diálogos y avisos propios a la aplicación. */
 export function PopUpsProvider({ children }: { children: ReactNode }) {
-  const { tokens, esquema } = useTema();
+  const { tokens, esquema, claseRaiz, estiloVariables } = useTema();
   const [dialogo, setDialogo] = useState<DialogoActivo | null>(null);
   const [aviso, setAviso] = useState<AvisoActivo | null>(null);
   const [texto, setTexto] = useState('');
@@ -243,8 +243,14 @@ export function PopUpsProvider({ children }: { children: ReactNode }) {
         animationType="fade"
         onRequestClose={() => cerrar(dialogo?.tipo === 'confirmar' ? false : null)}
       >
-        <View className="flex-1 items-center justify-center bg-black/50 p-4">
-          <View className="w-full max-w-md rounded-2xl border border-borde bg-superficie p-5">
+        <View
+          style={estiloVariables}
+          className={cn(claseRaiz, 'flex-1 items-center justify-center bg-black/50 p-4')}
+        >
+          <View
+            style={{ backgroundColor: tokens.superficie, borderColor: tokens.borde }}
+            className="w-full max-w-md rounded-2xl border border-borde bg-superficie p-5"
+          >
             <View className="mb-3 flex-row items-center gap-3">
               <View
                 className="h-11 w-11 items-center justify-center rounded-full"
@@ -256,7 +262,7 @@ export function PopUpsProvider({ children }: { children: ReactNode }) {
                   color={colorAcento}
                 />
               </View>
-              <Text className="flex-1 text-lg font-bold text-texto">
+              <Text style={{ color: tokens.texto }} className="flex-1 text-lg font-bold text-texto">
                 {dialogo?.opciones.titulo ??
                   (dialogo?.tipo === 'confirmar'
                     ? 'Confirmar acción'
@@ -266,7 +272,9 @@ export function PopUpsProvider({ children }: { children: ReactNode }) {
               </Text>
             </View>
 
-            <Text className="text-base leading-6 text-texto">{dialogo?.opciones.mensaje}</Text>
+            <Text style={{ color: tokens.texto }} className="text-base leading-6 text-texto">
+              {dialogo?.opciones.mensaje}
+            </Text>
 
             {dialogo?.tipo === 'solicitar' && (
               <View className="mt-4">

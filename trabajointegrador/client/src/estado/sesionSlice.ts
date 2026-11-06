@@ -132,17 +132,17 @@ export const iniciarSesion = createAsyncThunk<
   }
 });
 
-/** Inicia sesión con un proveedor OAuth (Google, Facebook, GitHub). */
-export const iniciarSesionOAuth = createAsyncThunk<
+/** Inicia sesión con el código de recuperación recibido por correo. */
+export const iniciarSesionConCodigo = createAsyncThunk<
   SesionIniciada,
-  { proveedor: 'google' | 'facebook' | 'github'; token: string },
+  { email: string; codigo: string },
   { rejectValue: string }
->('sesion/iniciarOAuth', async ({ proveedor, token }, { rejectWithValue }) => {
+>('sesion/iniciarConCodigo', async (datosCodigo, { rejectWithValue }) => {
   try {
-    const datos = await peticion<SesionIniciada>(`/auth/oauth/${proveedor}`, {
+    const datos = await peticion<SesionIniciada>('/auth/recuperar/verificar', {
       metodo: 'POST',
       autenticada: false,
-      cuerpo: { token }
+      cuerpo: datosCodigo
     });
     await aplicarTokens(datos.accessToken, datos.refreshToken);
     await persistirUsuario(datos.usuario);
@@ -151,6 +151,16 @@ export const iniciarSesionOAuth = createAsyncThunk<
     return rejectWithValue(mensajeDeError(error));
   }
 });
+
+/** Persiste y activa una sesión devuelta por el callback OAuth 2.0 real. */
+export const completarSesionOAuth = createAsyncThunk<SesionIniciada, SesionIniciada>(
+  'sesion/completarOAuth',
+  async (datos) => {
+    await aplicarTokens(datos.accessToken, datos.refreshToken);
+    await persistirUsuario(datos.usuario);
+    return datos;
+  }
+);
 
 /** Cierra la sesión y revoca el refresh token en el servidor. */
 export const cerrarSesion = createAsyncThunk('sesion/cerrar', async () => {
@@ -166,10 +176,16 @@ export const cerrarSesion = createAsyncThunk('sesion/cerrar', async () => {
   await limpiarTokens();
 });
 
-/** Actualiza nombre, apellido y teléfono del usuario autenticado. */
+/** Actualiza email, nombre, apellido, teléfono y rol del usuario autenticado. */
 export const actualizarPerfil = createAsyncThunk<
   Usuario,
-  { nombre?: string; apellido?: string; telefono?: string },
+  {
+    email?: string;
+    nombre?: string;
+    apellido?: string | null;
+    telefono?: string | null;
+    rol?: string;
+  },
   { rejectValue: string }
 >('sesion/actualizarPerfil', async (cambios, { rejectWithValue }) => {
   try {
@@ -244,9 +260,10 @@ const slice = createSlice({
       .addCase(iniciarSesion.pending, iniciarSesionPendiente)
       .addCase(iniciarSesion.fulfilled, iniciarSesionCompletada)
       .addCase(iniciarSesion.rejected, iniciarSesionFallida)
-      .addCase(iniciarSesionOAuth.pending, iniciarSesionPendiente)
-      .addCase(iniciarSesionOAuth.fulfilled, iniciarSesionCompletada)
-      .addCase(iniciarSesionOAuth.rejected, iniciarSesionFallida);
+      .addCase(completarSesionOAuth.fulfilled, iniciarSesionCompletada)
+      .addCase(iniciarSesionConCodigo.pending, iniciarSesionPendiente)
+      .addCase(iniciarSesionConCodigo.fulfilled, iniciarSesionCompletada)
+      .addCase(iniciarSesionConCodigo.rejected, iniciarSesionFallida);
 
     constructor
       .addCase(cerrarSesion.pending, (estado) => {

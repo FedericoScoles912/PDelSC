@@ -10,7 +10,12 @@ import { z } from 'zod';
 import { autorizar } from '../middlewares/autenticacion.js';
 import { validarBody, validarQuery } from '../middlewares/validacion.js';
 import { ApiError, asyncHandler, responder, responderCreado } from '../utils/http.js';
-import { alertas, listarMovimientos, registrarMovimiento } from '../servicios/stock.servicio.js';
+import {
+  alertas,
+  listarMovimientos,
+  obtenerStockDeposito,
+  registrarMovimiento
+} from '../servicios/stock.servicio.js';
 import { ipDe, registrar } from '../servicios/auditoria.servicio.js';
 
 const router = Router();
@@ -92,6 +97,15 @@ router.get(
   asyncHandler(async (_req, res) => {
     const datos = await alertas();
     return responder(res, datos);
+  })
+);
+
+router.get(
+  '/deposito',
+  autorizar('admin', 'deposito'),
+  asyncHandler(async (req, res) => {
+    const { resumen, datos, meta } = await obtenerStockDeposito(req.query);
+    return responder(res, { resumen, articulos: datos }, meta);
   })
 );
 

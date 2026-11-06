@@ -1,7 +1,7 @@
 -- ============================================================================
 --  06_seed_productos.sql  --  GENERADO AUTOMÁTICAMENTE por Scripts/importar_excel.js
 --  Archivo origen: Retenes_EMIC__Lista_de_Precios_-_Vigencia_01_Nov_2025.xlsx
---  Generado: 2026-10-30T16:57:59.338Z
+--  Generado: 2026-11-04T00:29:58.586Z
 -- ----------------------------------------------------------------------------
 --  Carga la lista de precios EMIC sin necesidad de correr Node.
 --  Idempotente: puede ejecutarse varias veces sin duplicar datos.

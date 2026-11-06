@@ -57,9 +57,18 @@ export function Entrada({
   return (
     <View style={contenedorStyle} className={cn('w-full', clase)}>
       {etiqueta && (
-        <Text className="mb-1.5 text-sm font-semibold text-texto-suave">{etiqueta}</Text>
+        <Text
+          style={{ color: tokens.textoSuave }}
+          className="mb-1.5 text-sm font-semibold text-texto-suave"
+        >
+          {etiqueta}
+        </Text>
       )}
       <View
+        style={{
+          backgroundColor: tokens.superficie,
+          borderColor: hayError ? tokens.peligro : enfocado ? tokens.primario : tokens.borde
+        }}
         className={cn(
           'flex-row items-center gap-2 rounded-xl border bg-superficie px-3',
           hayError ? 'border-peligro' : enfocado ? 'border-primario' : 'border-borde',
@@ -74,6 +83,7 @@ export function Entrada({
           />
         )}
         <TextInput
+          style={{ color: tokens.texto }}
           className="min-h-[44px] flex-1 py-2.5 text-base text-texto"
           placeholderTextColor={tokens.textoSuave}
           editable={editable}

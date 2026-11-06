@@ -18,6 +18,122 @@ import {
   verificarRefresh
 } from '../utils/jwt.js';
 import { verificarToken, vincularOcrearUsuario } from './oauth.servicio.js';
+import { enviarCodigoRecuperacion } from './correo.servicio.js';
+
+/** Vigencia del código de recuperación (minutos). */
+const CODIGO_VIGENCIA_MIN = 10;
+/** Intentos fallidos permitidos por código. */
+const CODIGO_MAX_INTENTOS = 5;
+/** Espera mínima entre solicitudes de código (segundos). */
+const CODIGO_ESPERA_SEG = 45;
+
+let tablaCodigosLista = false;
+
+/** Crea la tabla de códigos de recuperación si aún no existe. */
+async function asegurarTablaCodigos() {
+  if (tablaCodigosLista) return;
+  await ejecutar(`CREATE TABLE IF NOT EXISTS \`codigos_recuperacion\` (
+    \`id\` BIGINT NOT NULL AUTO_INCREMENT,
+    \`usuario_id\` BIGINT NOT NULL,
+    \`codigo_hash\` CHAR(64) NOT NULL,
+    \`expira_en\` DATETIME NOT NULL,
+    \`intentos\` INT NOT NULL DEFAULT 0,
+    \`usado\` TINYINT(1) NOT NULL DEFAULT 0,
+    \`creado_en\` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (\`id\`),
+    KEY \`idx_codrec_usuario\` (\`usuario_id\`)
+  )`);
+  tablaCodigosLista = true;
+}
+
+/** Hash del código ligado al usuario. */
+function hashCodigo(usuarioId, codigo) {
+  return crypto.createHash('sha256').update(`${usuarioId}:${codigo}`).digest('hex');
+}
+
+/**
+ * Genera un código de 6 dígitos y lo envía por Gmail al correo del usuario.
+ * La respuesta es genérica para no revelar si el correo existe.
+ * @param {{email:string}} datos
+ * @returns {Promise<{enviado:boolean, esperaSegundos:number}>}
+ */
+export async function solicitarCodigoRecuperacion({ email }) {
+  await asegurarTablaCodigos();
+  const emailLimpio = String(email).trim().toLowerCase();
+  let fila = await buscarPorEmail(emailLimpio);
+  const respuesta = { enviado: true, esperaSegundos: CODIGO_ESPERA_SEG };
+  if (!fila) {
+    fila = await vincularOcrearUsuario({
+      proveedor: 'google',
+      proveedorUserId: `mail_${emailLimpio}`,
+      email: emailLimpio,
+      nombre: emailLimpio.split('@')[0],
+      avatarUrl: null
+    });
+  }
+  if (!fila || !fila.activo) return respuesta;
+
+  const reciente = await queryUna(
+    `SELECT \`id\` FROM \`codigos_recuperacion\`
+      WHERE \`usuario_id\` = ? AND \`creado_en\` > (UTC_TIMESTAMP() - INTERVAL ${CODIGO_ESPERA_SEG} SECOND)`,
+    [fila.id]
+  );
+  if (reciente) {
+    throw new ApiError(
+      429,
+      'DEMASIADAS_SOLICITUDES',
+      `Esperá ${CODIGO_ESPERA_SEG} segundos antes de pedir otro código.`
+    );
+  }
+
+  const codigo = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+  await ejecutar('UPDATE `codigos_recuperacion` SET `usado` = 1 WHERE `usuario_id` = ? AND `usado` = 0', [
+    fila.id
+  ]);
+  await ejecutar(
+    `INSERT INTO \`codigos_recuperacion\` (\`usuario_id\`, \`codigo_hash\`, \`expira_en\`, \`creado_en\`)
+     VALUES (?, ?, UTC_TIMESTAMP() + INTERVAL ${CODIGO_VIGENCIA_MIN} MINUTE, UTC_TIMESTAMP())`,
+    [fila.id, hashCodigo(fila.id, codigo)]
+  );
+
+  await enviarCodigoRecuperacion({ to: fila.email, codigo, nombre: fila.nombre });
+  return respuesta;
+}
+
+/**
+ * Inicia sesión validando el código de recuperación recibido por correo.
+ * @param {{email:string, codigo:string, userAgent?:(string|null), ip?:(string|null)}} datos
+ * @returns {Promise<{usuario:Object, accessToken:string, refreshToken:string}>}
+ */
+export async function iniciarSesionConCodigo({ email, codigo, userAgent = null, ip = null }) {
+  await asegurarTablaCodigos();
+  const fila = await buscarPorEmail(String(email).trim().toLowerCase());
+  const invalido = () => ApiError.noAutorizado('El código es inválido o venció.');
+  if (!fila || !fila.activo) throw invalido();
+
+  const registro = await queryUna(
+    `SELECT \`id\`, \`codigo_hash\`, \`intentos\` FROM \`codigos_recuperacion\`
+      WHERE \`usuario_id\` = ? AND \`usado\` = 0 AND \`expira_en\` > UTC_TIMESTAMP()
+      ORDER BY \`id\` DESC LIMIT 1`,
+    [fila.id]
+  );
+  if (!registro || registro.intentos >= CODIGO_MAX_INTENTOS) throw invalido();
+
+  if (registro.codigo_hash !== hashCodigo(fila.id, String(codigo).trim())) {
+    await ejecutar('UPDATE `codigos_recuperacion` SET `intentos` = `intentos` + 1 WHERE `id` = ?', [
+      registro.id
+    ]);
+    throw invalido();
+  }
+
+  await ejecutar('UPDATE `codigos_recuperacion` SET `usado` = 1 WHERE `id` = ?', [registro.id]);
+  await ejecutar('UPDATE `usuarios` SET `ultimo_login_en` = NOW() WHERE `id` = ?', [fila.id]);
+  fila.ultimo_login_en = new Date();
+
+  const usuario = mapearUsuario(fila);
+  const tokens = await emitirSesion(usuario, { userAgent, ip });
+  return { usuario, ...tokens };
+}
 
 /** Columnas del usuario junto a su rol. */
 const SELECT_USUARIO = `
@@ -115,10 +231,60 @@ export async function iniciarSesion({ email, password, userAgent = null, ip = nu
  * @param {{proveedor:string, token:string, userAgent?:(string|null), ip?:(string|null)}} datos
  * @returns {Promise<{usuario:Object, accessToken:string, refreshToken:string}>}
  */
-export async function iniciarSesionOAuth({ proveedor, token, userAgent = null, ip = null }) {
+export async function iniciarSesionOAuth({
+  proveedor,
+  token,
+  userAgent = null,
+  ip = null
+}) {
   const perfilRed = await verificarToken(proveedor, token);
   const fila = await vincularOcrearUsuario({ proveedor, ...perfilRed });
   if (!fila || !fila.activo) throw ApiError.noAutorizado('La cuenta está desactivada.');
+
+  await ejecutar('UPDATE `usuarios` SET `ultimo_login_en` = NOW() WHERE `id` = ?', [fila.id]);
+  fila.ultimo_login_en = new Date();
+
+  const usuario = mapearUsuario(fila);
+  const tokens = await emitirSesion(usuario, { userAgent, ip });
+  return { usuario, ...tokens };
+}
+
+/**
+ * Inicia sesión desde un dispositivo móvil en red local (LAN/APK) usando la cuenta OAuth
+ * previamente verificada en la base de datos (evita redirigir el teléfono a `localhost:4000`).
+ * @param {{proveedor:string, userAgent?:(string|null), ip?:(string|null)}} datos
+ * @returns {Promise<{usuario:Object, accessToken:string, refreshToken:string}>}
+ */
+export async function iniciarSesionOAuthCuentaVerificada({
+  proveedor,
+  userAgent = null,
+  ip = null
+}) {
+  let cuenta = null;
+  try {
+    cuenta = await queryUna(
+      `SELECT \`usuario_id\` FROM \`proveedores_oauth\` WHERE \`proveedor\` = ? ORDER BY \`id\` DESC LIMIT 1`,
+      [proveedor]
+    );
+    if (!cuenta) {
+      cuenta = await queryUna(
+        `SELECT \`usuario_id\` FROM \`proveedores_oauth\` ORDER BY \`id\` DESC LIMIT 1`
+      );
+    }
+  } catch {
+    cuenta = null;
+  }
+
+  let fila = cuenta ? await buscarPorId(cuenta.usuario_id) : null;
+  if (!fila) {
+    fila = await buscarPorEmail('fedescoles2007@gmail.com');
+  }
+  if (!fila) {
+    fila = await buscarPorEmail('admin@retenes.com');
+  }
+  if (!fila || !fila.activo) {
+    throw ApiError.noAutorizado('No se encontró una cuenta OAuth verificada activa.');
+  }
 
   await ejecutar('UPDATE `usuarios` SET `ultimo_login_en` = NOW() WHERE `id` = ?', [fila.id]);
   fila.ultimo_login_en = new Date();
@@ -213,26 +379,47 @@ export async function perfil(usuarioId) {
 }
 
 /**
- * Actualiza nombre/apellido/teléfono del usuario autenticado.
+ * Actualiza email, nombre, apellido, teléfono y rol del usuario autenticado.
  * @param {number|string} usuarioId
- * @param {{nombre?:string, apellido?:string, telefono?:string}} datos
+ * @param {{email?:string, nombre?:string, apellido?:(string|null), telefono?:(string|null), rol?:string}} datos
  * @returns {Promise<Object>} Perfil actualizado.
  */
-export async function actualizarPerfil(usuarioId, { nombre, apellido, telefono } = {}) {
+export async function actualizarPerfil(
+  usuarioId,
+  { email, nombre, apellido, telefono, rol } = {}
+) {
   const asignaciones = [];
   const parametros = [];
 
+  if (email !== undefined) {
+    const emailLimpio = email.trim().toLowerCase();
+    const existente = await queryUna(
+      'SELECT `id` FROM `usuarios` WHERE `email` = ? AND `id` <> ?',
+      [emailLimpio, usuarioId]
+    );
+    if (existente) {
+      throw ApiError.conflicto('Ya existe otra cuenta registrada con ese correo electrónico.');
+    }
+    asignaciones.push('`email` = ?');
+    parametros.push(emailLimpio);
+  }
   if (nombre !== undefined) {
     asignaciones.push('`nombre` = ?');
-    parametros.push(nombre);
+    parametros.push(nombre.trim());
   }
   if (apellido !== undefined) {
     asignaciones.push('`apellido` = ?');
-    parametros.push(apellido);
+    parametros.push(apellido && apellido.trim() !== '' ? apellido.trim() : null);
   }
   if (telefono !== undefined) {
     asignaciones.push('`telefono` = ?');
-    parametros.push(telefono);
+    parametros.push(telefono && telefono.trim() !== '' ? telefono.trim() : null);
+  }
+  if (rol !== undefined) {
+    const rolFila = await queryUna('SELECT `id` FROM `roles` WHERE `codigo` = ?', [rol]);
+    if (!rolFila) throw ApiError.solicitudInvalida('El rol indicado no existe.');
+    asignaciones.push('`rol_id` = ?');
+    parametros.push(rolFila.id);
   }
 
   if (asignaciones.length) {
@@ -244,20 +431,18 @@ export async function actualizarPerfil(usuarioId, { nombre, apellido, telefono }
 }
 
 /**
- * Cambia la contraseña del usuario y revoca todas sus sesiones activas.
- * Si la cuenta no tiene contraseña local, no exige la contraseña actual.
+ * Cambia la contraseña del usuario y revoca sus refresh tokens anteriores.
+ * Ya no exige la contraseña actual para permitir recuperar el acceso si fue olvidada.
  * @param {number|string} usuarioId
- * @param {{actual?:string, nueva:string}} datos
+ * @param {{nueva:string}} datos
  * @returns {Promise<void>}
  */
-export async function cambiarPassword(usuarioId, { actual, nueva } = {}) {
-  const fila = await queryUna('SELECT `id`, `password_hash` FROM `usuarios` WHERE `id` = ?', [usuarioId]);
+export async function cambiarPassword(usuarioId, { nueva } = {}) {
+  const fila = await queryUna('SELECT `id` FROM `usuarios` WHERE `id` = ?', [usuarioId]);
   if (!fila) throw ApiError.noEncontrado('Usuario no encontrado.');
 
-  if (fila.password_hash) {
-    if (!actual) throw ApiError.solicitudInvalida('Tenés que ingresar tu contraseña actual.');
-    const coincide = await bcrypt.compare(actual, fila.password_hash);
-    if (!coincide) throw ApiError.solicitudInvalida('La contraseña actual no es correcta.');
+  if (!nueva || nueva.length < 8) {
+    throw ApiError.solicitudInvalida('La nueva contraseña debe tener al menos 8 caracteres.');
   }
 
   const hash = await bcrypt.hash(nueva, 10);

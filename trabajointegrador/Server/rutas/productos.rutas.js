@@ -159,7 +159,7 @@ router.get(
 
 router.post(
   '/',
-  autorizar('admin', 'deposito'),
+  autorizar('admin', 'deposito', 'vendedor'),
   validarBody(esquemaCrear),
   asyncHandler(async (req, res) => {
     const datos = await servicio.crear(req.body);
@@ -177,7 +177,7 @@ router.post(
 
 router.put(
   '/:id',
-  autorizar('admin', 'deposito'),
+  autorizar('admin', 'deposito', 'vendedor'),
   validarParams(esquemaParams),
   validarBody(esquemaActualizar),
   asyncHandler(async (req, res) => {
@@ -196,7 +196,7 @@ router.put(
 
 router.patch(
   '/:id/activo',
-  autorizar('admin', 'deposito'),
+  autorizar('admin', 'deposito', 'vendedor'),
   validarParams(esquemaParams),
   validarBody(esquemaActivo),
   asyncHandler(async (req, res) => {
@@ -215,7 +215,7 @@ router.patch(
 
 router.delete(
   '/:id',
-  autorizar('admin'),
+  autorizar('admin', 'deposito', 'vendedor'),
   validarParams(esquemaParams),
   asyncHandler(async (req, res) => {
     const datos = await servicio.eliminar(req.params.id);

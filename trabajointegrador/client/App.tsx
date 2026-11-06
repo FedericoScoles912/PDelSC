@@ -5,6 +5,7 @@
  */
 
 import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 import { Provider } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -17,15 +18,20 @@ import { TemaProvider, useTema } from './src/tema/TemaProvider';
 
 /** Contenido interno, ya dentro del contexto de tema. */
 function Contenido() {
-  const { esOscuro, claseRaiz } = useTema();
+  const { esOscuro, claseRaiz, tokens, estiloVariables } = useTema();
   return (
-    <GestureHandlerRootView className={claseRaiz}>
-      <StatusBar style={esOscuro ? 'light' : 'dark'} />
-      <SafeAreaProvider>
-        <PopUpsProvider>
-          <NavegacionRaiz />
-        </PopUpsProvider>
-      </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: tokens.fondo }}>
+      <View
+        className={claseRaiz}
+        style={[{ flex: 1, backgroundColor: tokens.fondo }, estiloVariables]}
+      >
+        <StatusBar style={esOscuro ? 'light' : 'dark'} />
+        <SafeAreaProvider>
+          <PopUpsProvider>
+            <NavegacionRaiz />
+          </PopUpsProvider>
+        </SafeAreaProvider>
+      </View>
     </GestureHandlerRootView>
   );
 }

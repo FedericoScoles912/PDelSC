@@ -7,6 +7,7 @@
 import { Text, View } from 'react-native';
 
 import { cn } from '../../utils/cn';
+import { useTema } from '../../tema/TemaProvider';
 import type { Esquema } from '../../tema/tokens';
 
 /** Colores semánticos admitidos por la insignia. */
@@ -44,8 +45,24 @@ export interface InsigniaProps {
 
 /** Etiqueta compacta de estado. */
 export function Insignia({ texto, tono = 'neutro', icono, clase }: InsigniaProps) {
+  const { tokens } = useTema();
+  const colorBase =
+    tono === 'primario'
+      ? tokens.primario
+      : tono === 'exito'
+        ? tokens.exito
+        : tono === 'advertencia'
+          ? tokens.advertencia
+          : tono === 'peligro'
+            ? tokens.peligro
+            : tono === 'info'
+              ? tokens.info
+              : tokens.textoSuave;
+  const fondoBase = tono === 'neutro' ? tokens.superficieAlt : `${colorBase}26`;
+
   return (
     <View
+      style={{ backgroundColor: fondoBase }}
       className={cn(
         'flex-row items-center gap-1 self-start rounded-full px-2.5 py-1',
         FONDO[tono],
@@ -53,7 +70,9 @@ export function Insignia({ texto, tono = 'neutro', icono, clase }: InsigniaProps
       )}
     >
       {icono}
-      <Text className={cn('text-xs font-bold', TEXTO[tono])}>{texto}</Text>
+      <Text style={{ color: colorBase }} className={cn('text-xs font-bold', TEXTO[tono])}>
+        {texto}
+      </Text>
     </View>
   );
 }

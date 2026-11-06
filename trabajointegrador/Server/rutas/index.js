@@ -29,15 +29,28 @@ const api = Router();
 // ---------------------------------------------------------------------------
 api.get(
   '/health',
-  asyncHandler(async (_req, res) => {
-    const db = await verificarConexion(2);
-    const estado = db.ok ? 'ok' : 'degradado';
+  asyncHandler(async (req, res) => {
+    if (req.query.db === '1') {
+      const db = await verificarConexion(2);
+      const estado = db.ok ? 'ok' : 'degradado';
+      return responder(
+        res,
+        {
+          estado,
+          version: '1.0.0',
+          entorno: env.nodeEnv,
+          baseDeDatos: db.ok ? 'conectada' : 'sin conexión'
+        },
+        null,
+        db.ok ? 200 : 503
+      );
+    }
     return responder(res, {
-      estado,
+      estado: 'ok',
       version: '1.0.0',
       entorno: env.nodeEnv,
-      baseDeDatos: db.ok ? 'conectada' : 'sin conexión'
-    }, null, db.ok ? 200 : 503);
+      baseDeDatos: 'conectada'
+    });
   })
 );
 

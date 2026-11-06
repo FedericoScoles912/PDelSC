@@ -115,21 +115,33 @@ export async function crear({
  * @returns {Promise<Object>}
  */
 export async function actualizar(id, datos = {}) {
-  const { nombre, apellido, telefono, rol, activo, password } = datos;
+  const { email, nombre, apellido, telefono, rol, activo, password } = datos;
   const asignaciones = [];
   const parametros = [];
 
+  if (email !== undefined) {
+    const emailLimpio = email.trim().toLowerCase();
+    const existente = await queryUna(
+      'SELECT `id` FROM `usuarios` WHERE `email` = ? AND `id` <> ?',
+      [emailLimpio, id]
+    );
+    if (existente) {
+      throw ApiError.conflicto('Ya existe otro usuario con ese correo electrónico.');
+    }
+    asignaciones.push('`email` = ?');
+    parametros.push(emailLimpio);
+  }
   if (nombre !== undefined) {
     asignaciones.push('`nombre` = ?');
-    parametros.push(nombre);
+    parametros.push(nombre.trim());
   }
   if (apellido !== undefined) {
     asignaciones.push('`apellido` = ?');
-    parametros.push(apellido);
+    parametros.push(apellido && apellido.trim() !== '' ? apellido.trim() : null);
   }
   if (telefono !== undefined) {
     asignaciones.push('`telefono` = ?');
-    parametros.push(telefono);
+    parametros.push(telefono && telefono.trim() !== '' ? telefono.trim() : null);
   }
   if (activo !== undefined) {
     asignaciones.push('`activo` = ?');

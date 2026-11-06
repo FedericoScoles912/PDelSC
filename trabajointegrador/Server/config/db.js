@@ -59,6 +59,7 @@ export function getPool() {
     waitForConnections: true,
     connectionLimit: env.db.limitePool,
     maxIdle: env.db.limitePool,
+    idleTimeout: 45000,
     queueLimit: 0,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
@@ -79,18 +80,28 @@ export function getPool() {
     });
   });
 
+  // Keep-alive periódico para evitar que TiDB Cloud Serverless cierre conexiones por inactividad.
+  if (env.nodeEnv !== 'test') {
+    setInterval(() => {
+      if (!pool) return;
+      pool.query('SELECT 1').catch(() => {});
+    }, 45000).unref();
+  }
+
   return pool;
 }
 
 /**
- * Ejecuta un SELECT parametrizado.
+ * Ejecuta un SELECT parametrizado con reintento automático ante cortes de conexión.
  * @param {string} sql
  * @param {Array<*>} [parametros]
  * @returns {Promise<Array<Object>>}
  */
 export async function query(sql, parametros = []) {
-  const [filas] = await getPool().execute(sql, parametros);
-  return filas;
+  return conReintentos(async () => {
+    const [filas] = await getPool().execute(sql, parametros);
+    return filas;
+  });
 }
 
 /**
@@ -105,14 +116,16 @@ export async function queryUna(sql, parametros = []) {
 }
 
 /**
- * Ejecuta una sentencia de escritura (INSERT/UPDATE/DELETE).
+ * Ejecuta una sentencia de escritura (INSERT/UPDATE/DELETE) con reintento automático.
  * @param {string} sql
  * @param {Array<*>} [parametros]
  * @returns {Promise<import('mysql2').ResultSetHeader>}
  */
 export async function ejecutar(sql, parametros = []) {
-  const [resultado] = await getPool().execute(sql, parametros);
-  return resultado;
+  return conReintentos(async () => {
+    const [resultado] = await getPool().execute(sql, parametros);
+    return resultado;
+  });
 }
 
 /**

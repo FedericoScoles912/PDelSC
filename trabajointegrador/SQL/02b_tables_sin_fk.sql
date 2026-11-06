@@ -12,19 +12,19 @@
 USE `retenes_stock`;
 
 CREATE TABLE IF NOT EXISTS `roles` (
-  `id`          TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `codigo`      VARCHAR(32)      NOT NULL,
-  `nombre`      VARCHAR(64)      NOT NULL,
-  `descripcion` VARCHAR(255)     NULL,
-  `creado_en`   DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `codigo`      VARCHAR(32)  NOT NULL,
+  `nombre`      VARCHAR(64)  NOT NULL,
+  `descripcion` VARCHAR(255) NULL,
+  `creado_en`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_roles_codigo` (`codigo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `usuarios` (
-  `id`               BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  `rol_id`           TINYINT UNSIGNED NOT NULL,
-  `email`            VARCHAR(190)     NOT NULL,
+  `id`               BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `rol_id`           INT UNSIGNED    NOT NULL,
+  `email`            VARCHAR(190)    NOT NULL,
   `password_hash`    VARCHAR(255)     NULL,
   `nombre`           VARCHAR(120)     NOT NULL,
   `apellido`         VARCHAR(120)     NULL,
@@ -70,31 +70,31 @@ CREATE TABLE IF NOT EXISTS `refresh_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `categorias` (
-  `id`             SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre`         VARCHAR(150)      NOT NULL,
-  `slug`           VARCHAR(160)      NOT NULL,
-  `orden`          SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-  `activo`         TINYINT(1)        NOT NULL DEFAULT 1,
-  `creado_en`      DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `actualizado_en` DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id`             INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre`         VARCHAR(150) NOT NULL,
+  `slug`           VARCHAR(160) NOT NULL,
+  `orden`          INT UNSIGNED NOT NULL DEFAULT 0,
+  `activo`         TINYINT(1)   NOT NULL DEFAULT 1,
+  `creado_en`      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `actualizado_en` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_categorias_nombre` (`nombre`),
   UNIQUE KEY `uk_categorias_slug` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `productos` (
-  `id`              BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
-  `codigo`          VARCHAR(32)       NOT NULL,
-  `categoria_id`    SMALLINT UNSIGNED NULL,
-  `lanzamiento`     TINYINT(1)        NOT NULL DEFAULT 0,
-  `eje_texto`       VARCHAR(32)       NULL,
-  `eje_valor`       DECIMAL(10,2)     NULL,
-  `aloj_texto`      VARCHAR(32)       NULL,
-  `aloj_valor`      DECIMAL(10,2)     NULL,
-  `alt_texto`       VARCHAR(32)       NULL,
-  `alt_valor`       DECIMAL(10,2)     NULL,
-  `giro`            VARCHAR(10)       NULL,
-  `uxb`             TINYINT UNSIGNED  NULL,
+  `id`              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `codigo`          VARCHAR(32)     NOT NULL,
+  `categoria_id`    INT UNSIGNED    NULL,
+  `lanzamiento`     TINYINT(1)      NOT NULL DEFAULT 0,
+  `eje_texto`       VARCHAR(32)     NULL,
+  `eje_valor`       DECIMAL(10,2)   NULL,
+  `aloj_texto`      VARCHAR(32)     NULL,
+  `aloj_valor`      DECIMAL(10,2)   NULL,
+  `alt_texto`       VARCHAR(32)     NULL,
+  `alt_valor`       DECIMAL(10,2)   NULL,
+  `giro`            VARCHAR(10)     NULL,
+  `uxb`             INT UNSIGNED    NULL,
   `observaciones`   TEXT              NULL,
   `precio_lista`    DECIMAL(14,2)     NULL,
   `proximo_ingreso` TINYINT(1)        NOT NULL DEFAULT 0,

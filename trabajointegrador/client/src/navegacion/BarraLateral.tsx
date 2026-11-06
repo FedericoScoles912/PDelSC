@@ -75,6 +75,7 @@ export function BarraLateral({
 
   return (
     <View
+      style={{ backgroundColor: tokens.superficie, borderColor: tokens.borde }}
       className={cn(
         'h-full border-r border-borde bg-superficie',
         compacta ? 'w-sidebar-mini' : 'w-sidebar'
@@ -82,20 +83,32 @@ export function BarraLateral({
     >
       {/* Marca */}
       <View
+        style={{ borderColor: tokens.borde }}
         className={cn(
           'h-topbar flex-row items-center gap-3 border-b border-borde px-4',
           compacta && 'justify-center px-2'
         )}
       >
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-primario">
+        <View
+          style={{ backgroundColor: tokens.primario }}
+          className="h-9 w-9 items-center justify-center rounded-xl bg-primario"
+        >
           <Ionicons name="aperture-outline" size={20} color={tokens.sobrePrimario} />
         </View>
         {!compacta && (
           <View className="flex-1">
-            <Text numberOfLines={1} className="text-base font-bold text-texto">
-              Retenes EMIC
+            <Text
+              numberOfLines={1}
+              style={{ color: tokens.texto }}
+              className="text-base font-bold text-texto"
+            >
+              Stocker
             </Text>
-            <Text numberOfLines={1} className="text-xs text-texto-suave">
+            <Text
+              numberOfLines={1}
+              style={{ color: tokens.textoSuave }}
+              className="text-xs text-texto-suave"
+            >
               Control de stock
             </Text>
           </View>
@@ -112,7 +125,10 @@ export function BarraLateral({
         {grupos.map((seccion) => (
           <View key={seccion.grupo} className="mb-2">
             {!compacta && (
-              <Text className="mb-1 px-4 text-[11px] font-bold uppercase tracking-wider text-texto-suave">
+              <Text
+                style={{ color: tokens.textoSuave }}
+                className="mb-1 px-4 text-[11px] font-bold uppercase tracking-wider text-texto-suave"
+              >
                 {seccion.grupo}
               </Text>
             )}
@@ -125,6 +141,7 @@ export function BarraLateral({
                   accessibilityLabel={item.titulo}
                   accessibilityState={{ selected: activo }}
                   onPress={() => onSeleccionar(item.ruta)}
+                  style={activo ? { backgroundColor: `${tokens.primario}22` } : undefined}
                   className={cn(
                     'mx-2 mb-1 flex-row items-center gap-3 overflow-hidden rounded-xl py-2.5',
                     compacta ? 'justify-center px-2' : 'px-3',
@@ -132,7 +149,10 @@ export function BarraLateral({
                   )}
                 >
                   {activo && (
-                    <View className="absolute bottom-2 left-0 top-2 w-1 rounded-r-full bg-primario" />
+                    <View
+                      style={{ backgroundColor: tokens.primario }}
+                      className="absolute bottom-2 left-0 top-2 w-1 rounded-r-full bg-primario"
+                    />
                   )}
                   <Ionicons
                     name={item.icono}
@@ -142,6 +162,7 @@ export function BarraLateral({
                   {!compacta && (
                     <Text
                       numberOfLines={1}
+                      style={{ color: activo ? tokens.primario : tokens.texto }}
                       className={cn(
                         'min-w-0 flex-1 text-sm',
                         activo ? 'font-bold text-primario' : 'font-medium text-texto'
@@ -158,16 +179,23 @@ export function BarraLateral({
       </ScrollView>
 
       {/* Cuenta */}
-      <View className="border-t border-borde p-3">
+      <View style={{ borderColor: tokens.borde }} className="border-t border-borde p-3">
         <View className={cn('flex-row items-center gap-3', compacta && 'justify-center')}>
-          <View className="h-9 w-9 items-center justify-center rounded-full bg-primario/15">
-            <Text className="text-xs font-bold text-primario">
+          <View
+            style={{ backgroundColor: `${tokens.primario}26` }}
+            className="h-9 w-9 items-center justify-center rounded-full bg-primario/15"
+          >
+            <Text style={{ color: tokens.primario }} className="text-xs font-bold text-primario">
               {iniciales(usuario?.nombre ?? '', usuario?.apellido ?? null)}
             </Text>
           </View>
           {!compacta && (
             <View className="min-w-0 flex-1">
-              <Text numberOfLines={1} className="text-sm font-semibold text-texto">
+              <Text
+                numberOfLines={1}
+                style={{ color: tokens.texto }}
+                className="text-sm font-semibold text-texto"
+              >
                 {usuario ? `${usuario.nombre} ${usuario.apellido ?? ''}`.trim() : 'Sin sesión'}
               </Text>
               <View className="mt-0.5">

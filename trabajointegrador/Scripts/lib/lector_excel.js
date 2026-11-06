@@ -23,13 +23,14 @@ export const NOMBRE_HOJA = 'Por Medidas';
 
 /** Patrones para ubicar cada columna por su encabezado (tolerante a cambios). */
 const PATRONES = {
-  codigo: /c[oó]digo/i,
+  codigo: /c[oó]digo|sku/i,
+  categoria: /^categor[ií]a|^rubro$/i,
   lanzamiento: /lanzam/i,
   giro: /^giro$/i,
   uxb: /u\s*x\s*b|unid/i,
-  observaciones: /observaci/i,
+  observaciones: /observaci|descripci[oó]n/i,
   oem: /^oem$/i,
-  disponibilidad: /disp/i,
+  disponibilidad: /disp|^stock$/i,
   proxEmbarque: /prox/i,
   precio: /precio/i
 };
@@ -69,6 +70,7 @@ export async function leerExcel(rutaArchivo, opciones = {}) {
   const libro = new ExcelJS.Workbook();
   await libro.xlsx.readFile(rutaArchivo);
 
+  const hojas = libro.worksheets.map((w) => w.name);
   const hoja = libro.getWorksheet(nombreHoja) || libro.worksheets[0];
   if (!hoja) {
     throw new Error(`No se encontró ninguna hoja en el archivo ${rutaArchivo}`);
@@ -83,6 +85,7 @@ export async function leerExcel(rutaArchivo, opciones = {}) {
     meta: {
       archivo: rutaArchivo.split(/[\\/]/).pop(),
       hoja: hoja.name,
+      hojas,
       totalFilas: hoja.rowCount,
       filaEncabezado: columnas.filaEncabezado,
       totalCategorias: resultado.categorias.length,
@@ -119,33 +122,54 @@ function extraerMatriz(hoja) {
  */
 function detectarColumnas(matriz) {
   let filaEncabezado = -1;
+  let esEncabezadoSimple = false;
   for (let f = 1; f < matriz.length; f += 1) {
     const fila = matriz[f] ?? [];
-    const tieneCodigo = fila.some((valor) => /c[oó]digo/i.test(valor) && /producto/i.test(valor));
-    if (tieneCodigo) {
+    const tieneCodigoProducto = fila.some(
+      (valor) => /c[oó]digo/i.test(valor) && /producto/i.test(valor)
+    );
+    if (tieneCodigoProducto) {
       filaEncabezado = f;
       break;
     }
   }
   if (filaEncabezado === -1) {
-    throw new Error('No se pudo detectar la fila de encabezado (se esperaba "CODIGO PRODUCTO")');
+    for (let f = 1; f < matriz.length; f += 1) {
+      const fila = matriz[f] ?? [];
+      const tieneCodigoSimple = fila.some((valor) => /^(c[oó]digo|sku)(\s+producto)?$/i.test(valor));
+      if (tieneCodigoSimple) {
+        filaEncabezado = f;
+        esEncabezadoSimple = true;
+        break;
+      }
+    }
+  }
+  if (filaEncabezado === -1) {
+    throw new Error(
+      'No se pudo detectar la fila de encabezado (se esperaba una columna "CODIGO PRODUCTO" o "CODIGO")'
+    );
   }
 
-  // Los encabezados pueden ocupar 2-3 filas (grupo + sub-encabezados EJE/ALOJ/ALT).
-  const filasEncabezado = [matriz[filaEncabezado], matriz[filaEncabezado + 1] ?? [], matriz[filaEncabezado + 2] ?? []];
+  // Los encabezados pueden ocupar 1 fila (planillas simples) o 2-3 filas (grupo + sub-encabezados EJE/ALOJ/ALT).
+  const filasEncabezado = esEncabezadoSimple
+    ? [matriz[filaEncabezado]]
+    : [matriz[filaEncabezado], matriz[filaEncabezado + 1] ?? [], matriz[filaEncabezado + 2] ?? []];
 
-  const columnas = { filaEncabezado, primerDato: filaEncabezado + 3 };
+  const columnas = {
+    filaEncabezado,
+    primerDato: esEncabezadoSimple ? filaEncabezado + 1 : filaEncabezado + 3
+  };
   for (const [clave, patron] of Object.entries(PATRONES)) {
     columnas[clave] = buscarColumna(filasEncabezado, patron);
   }
   columnas.eje = buscarColumna(filasEncabezado, /^eje$/i);
   columnas.aloj = buscarColumna(filasEncabezado, /^aloj/i);
-  columnas.alt = buscarColumna(filasEncabezado, /^alt$/i);
+  columnas.alt = buscarColumna(filasEncabezado, /^alt/i);
   columnas.equivalenciaA = buscarColumna([matriz[filaEncabezado]], /^a$/i);
   columnas.equivalenciaS = buscarColumna([matriz[filaEncabezado]], /^s$/i);
 
-  // El primer dato real siempre está después de la última fila de encabezado.
-  if (columnas.eje) columnas.primerDato = filaEncabezado + 3;
+  // El primer dato real en planillas EMIC multi-fila está después de la 3ª fila de encabezado.
+  if (!esEncabezadoSimple && columnas.eje) columnas.primerDato = filaEncabezado + 3;
 
   return columnas;
 }
@@ -210,7 +234,16 @@ function procesarFilas(matriz, columnas) {
       }
       codigosVistos.set(codigo, f);
 
-      productos.push(construirProducto(fila, columnas, codigo, categoriaActual, f));
+      let catProducto = categoriaActual;
+      if (columnas.categoria && fila[columnas.categoria]) {
+        const catExplicita = normalizarNombreCategoria(limpiarTexto(fila[columnas.categoria]));
+        if (catExplicita) {
+          if (!categorias.includes(catExplicita)) categorias.push(catExplicita);
+          catProducto = catExplicita;
+        }
+      }
+
+      productos.push(construirProducto(fila, columnas, codigo, catProducto, f));
       continue;
     }
 

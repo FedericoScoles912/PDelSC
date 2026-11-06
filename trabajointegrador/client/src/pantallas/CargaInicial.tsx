@@ -19,7 +19,7 @@ export function CargaInicial() {
         <Ionicons name="aperture-outline" size={42} color={tokens.sobrePrimario} />
       </View>
       <View className="items-center gap-1">
-        <Text className="text-xl font-bold text-texto">Retenes EMIC</Text>
+        <Text className="text-xl font-bold text-texto">Stocker</Text>
         <Text className="text-sm text-texto-suave">Sistema de control de stock</Text>
       </View>
       <ActivityIndicator size="small" color={tokens.primario} />

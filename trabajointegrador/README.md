@@ -1,6 +1,6 @@
-# Sistema de Control de Stock — Retenes EMIC
+# Stocker — Sistema de Control de Stock
 
-Aplicación de gestión de stock para un distribuidor de retenes y sellos automotrices.
+Aplicación de gestión de stock para un distribuidor de retenes y sellos automotrices (**Stocker**).
 Backend REST en **Node.js + Express** sobre **MySQL / TiDB Cloud** y frontend móvil
 multiplataforma en **React Native + Expo** (Android, iOS y Web).
 

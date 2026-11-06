@@ -158,3 +158,101 @@ export async function alertas() {
     'SELECT * FROM `vw_productos_bajo_minimo` ORDER BY `faltante` DESC, `codigo`'
   );
 }
+
+/**
+ * Consulta el stock físico real que se encuentra en depósito (stock > 0).
+ * Exclusivo para Encargado de Depósito y Administrador.
+ * @param {Object} [filtros]
+ * @returns {Promise<{resumen:Object, datos:Array<Object>, meta:Object}>}
+ */
+export async function obtenerStockDeposito(filtros = {}) {
+  const { pagina, limite, offset } = leerPaginacion(filtros, { limiteDef: 30, limiteMax: 100 });
+
+  // 1) Métricas consolidadas del depósito físico
+  const filaResumen = await queryUna(`
+    SELECT
+      COALESCE(SUM(p.\`stock\`), 0) AS total_unidades,
+      COUNT(p.\`id\`) AS total_articulos,
+      COALESCE(SUM(CASE WHEN p.\`stock\` <= p.\`stock_minimo\` THEN 1 ELSE 0 END), 0) AS articulos_criticos,
+      COALESCE(SUM(p.\`proximo_embarque\`), 0) AS unidades_embarque,
+      COALESCE(SUM(p.\`stock\` * COALESCE(p.\`precio_lista\`, 0)), 0) AS valor_estimado
+    FROM \`productos\` p
+    WHERE p.\`activo\` = 1 AND p.\`stock\` > 0
+  `);
+
+  const resumen = {
+    totalUnidades: Number(filaResumen?.total_unidades ?? 0),
+    totalArticulosConStock: Number(filaResumen?.total_articulos ?? 0),
+    articulosCriticos: Number(filaResumen?.articulos_criticos ?? 0),
+    unidadesEmbarque: Number(filaResumen?.unidades_embarque ?? 0),
+    valorEstimado: Number(filaResumen?.valor_estimado ?? 0)
+  };
+
+  // 2) Filtros para la lista de productos del depósito
+  const condiciones = ['p.`activo` = 1', 'p.`stock` > 0'];
+  const parametros = [];
+
+  if (filtros.q) {
+    const patron = `%${filtros.q}%`;
+    condiciones.push('(p.`codigo` LIKE ? OR p.`observaciones` LIKE ? OR p.`eje_texto` LIKE ? OR p.`aloj_texto` LIKE ?)');
+    parametros.push(patron, patron, patron, patron);
+  }
+
+  if (filtros.categoria_id) {
+    condiciones.push('p.`categoria_id` = ?');
+    parametros.push(filtros.categoria_id);
+  }
+
+  if (filtros.estado === 'critico') {
+    condiciones.push('p.`stock` <= p.`stock_minimo`');
+  } else if (filtros.estado === 'embarque') {
+    condiciones.push('p.`proximo_embarque` > 0');
+  }
+
+  const donde = `WHERE ${condiciones.join(' AND ')}`;
+
+  const totalFila = await queryUna(
+    `SELECT COUNT(*) AS total
+       FROM \`productos\` p
+       LEFT JOIN \`categorias\` c ON c.\`id\` = p.\`categoria_id\`
+       ${donde}`,
+    parametros
+  );
+
+  const filas = await query(
+    `SELECT
+       p.\`id\`, p.\`codigo\`, p.\`categoria_id\`, c.\`nombre\` AS categoria_nombre,
+       p.\`stock\`, p.\`stock_minimo\`, p.\`proximo_embarque\`, p.\`proximo_ingreso\`,
+       p.\`eje_texto\`, p.\`aloj_texto\`, p.\`alt_texto\`, p.\`giro\`, p.\`uxb\`,
+       p.\`observaciones\`, p.\`precio_lista\`, p.\`actualizado_en\`
+     FROM \`productos\` p
+     LEFT JOIN \`categorias\` c ON c.\`id\` = p.\`categoria_id\`
+     ${donde}
+     ORDER BY p.\`stock\` DESC, p.\`codigo\` ASC
+     ${clausulaLimite(limite, offset)}`,
+    parametros
+  );
+
+  return {
+    resumen,
+    datos: filas.map((f) => ({
+      id: f.id,
+      codigo: f.codigo,
+      categoriaId: f.categoria_id,
+      categoriaNombre: f.categoria_nombre ?? 'Sin categoría',
+      stock: Number(f.stock),
+      stockMinimo: Number(f.stock_minimo),
+      proximoEmbarque: Number(f.proximo_embarque),
+      proximoIngreso: Boolean(f.proximo_ingreso),
+      ejeTexto: f.eje_texto,
+      alojTexto: f.aloj_texto,
+      altTexto: f.alt_texto,
+      giro: f.giro,
+      uxb: f.uxb ? Number(f.uxb) : null,
+      observaciones: f.observaciones,
+      precioLista: f.precio_lista !== null ? Number(f.precio_lista) : null,
+      actualizadoEn: f.actualizado_en
+    })),
+    meta: metaPaginacion(totalFila?.total ?? 0, pagina, limite)
+  };
+}

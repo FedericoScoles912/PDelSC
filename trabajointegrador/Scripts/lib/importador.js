@@ -33,24 +33,23 @@ export const TAMANO_LOTE_BD = 200;
  * @returns {Promise<Object>} Resumen del impacto.
  */
 export async function generarPreview(datos) {
-  const categoriasExistentes = new Set(
-    (await query('SELECT `nombre` FROM `categorias`')).map((fila) => fila.nombre)
-  );
+  const filasCategorias = await query('SELECT `id`, `nombre` FROM `categorias`');
+  const idPorCategoriaNombre = new Map(filasCategorias.map((fila) => [fila.nombre, fila.id]));
+  const categoriasExistentes = new Set(filasCategorias.map((fila) => fila.nombre));
 
   const codigos = datos.productos.map((p) => p.codigo);
-  const preciosActuales = new Map();
-  const existentes = new Set();
+  const previos = new Map();
 
   for (const lote of enLotes(codigos, 500)) {
     if (!lote.length) continue;
     const marcadores = lote.map(() => '?').join(',');
     const filas = await query(
-      `SELECT \`codigo\`, \`precio_lista\` FROM \`productos\` WHERE \`codigo\` IN (${marcadores})`,
+      `SELECT ${COLUMNAS_COMPARABLES.map((c) => `\`${c}\``).join(', ')}
+         FROM \`productos\` WHERE \`codigo\` IN (${marcadores})`,
       lote
     );
     for (const fila of filas) {
-      existentes.add(fila.codigo);
-      preciosActuales.set(fila.codigo, fila.precio_lista);
+      previos.set(fila.codigo, fila);
     }
   }
 
@@ -58,21 +57,42 @@ export async function generarPreview(datos) {
   const actualizados = [];
   const sinCambios = [];
   const cambiosDePrecio = [];
+  const estadoPorCodigo = new Map();
 
   for (const producto of datos.productos) {
-    if (!existentes.has(producto.codigo)) {
+    const previo = previos.get(producto.codigo);
+    if (!previo) {
       nuevos.push(producto.codigo);
+      estadoPorCodigo.set(producto.codigo, 'nuevo');
       continue;
     }
-    const precioAnterior = preciosActuales.get(producto.codigo);
+    const precioAnterior = previo.precio_lista;
     const precioNuevo = producto.precioLista;
     if (numeroDistinto(precioAnterior, precioNuevo)) {
+      cambiosDePrecio.push({
+        codigo: producto.codigo,
+        anterior: precioAnterior,
+        nuevo: precioNuevo
+      });
+    }
+    if (productoCambio(previo, producto, idPorCategoriaNombre)) {
       actualizados.push(producto.codigo);
-      cambiosDePrecio.push({ codigo: producto.codigo, anterior: precioAnterior, nuevo: precioNuevo });
+      estadoPorCodigo.set(producto.codigo, 'actualizado');
     } else {
       sinCambios.push(producto.codigo);
+      estadoPorCodigo.set(producto.codigo, 'sin_cambios');
     }
   }
+
+  const muestraProductos = datos.productos.slice(0, 25).map((p) => ({
+    fila: p.fila,
+    codigo: p.codigo,
+    categoriaNombre: p.categoriaNombre,
+    medidas: [p.ejeTexto, p.alojTexto, p.altTexto].filter(Boolean).join(' × ') || '—',
+    precioLista: p.precioLista,
+    stockInicial: p.stockInicial,
+    estado: estadoPorCodigo.get(p.codigo) ?? 'sin_cambios'
+  }));
 
   return {
     meta: datos.meta,
@@ -86,6 +106,7 @@ export async function generarPreview(datos) {
       actualizados: actualizados.length,
       sinCambios: sinCambios.length
     },
+    muestraProductos,
     cambiosDePrecio,
     descartes: datos.descartes,
     advertencias: datos.advertencias,
@@ -132,42 +153,66 @@ export async function aplicarImportacion(datos, opciones = {}) {
         );
         const previos = new Map(filasPrevias.map((fila) => [fila.codigo, fila]));
 
-        const { sql, parametros } = construirUpsertProductos(lote);
-        await conexion.execute(sql, parametros);
-
-        // TiDB devuelve affectedRows = 2 para toda fila que choca con la clave
-        // única, AUNQUE los valores sean idénticos (no implementa el 0 de MySQL
-        // para "sin cambios"). Por eso el conteo se calcula comparando campo por
-        // campo contra el estado previo en la base, no con affectedRows.
         let insertados = 0;
         let actualizados = 0;
         let sinCambios = 0;
+        const paraUpsert = [];
+        const codigosNuevos = [];
+
         for (const producto of lote) {
           const previo = previos.get(producto.codigo);
           if (!previo) {
             insertados += 1;
+            paraUpsert.push(producto);
+            codigosNuevos.push(producto.codigo);
           } else if (productoCambio(previo, producto, idPorCategoriaNombre)) {
             actualizados += 1;
+            paraUpsert.push(producto);
           } else {
             sinCambios += 1;
           }
         }
 
-        // Resolver ids para equivalencias e historial.
-        const [filasActuales] = await conexion.execute(
-          `SELECT \`id\`, \`codigo\`, \`precio_lista\` FROM \`productos\` WHERE \`codigo\` IN (${marcadores})`,
-          codigos
-        );
-        const idPorCodigo = new Map(filasActuales.map((fila) => [fila.codigo, fila.id]));
+        if (paraUpsert.length > 0) {
+          const { sql, parametros } = construirUpsertProductos(paraUpsert, idPorCategoriaNombre);
+          await conexion.execute(sql, parametros);
+        }
 
-        const equivalencias = construirEquivalencias(lote, idPorCodigo);
+        // Resolver ids para equivalencias e historial reutilizando filasPrevias y consultando sólo nuevos.
+        const idPorCodigo = new Map(filasPrevias.map((fila) => [fila.codigo, fila.id]));
+        if (codigosNuevos.length > 0) {
+          const marcadoresNuevos = codigosNuevos.map(() => '?').join(',');
+          const [filasNuevas] = await conexion.execute(
+            `SELECT \`id\`, \`codigo\` FROM \`productos\` WHERE \`codigo\` IN (${marcadoresNuevos})`,
+            codigosNuevos
+          );
+          for (const fila of filasNuevas) {
+            idPorCodigo.set(fila.codigo, fila.id);
+          }
+        }
+
+        // Consultar equivalencias ya existentes del lote para insertar únicamente las faltantes.
+        const idsLote = Array.from(idPorCodigo.values()).filter(Boolean);
+        const equivExistentes = new Set();
+        if (idsLote.length > 0) {
+          const marcadoresIds = idsLote.map(() => '?').join(',');
+          const [filasEquiv] = await conexion.execute(
+            `SELECT \`producto_id\`, \`tipo\`, \`codigo\` FROM \`equivalencias\` WHERE \`producto_id\` IN (${marcadoresIds})`,
+            idsLote
+          );
+          for (const eq of filasEquiv) {
+            equivExistentes.add(`${eq.producto_id}:${eq.tipo}:${eq.codigo}`);
+          }
+        }
+
+        const equivalencias = construirEquivalencias(lote, idPorCodigo, equivExistentes);
         if (equivalencias.sql) {
           const [resultadoEquiv] = await conexion.execute(equivalencias.sql, equivalencias.parametros);
           resumen.equivalencias += resultadoEquiv.affectedRows ?? 0;
         }
 
-        if (registrarHistorial) {
-          const historial = construirHistorial(lote, previos, idPorCodigo, usuarioId);
+        if (registrarHistorial && paraUpsert.length > 0) {
+          const historial = construirHistorial(paraUpsert, previos, idPorCodigo, usuarioId);
           if (historial.sql) {
             const [resultadoHistorial] = await conexion.execute(historial.sql, historial.parametros);
             resumen.preciosActualizados += resultadoHistorial.affectedRows ?? 0;
@@ -210,9 +255,10 @@ async function upsertCategorias(categorias) {
 /**
  * Construye la sentencia UPSERT de productos para un lote.
  * @param {Array<Object>} lote
+ * @param {Map<string, number>} [idPorCategoriaNombre]
  * @returns {{sql:string, parametros:Array<*>}}
  */
-function construirUpsertProductos(lote) {
+function construirUpsertProductos(lote, idPorCategoriaNombre = new Map()) {
   const columnas = [
     'codigo', 'categoria_id', 'lanzamiento',
     'eje_texto', 'eje_valor', 'aloj_texto', 'aloj_valor', 'alt_texto', 'alt_valor',
@@ -222,9 +268,12 @@ function construirUpsertProductos(lote) {
 
   const parametros = [];
   const filas = lote.map((producto) => {
+    const categoriaId = producto.categoriaNombre
+      ? (idPorCategoriaNombre.get(producto.categoriaNombre) ?? null)
+      : null;
     parametros.push(
       producto.codigo,
-      producto.categoriaNombre ?? null,
+      categoriaId,
       producto.lanzamiento ? 1 : 0,
       producto.ejeTexto,
       producto.ejeValor,
@@ -269,12 +318,12 @@ ON DUPLICATE KEY UPDATE
 }
 
 /**
- * Marcadores de la tupla de producto (categoria_id se resuelve con subconsulta).
+ * Marcadores de la tupla de producto.
  * @returns {string}
  */
 function marcadoresProducto() {
   return [
-    '?', '(SELECT `id` FROM `categorias` WHERE `nombre` = ? LIMIT 1)', '?',
+    '?', '?', '?',
     '?', '?', '?', '?', '?', '?',
     '?', '?', '?', '?', '?',
     '?', '?', '?', '?'
@@ -285,9 +334,10 @@ function marcadoresProducto() {
  * Construye el INSERT IGNORE de equivalencias resolviendo `producto_id` por id.
  * @param {Array<Object>} lote
  * @param {Map<string, number>} idPorCodigo
+ * @param {Set<string>} [equivExistentes]
  * @returns {{sql:string, parametros:Array<*>}}
  */
-function construirEquivalencias(lote, idPorCodigo) {
+function construirEquivalencias(lote, idPorCodigo, equivExistentes = new Set()) {
   const filas = [];
   const parametros = [];
 
@@ -295,6 +345,8 @@ function construirEquivalencias(lote, idPorCodigo) {
     const productoId = idPorCodigo.get(producto.codigo);
     if (!productoId) continue;
     for (const equivalencia of producto.equivalencias ?? []) {
+      const clave = `${productoId}:${equivalencia.tipo}:${equivalencia.codigo}`;
+      if (equivExistentes.has(clave)) continue;
       filas.push('(?, ?, ?)');
       parametros.push(productoId, equivalencia.tipo, equivalencia.codigo);
     }

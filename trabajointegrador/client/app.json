@@ -1,11 +1,17 @@
 {
   "expo": {
-    "name": "Retenes EMIC - Stock",
+    "name": "Stocker",
     "slug": "retenes-emic-stock",
     "version": "1.0.0",
     "orientation": "default",
+    "icon": "./assets/icon.png",
     "scheme": "retenesstock",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#14100E"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -14,11 +20,16 @@
       "bundleIdentifier": "com.emic.retenesstock"
     },
     "android": {
-      "package": "com.emic.retenesstock"
+      "package": "com.emic.retenesstock",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#E87E44"
+      }
     },
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store",

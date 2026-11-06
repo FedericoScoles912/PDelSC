@@ -6,7 +6,17 @@
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { EnConstruccion } from '../pantallas/EnConstruccion';
+import { Auditoria } from '../pantallas/Auditoria';
+import { Categorias } from '../pantallas/Categorias';
+import { Dashboard } from '../pantallas/Dashboard';
+import { Deposito } from '../pantallas/Deposito';
+import { Importar } from '../pantallas/Importar';
+import { Perfil } from '../pantallas/Perfil';
+import { Precios } from '../pantallas/Precios';
+import { Productos } from '../pantallas/Productos';
+import { Reportes } from '../pantallas/Reportes';
+import { Stock } from '../pantallas/Stock';
+import { Usuarios } from '../pantallas/Usuarios';
 import { MarcoApp } from './MarcoApp';
 import type { RutasApp } from './tipos';
 
@@ -27,16 +37,17 @@ export function NavegacionApp() {
         );
       }}
     >
-      <Pila.Screen name="Dashboard" component={EnConstruccion} />
-      <Pila.Screen name="Productos" component={EnConstruccion} />
-      <Pila.Screen name="Stock" component={EnConstruccion} />
-      <Pila.Screen name="Precios" component={EnConstruccion} />
-      <Pila.Screen name="Categorias" component={EnConstruccion} />
-      <Pila.Screen name="Reportes" component={EnConstruccion} />
-      <Pila.Screen name="Importar" component={EnConstruccion} />
-      <Pila.Screen name="Usuarios" component={EnConstruccion} />
-      <Pila.Screen name="Auditoria" component={EnConstruccion} />
-      <Pila.Screen name="Perfil" component={EnConstruccion} />
+      <Pila.Screen name="Dashboard" component={Dashboard} />
+      <Pila.Screen name="Productos" component={Productos} />
+      <Pila.Screen name="Deposito" component={Deposito} />
+      <Pila.Screen name="Stock" component={Stock} />
+      <Pila.Screen name="Precios" component={Precios} />
+      <Pila.Screen name="Categorias" component={Categorias} />
+      <Pila.Screen name="Reportes" component={Reportes} />
+      <Pila.Screen name="Importar" component={Importar} />
+      <Pila.Screen name="Usuarios" component={Usuarios} />
+      <Pila.Screen name="Auditoria" component={Auditoria} />
+      <Pila.Screen name="Perfil" component={Perfil} />
     </Pila.Navigator>
   );
 }

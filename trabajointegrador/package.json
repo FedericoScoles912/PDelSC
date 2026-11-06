@@ -1,9 +1,9 @@
 {
-  "name": "retenes-stock-server",
+  "name": "stocker-server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Backend (API REST) del Sistema de Control de Stock para distribuidor de retenes y sellos automotrices (EMIC). Node.js + Express + MySQL/TiDB.",
+  "description": "Backend (API REST) de Stocker — Sistema de Control de Stock. Node.js + Express + MySQL/TiDB.",
   "main": "server.js",
   "engines": {
     "node": ">=20.0.0"

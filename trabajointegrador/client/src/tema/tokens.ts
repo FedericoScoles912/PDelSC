@@ -65,21 +65,55 @@ export const TOKENS: Record<Esquema, TokensColor> = {
     sobrePrimario: '#FFFFFF'
   },
   oscuro: {
-    fondo: '#1A1512',
-    superficie: '#241D18',
-    superficieAlt: '#2E251E',
-    borde: '#3B2F26',
-    texto: '#F3E9DC',
-    textoSuave: '#B9A795',
-    primario: '#E07A45',
-    primarioSuave: '#E99364',
-    acento: '#E9B75C',
+    fondo: '#14100E',
+    superficie: '#201A16',
+    superficieAlt: '#2C241E',
+    borde: '#42352B',
+    texto: '#F5EDE2',
+    textoSuave: '#BEAD9B',
+    primario: '#E87E44',
+    primarioSuave: '#F29C6B',
+    acento: '#EEBA5C',
     exito: '#7AA874',
     advertencia: '#E0A33E',
-    peligro: '#E26A60',
+    peligro: '#E86C62',
     info: '#6CA0BE',
-    sombra: 'rgba(0, 0, 0, 0.45)',
-    sobrePrimario: '#1A1512'
+    sombra: 'rgba(0, 0, 0, 0.55)',
+    sobrePrimario: '#14100E'
+  }
+};
+
+/** Variables CSS (tripletes RGB separados por espacios) por esquema. */
+export const VARIABLES_CSS: Record<Esquema, Record<string, string>> = {
+  claro: {
+    '--color-fondo': '251 247 240',
+    '--color-superficie': '255 255 255',
+    '--color-superficie-alt': '245 237 225',
+    '--color-borde': '232 221 204',
+    '--color-texto': '46 36 25',
+    '--color-texto-suave': '122 106 87',
+    '--color-primario': '192 86 42',
+    '--color-primario-suave': '224 122 69',
+    '--color-acento': '224 163 62',
+    '--color-exito': '78 124 74',
+    '--color-advertencia': '199 121 27',
+    '--color-peligro': '179 38 30',
+    '--color-info': '58 110 138'
+  },
+  oscuro: {
+    '--color-fondo': '20 16 14',
+    '--color-superficie': '32 26 22',
+    '--color-superficie-alt': '44 36 30',
+    '--color-borde': '66 53 43',
+    '--color-texto': '245 237 226',
+    '--color-texto-suave': '190 173 155',
+    '--color-primario': '232 126 68',
+    '--color-primario-suave': '242 156 107',
+    '--color-acento': '238 186 92',
+    '--color-exito': '122 168 116',
+    '--color-advertencia': '224 163 62',
+    '--color-peligro': '232 108 98',
+    '--color-info': '108 160 190'
   }
 };
 

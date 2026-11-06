@@ -23,12 +23,14 @@ export function crearApp() {
   const app = express();
 
   app.disable('x-powered-by');
+  app.disable('etag');
   // Confía en el proxy (Render/Railway) para leer la IP real del cliente.
   app.set('trust proxy', 1);
 
   app.use(
     helmet({
-      crossOriginResourcePolicy: { policy: 'cross-origin' }
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: false
     })
   );
 
@@ -38,7 +40,13 @@ export function crearApp() {
       origin: (origen, callback) => {
         // Sin origen: apps nativas (APK), herramientas y health checks.
         if (!origen) return callback(null, true);
-        if (origenes.includes('*') || origenes.includes(origen)) return callback(null, true);
+        if (
+          origenes.includes('*') ||
+          origenes.includes(origen) ||
+          (!env.esProduccion && /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.)/.test(origen))
+        ) {
+          return callback(null, true);
+        }
         return callback(null, false);
       },
       credentials: true
@@ -46,8 +54,8 @@ export function crearApp() {
   );
 
   app.use(compression());
-  app.use(express.json({ limit: '1mb' }));
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '25mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
   if (env.nodeEnv !== 'test') {
     app.use(morgan(env.esProduccion ? 'combined' : 'dev'));
@@ -59,7 +67,7 @@ export function crearApp() {
     res.json({
       ok: true,
       datos: {
-        servicio: 'Sistema de Control de Stock — EMIC',
+        servicio: 'Stocker — Sistema de Control de Stock',
         api: env.apiPrefix,
         estado: 'activo'
       }

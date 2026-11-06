@@ -109,13 +109,26 @@ export function Boton({
         ? tokens.texto
         : tokens.primario;
 
+  const estiloVariante: ViewStyle =
+    variante === 'primario'
+      ? { backgroundColor: tokens.primario, borderColor: tokens.primario }
+      : variante === 'secundario'
+        ? { backgroundColor: tokens.superficieAlt, borderColor: tokens.borde }
+        : variante === 'contorno'
+          ? { backgroundColor: 'transparent', borderColor: tokens.primario }
+          : variante === 'peligro'
+            ? { backgroundColor: tokens.peligro, borderColor: tokens.peligro }
+            : variante === 'exito'
+              ? { backgroundColor: tokens.exito, borderColor: tokens.exito }
+              : { backgroundColor: 'transparent', borderColor: 'transparent' };
+
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ disabled: inactivo, busy: cargando }}
       disabled={inactivo}
       onPress={onPress}
-      style={style}
+      style={[estiloVariante, style]}
       className={cn(
         'flex-row items-center justify-center gap-2',
         CLASES_VARIANTE[variante],
@@ -133,6 +146,7 @@ export function Boton({
       )}
       <Text
         numberOfLines={1}
+        style={{ color: colorTexto }}
         className={cn('font-semibold', CLASES_TEXTO[variante], CLASES_TEXTO_TAMANO[tamano])}
       >
         {titulo}

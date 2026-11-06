@@ -32,7 +32,7 @@ export interface MarcoAppProps {
 /** Contenedor de la aplicación autenticada con navegación adaptativa. */
 export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
   const { usarSidebar, sidebarCompacta } = useBreakpoint();
-  const { tokens } = useTema();
+  const { tokens, esOscuro, alternar, claseRaiz, estiloVariables } = useTema();
   const usuario = useSeleccionar((estado) => estado.sesion.usuario);
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -46,7 +46,7 @@ export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
 
   if (usarSidebar) {
     return (
-      <View className="flex-1 flex-row bg-fondo">
+      <View style={{ backgroundColor: tokens.fondo }} className="flex-1 flex-row bg-fondo">
         <BarraLateral
           items={items}
           activa={activa}
@@ -59,9 +59,16 @@ export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
   }
 
   return (
-    <SafeAreaView edges={['top', 'left', 'right']} className="flex-1 bg-fondo">
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      style={{ backgroundColor: tokens.fondo }}
+      className="flex-1 bg-fondo"
+    >
       {/* Barra superior móvil */}
-      <View className="h-topbar flex-row items-center gap-3 border-b border-borde bg-superficie px-3">
+      <View
+        style={{ backgroundColor: tokens.superficie, borderColor: tokens.borde }}
+        className="h-topbar flex-row items-center gap-3 border-b border-borde bg-superficie px-3"
+      >
         <BotonIcono
           icono="menu-outline"
           tamano={24}
@@ -69,9 +76,20 @@ export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
           accessibilityLabel="Abrir menú de navegación"
           color={tokens.texto}
         />
-        <Text numberOfLines={1} className="min-w-0 flex-1 text-base font-bold text-texto">
-          {activo?.titulo ?? 'Retenes EMIC'}
+        <Text
+          numberOfLines={1}
+          style={{ color: tokens.texto }}
+          className="min-w-0 flex-1 text-base font-bold text-texto"
+        >
+          {activo?.titulo ?? 'Stocker'}
         </Text>
+        <BotonIcono
+          icono={esOscuro ? 'sunny-outline' : 'moon-outline'}
+          tamano={22}
+          onPress={alternar}
+          accessibilityLabel={esOscuro ? 'Activar tema claro' : 'Activar tema oscuro'}
+          color={tokens.primario}
+        />
       </View>
 
       <View className="min-w-0 flex-1">{children}</View>
@@ -83,8 +101,12 @@ export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
         animationType="fade"
         onRequestClose={() => setMenuAbierto(false)}
       >
-        <View className="flex-1 flex-row bg-black/50">
-          <SafeAreaView edges={['top', 'bottom', 'left']} className={cn('h-full bg-superficie')}>
+        <View style={estiloVariables} className={cn(claseRaiz, 'flex-1 flex-row bg-black/50')}>
+          <SafeAreaView
+            edges={['top', 'bottom', 'left']}
+            style={{ backgroundColor: tokens.superficie }}
+            className={cn('h-full bg-superficie')}
+          >
             <BarraLateral
               items={items}
               activa={activa}

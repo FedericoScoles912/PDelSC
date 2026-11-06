@@ -16,8 +16,8 @@ if (problemas.length) {
 
 const app = crearApp();
 
-const servidor = app.listen(env.puerto, async () => {
-  console.log(`[server] API escuchando en http://localhost:${env.puerto}${env.apiPrefix}`);
+const servidor = app.listen(env.puerto, '0.0.0.0', async () => {
+  console.log(`[server] API escuchando en http://0.0.0.0:${env.puerto}${env.apiPrefix} (LAN: http://10.0.11.139:${env.puerto}${env.apiPrefix})`);
   const db = await verificarConexion(3);
   if (db.ok) {
     console.log(`[db] Conectado a la base (${db.version})`);
