@@ -389,31 +389,49 @@ export async function eliminar(id) {
 }
 
 /**
+ * Normaliza el código de tipo de equivalencia a su nombre original (OEM | AJUSA | SABO).
+ * @param {string} tipo
+ * @returns {'OEM'|'AJUSA'|'SABO'|string}
+ */
+function normalizarTipoEquivalencia(tipo) {
+  const valor = String(tipo ?? '').trim().toUpperCase();
+  if (valor === 'A' || valor === 'AJUSA') return 'AJUSA';
+  if (valor === 'S' || valor === 'SABO') return 'SABO';
+  if (valor === 'OEM') return 'OEM';
+  return valor;
+}
+
+/**
  * Lista las equivalencias de un producto.
  * @param {number} productoId
  * @returns {Promise<Array<Object>>}
  */
 export async function listarEquivalencias(productoId) {
-  return query(
+  const filas = await query(
     `SELECT \`id\`, \`producto_id\`, \`tipo\`, \`codigo\`, \`creado_en\`
        FROM \`equivalencias\`
       WHERE \`producto_id\` = ?
       ORDER BY \`tipo\` ASC, \`codigo\` ASC`,
     [productoId]
   );
+  return filas.map((fila) => ({
+    ...fila,
+    tipo: normalizarTipoEquivalencia(fila.tipo)
+  }));
 }
 
 /**
- * Agrega una equivalencia (OEM | A | S) evitando duplicados.
+ * Agrega una equivalencia (OEM | AJUSA | SABO) evitando duplicados.
  * @param {number} productoId
  * @param {Object} datos
- * @param {'OEM'|'A'|'S'} datos.tipo
+ * @param {'OEM'|'AJUSA'|'SABO'|'A'|'S'} datos.tipo
  * @param {string} datos.codigo
  * @returns {Promise<Array<Object>>}
  */
 export async function agregarEquivalencia(productoId, { tipo, codigo } = {}) {
-  if (!['OEM', 'A', 'S'].includes(tipo)) {
-    throw ApiError.solicitudInvalida('El tipo de equivalencia debe ser OEM, A o S.');
+  const tipoNormalizado = normalizarTipoEquivalencia(tipo);
+  if (!['OEM', 'AJUSA', 'SABO'].includes(tipoNormalizado)) {
+    throw ApiError.solicitudInvalida('El tipo de equivalencia debe ser OEM, AJUSA o SABO.');
   }
 
   const producto = await queryUna('SELECT `id` FROM `productos` WHERE `id` = ?', [productoId]);
@@ -421,7 +439,7 @@ export async function agregarEquivalencia(productoId, { tipo, codigo } = {}) {
 
   await ejecutar(
     'INSERT IGNORE INTO `equivalencias` (`producto_id`, `tipo`, `codigo`) VALUES (?, ?, ?)',
-    [productoId, tipo, codigo]
+    [productoId, tipoNormalizado, codigo]
   );
 
   return listarEquivalencias(productoId);

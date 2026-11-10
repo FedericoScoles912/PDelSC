@@ -1,7 +1,7 @@
 /**
  * @file Catálogo de productos con búsqueda por texto, filtro por categoría,
  *       búsqueda técnica dimensional (Eje, Alojamiento, Altura ± Tolerancia),
- *       alta/edición de productos y gestión de equivalencias (OEM, A, S).
+ *       alta/edición de productos y gestión de equivalencias (OEM, AJUSA, SABO).
  * @module client/src/pantallas/Productos
  */
 
@@ -9,7 +9,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -59,8 +61,16 @@ interface CategoriaItem {
 interface EquivalenciaItem {
   id: number;
   producto_id: number;
-  tipo: 'OEM' | 'A' | 'S';
+  tipo: 'OEM' | 'AJUSA' | 'SABO' | 'A' | 'S';
   codigo: string;
+}
+
+/** Devuelve el nombre original de la marca de equivalencia (OEM, AJUSA o SABO). */
+function nombreTipoEquivalencia(tipo: string): 'OEM' | 'AJUSA' | 'SABO' {
+  const limpio = String(tipo ?? '').trim().toUpperCase();
+  if (limpio === 'A' || limpio === 'AJUSA') return 'AJUSA';
+  if (limpio === 'S' || limpio === 'SABO') return 'SABO';
+  return 'OEM';
 }
 
 function formatearPrecio(valor: number | null | undefined): string {
@@ -104,7 +114,7 @@ export function Productos() {
   const [seleccionado, setSeleccionado] = useState<ProductoItem | null>(null);
   const [equivalencias, setEquivalencias] = useState<EquivalenciaItem[]>([]);
   const [cargandoEquiv, setCargandoEquiv] = useState(false);
-  const [nuevoTipoEquiv, setNuevoTipoEquiv] = useState<'OEM' | 'A' | 'S'>('OEM');
+  const [nuevoTipoEquiv, setNuevoTipoEquiv] = useState<'OEM' | 'AJUSA' | 'SABO'>('OEM');
   const [nuevoCodigoEquiv, setNuevoCodigoEquiv] = useState('');
 
   // Modal de crear / editar producto
@@ -758,7 +768,7 @@ export function Productos() {
                 {/* Equivalencias */}
                 <View className="gap-2">
                   <Text className="text-sm font-bold text-texto">
-                    Códigos de Equivalencia (OEM / Alternativos / Sustitutos)
+                    Códigos de Equivalencia (OEM / AJUSA / SABO)
                   </Text>
                   {cargandoEquiv ? (
                     <ActivityIndicator size="small" color={tokens.primario} />
@@ -768,23 +778,32 @@ export function Productos() {
                     </Text>
                   ) : (
                     <View className="flex-row flex-wrap gap-2">
-                      {equivalencias.map((eq) => (
-                        <View
-                          key={eq.id}
-                          className="flex-row items-center gap-1.5 rounded-lg border border-borde bg-superficie-alt px-2.5 py-1"
-                        >
-                          <Insignia
-                            texto={eq.tipo}
-                            tono={eq.tipo === 'OEM' ? 'primario' : eq.tipo === 'A' ? 'info' : 'neutro'}
-                          />
-                          <Text className="text-xs font-semibold text-texto">{eq.codigo}</Text>
-                          {puedeEditar && (
-                            <Pressable onPress={() => void borrarEquiv(eq.id)}>
-                              <Ionicons name="close-circle" size={16} color={tokens.peligro} />
-                            </Pressable>
-                          )}
-                        </View>
-                      ))}
+                      {equivalencias.map((eq) => {
+                        const etiquetaTipo = nombreTipoEquivalencia(eq.tipo);
+                        return (
+                          <View
+                            key={eq.id}
+                            className="flex-row items-center gap-1.5 rounded-lg border border-borde bg-superficie-alt px-2.5 py-1"
+                          >
+                            <Insignia
+                              texto={etiquetaTipo}
+                              tono={
+                                etiquetaTipo === 'OEM'
+                                  ? 'primario'
+                                  : etiquetaTipo === 'AJUSA'
+                                    ? 'info'
+                                    : 'neutro'
+                              }
+                            />
+                            <Text className="text-xs font-semibold text-texto">{eq.codigo}</Text>
+                            {puedeEditar && (
+                              <Pressable onPress={() => void borrarEquiv(eq.id)}>
+                                <Ionicons name="close-circle" size={16} color={tokens.peligro} />
+                              </Pressable>
+                            )}
+                          </View>
+                        );
+                      })}
                     </View>
                   )}
 
@@ -793,8 +812,8 @@ export function Productos() {
                       <Text className="text-xs font-bold text-texto-suave">
                         Agregar equivalencia
                       </Text>
-                      <View className="flex-row gap-2">
-                        {(['OEM', 'A', 'S'] as const).map((t) => (
+                      <View className="flex-row flex-wrap gap-2">
+                        {(['OEM', 'AJUSA', 'SABO'] as const).map((t) => (
                           <Pressable
                             key={t}
                             onPress={() => setNuevoTipoEquiv(t)}
@@ -821,7 +840,7 @@ export function Productos() {
                           placeholder="Código equivalente…"
                           value={nuevoCodigoEquiv}
                           onChangeText={setNuevoCodigoEquiv}
-                          clase="flex-1"
+                          clase="flex-1 min-w-0"
                         />
                         <Boton
                           titulo="Agregar"
@@ -869,17 +888,24 @@ export function Productos() {
         animationType="fade"
         onRequestClose={() => setModalFormulario(false)}
       >
-        <View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={estiloVariables}
           className={cn(claseRaiz, 'flex-1 items-center justify-center bg-black/50 p-4')}
         >
           <View
             style={{ backgroundColor: tokens.superficie, borderColor: tokens.borde }}
-            className="max-h-[92%] w-full max-w-lg rounded-2xl border border-borde bg-superficie p-5"
+            className="max-h-[92%] w-full max-w-lg overflow-hidden rounded-2xl border border-borde bg-superficie p-5"
           >
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3">
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets
+              contentContainerClassName="gap-3.5"
+            >
               <EncabezadoTarjeta
-                titulo={editandoId ? 'Editar Producto' : 'Nuevo Producto'}
+                titulo={editandoId ? `Editar Producto (${formCodigo})` : 'Nuevo Producto'}
+                subtitulo="Completá las medidas y detalles técnicos del artículo"
                 icono="pricetags-outline"
               />
               {!editandoId && (
@@ -890,66 +916,68 @@ export function Productos() {
                   onChangeText={setFormCodigo}
                 />
               )}
-              <View className="flex-row gap-2">
+              <View className="w-full flex-row gap-3">
                 <Entrada
                   etiqueta="Eje (mm)"
                   placeholder="85"
                   value={formEje}
                   onChangeText={setFormEje}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
                 <Entrada
                   etiqueta="Alojamiento (mm)"
                   placeholder="105"
                   value={formAloj}
                   onChangeText={setFormAloj}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
+              </View>
+              <View className="w-full flex-row gap-3">
                 <Entrada
                   etiqueta="Altura (mm)"
                   placeholder="11"
                   value={formAlt}
                   onChangeText={setFormAlt}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
-              </View>
-              <View className="flex-row gap-2">
                 <Entrada
                   etiqueta="Giro"
                   placeholder="AH / H / LI"
                   value={formGiro}
                   onChangeText={setFormGiro}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
+              </View>
+              <View className="w-full flex-row gap-3">
                 <Entrada
                   etiqueta="UxB"
                   keyboardType="numeric"
                   value={formUxb}
                   onChangeText={setFormUxb}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
                 <Entrada
                   etiqueta="Precio Lista ($)"
                   keyboardType="numeric"
                   value={formPrecio}
                   onChangeText={setFormPrecio}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
               </View>
-              <View className="flex-row gap-2">
+              <View className="w-full flex-row gap-3">
                 <Entrada
                   etiqueta="Stock Actual"
                   keyboardType="numeric"
                   value={formStock}
                   onChangeText={setFormStock}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
                 <Entrada
                   etiqueta="Stock Mínimo"
                   keyboardType="numeric"
                   value={formStockMin}
                   onChangeText={setFormStockMin}
-                  clase="flex-1"
+                  clase="flex-1 min-w-0"
                 />
               </View>
               <Entrada
@@ -959,7 +987,7 @@ export function Productos() {
                 onChangeText={setFormObs}
                 multiline
               />
-              <View className="mt-3 flex-row flex-wrap items-center justify-between gap-2">
+              <View className="mt-2 flex-row flex-wrap items-center justify-between gap-2 pt-1">
                 {editandoId ? (
                   <Boton
                     titulo="Eliminar"
@@ -990,7 +1018,7 @@ export function Productos() {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

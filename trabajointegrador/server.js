@@ -5,7 +5,7 @@
  */
 
 import { crearApp } from './Server/app.js';
-import { cerrarPool, verificarConexion } from './Server/config/db.js';
+import { cerrarPool, ejecutar, verificarConexion } from './Server/config/db.js';
 import { env, validarEntorno } from './Server/config/env.js';
 
 const problemas = validarEntorno();
@@ -21,8 +21,29 @@ const servidor = app.listen(env.puerto, '0.0.0.0', async () => {
   const db = await verificarConexion(3);
   if (db.ok) {
     console.log(`[db] Conectado a la base (${db.version})`);
+    try {
+      await ejecutar("UPDATE IGNORE `equivalencias` SET `tipo` = 'AJUSA' WHERE `tipo` = 'A'");
+      await ejecutar("UPDATE IGNORE `equivalencias` SET `tipo` = 'SABO' WHERE `tipo` = 'S'");
+      await ejecutar("DELETE FROM `equivalencias` WHERE `tipo` IN ('A', 'S')");
+    } catch (err) {
+      console.warn('[db] Advertencia normalizando equivalencias:', err?.message ?? err);
+    }
   } else {
     console.warn(`[db] Sin conexión a la base: ${db.error}`);
+  }
+
+  // Keep-alive automático para mantener despierto el servicio en Render 24/7
+  const urlRender = (process.env.RENDER_EXTERNAL_URL || process.env.KEEP_ALIVE_URL || '').replace(/\/+$/, '');
+  if (urlRender) {
+    const urlHealth = `${urlRender}${env.apiPrefix}/health`;
+    console.log(`[keep-alive] Activado cada 10 min hacia ${urlHealth}`);
+    setInterval(async () => {
+      try {
+        await fetch(urlHealth, { method: 'GET' });
+      } catch (err) {
+        console.warn('[keep-alive] Error en ping:', err?.message ?? err);
+      }
+    }, 10 * 60 * 1000).unref();
   }
 });
 

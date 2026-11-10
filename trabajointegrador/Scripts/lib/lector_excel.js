@@ -165,8 +165,8 @@ function detectarColumnas(matriz) {
   columnas.eje = buscarColumna(filasEncabezado, /^eje$/i);
   columnas.aloj = buscarColumna(filasEncabezado, /^aloj/i);
   columnas.alt = buscarColumna(filasEncabezado, /^alt/i);
-  columnas.equivalenciaA = buscarColumna([matriz[filaEncabezado]], /^a$/i);
-  columnas.equivalenciaS = buscarColumna([matriz[filaEncabezado]], /^s$/i);
+  columnas.equivalenciaA = buscarColumna([matriz[filaEncabezado]], /^(a|ajusa)$/i);
+  columnas.equivalenciaS = buscarColumna([matriz[filaEncabezado]], /^(s|sabo|sab[oó])$/i);
 
   // El primer dato real en planillas EMIC multi-fila está después de la 3ª fila de encabezado.
   if (!esEncabezadoSimple && columnas.eje) columnas.primerDato = filaEncabezado + 3;
@@ -305,7 +305,7 @@ function construirProducto(fila, columnas, codigo, categoriaNombre, numeroFila) 
 }
 
 /**
- * Extrae las equivalencias OEM / A / S (multi-línea) de la fila.
+ * Extrae las equivalencias OEM / AJUSA / SABO (multi-línea) de la fila.
  * @param {string[]} fila
  * @param {Object} columnas
  * @returns {Array<{tipo:string, codigo:string}>}
@@ -314,8 +314,8 @@ function extraerEquivalencias(fila, columnas) {
   const resultado = [];
   const grupos = [
     { tipo: 'OEM', columna: columnas.oem },
-    { tipo: 'A', columna: columnas.equivalenciaA },
-    { tipo: 'S', columna: columnas.equivalenciaS }
+    { tipo: 'AJUSA', columna: columnas.equivalenciaA },
+    { tipo: 'SABO', columna: columnas.equivalenciaS }
   ];
 
   for (const { tipo, columna } of grupos) {

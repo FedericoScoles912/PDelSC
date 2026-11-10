@@ -105,7 +105,11 @@ const esquemaActivo = z.object({
 });
 
 const esquemaEquivalencia = z.object({
-  tipo: z.enum(['OEM', 'A', 'S'], { errorMap: () => ({ message: 'El tipo debe ser OEM, A o S.' }) }),
+  tipo: z
+    .enum(['OEM', 'AJUSA', 'SABO', 'A', 'S'], {
+      errorMap: () => ({ message: 'El tipo debe ser OEM, AJUSA o SABO.' })
+    })
+    .transform((valor) => (valor === 'A' ? 'AJUSA' : valor === 'S' ? 'SABO' : valor)),
   codigo: z
     .string({ required_error: 'El código es obligatorio.', invalid_type_error: 'El código debe ser texto.' })
     .trim()

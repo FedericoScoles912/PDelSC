@@ -53,11 +53,17 @@ export function Entrada({
   const [enfocado, setEnfocado] = useState(false);
   const [oculto, setOculto] = useState(Boolean(secureTextEntry));
   const hayError = Boolean(error);
+  const usaFlex = Boolean(clase && /\bflex-1\b/.test(clase));
+  const esMultilinea = Boolean(resto.multiline);
 
   return (
-    <View style={contenedorStyle} className={cn('w-full', clase)}>
+    <View
+      style={[{ minWidth: 0, flexShrink: 1 }, contenedorStyle]}
+      className={cn(!usaFlex && 'w-full', 'min-w-0', clase)}
+    >
       {etiqueta && (
         <Text
+          numberOfLines={1}
           style={{ color: tokens.textoSuave }}
           className="mb-1.5 text-sm font-semibold text-texto-suave"
         >
@@ -66,11 +72,14 @@ export function Entrada({
       )}
       <View
         style={{
+          minWidth: 0,
+          overflow: 'hidden',
           backgroundColor: tokens.superficie,
           borderColor: hayError ? tokens.peligro : enfocado ? tokens.primario : tokens.borde
         }}
         className={cn(
-          'flex-row items-center gap-2 rounded-xl border bg-superficie px-3',
+          'w-full min-w-0 flex-row gap-2 overflow-hidden rounded-xl border bg-superficie px-3',
+          esMultilinea ? 'items-start py-1' : 'items-center',
           hayError ? 'border-peligro' : enfocado ? 'border-primario' : 'border-borde',
           !editable && 'opacity-60'
         )}
@@ -83,8 +92,19 @@ export function Entrada({
           />
         )}
         <TextInput
-          style={{ color: tokens.texto }}
-          className="min-h-[44px] flex-1 py-2.5 text-base text-texto"
+          style={
+            {
+              color: tokens.texto,
+              minWidth: 0,
+              width: '100%',
+              flex: 1,
+              outlineStyle: 'none'
+            } as any
+          }
+          className={cn(
+            'min-h-[44px] min-w-0 flex-1 py-2.5 text-base text-texto',
+            esMultilinea && 'min-h-[84px]'
+          )}
           placeholderTextColor={tokens.textoSuave}
           editable={editable}
           secureTextEntry={oculto}
