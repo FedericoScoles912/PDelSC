@@ -17,6 +17,7 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeRol } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
@@ -127,7 +128,7 @@ export function Perfil() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
     >
-      <ScrollView
+      <ContenedorScrollSeccion
         style={{ backgroundColor: tokens.fondo }}
         className="flex-1 bg-fondo"
         contentContainerStyle={{ padding: 20, paddingBottom: 280, gap: 20 }}
@@ -370,7 +371,7 @@ export function Perfil() {
           />
         </View>
       </Tarjeta>
-    </ScrollView>
+    </ContenedorScrollSeccion>
   </KeyboardAvoidingView>
   );
 }

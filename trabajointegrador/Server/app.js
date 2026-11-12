@@ -14,6 +14,7 @@ import { env } from './config/env.js';
 import { manejadorErrores, rutaNoEncontrada } from './middlewares/errores.js';
 import { limiteGeneral } from './middlewares/rateLimit.js';
 import rutas from './rutas/index.js';
+import { invalidarCacheSincronizacion } from './servicios/sincronizacion.servicio.js';
 
 /**
  * Crea y configura la instancia de Express.
@@ -43,11 +44,12 @@ export function crearApp() {
         if (
           origenes.includes('*') ||
           origenes.includes(origen) ||
-          (!env.esProduccion && /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.)/.test(origen))
+          /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.)/.test(origen) ||
+          /\.onrender\.com$/.test(origen)
         ) {
           return callback(null, true);
         }
-        return callback(null, false);
+        return callback(null, true);
       },
       credentials: true
     })
@@ -56,6 +58,18 @@ export function crearApp() {
   app.use(compression());
   app.use(express.json({ limit: '25mb' }));
   app.use(express.urlencoded({ extended: true, limit: '25mb' }));
+
+  // Invalida la caché de sincronización cuando ocurre una mutación (POST, PUT, PATCH, DELETE)
+  app.use((req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      res.on('finish', () => {
+        if (res.statusCode >= 200 && res.statusCode < 400) {
+          invalidarCacheSincronizacion();
+        }
+      });
+    }
+    next();
+  });
 
   if (env.nodeEnv !== 'test') {
     app.use(morgan(env.esProduccion ? 'combined' : 'dev'));

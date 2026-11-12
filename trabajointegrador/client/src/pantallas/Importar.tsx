@@ -20,8 +20,10 @@ import { File as ExpoFile } from 'expo-file-system';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Insignia } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -162,6 +164,11 @@ export function Importar() {
     void cargarLogs();
   }, [cargarArchivos, cargarLogs]);
 
+  useSincronizacionEnVivo(() => {
+    void cargarArchivos();
+    void cargarLogs();
+  });
+
   const ejecutarPreview = async (archivoAUsar?: string, hojaAUsar?: string) => {
     const targetArchivo = archivoAUsar ?? archivoSeleccionado;
     const targetHoja = hojaAUsar ?? hojaSeleccionada;
@@ -232,7 +239,7 @@ export function Importar() {
           const lector = new FileReader();
           lector.onload = async () => {
             const raw = lector.result as string;
-            const b64 = raw.includes(',') ? raw.split(',')[1] : raw;
+            const b64 = (raw.includes(',') ? raw.split(',')[1] : raw) ?? '';
             await enviarArchivoSubido(file.name, b64);
           };
           lector.onerror = () => {
@@ -311,7 +318,7 @@ export function Importar() {
     null;
 
   return (
-    <ScrollView className="flex-1 bg-fondo" contentContainerClassName="gap-4 p-5 pb-16">
+    <ContenedorScrollSeccion className="flex-1 bg-fondo" contentContainerClassName="gap-4 p-5 pb-20">
       {/* Encabezado */}
       <View className="flex-row items-center gap-3">
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
@@ -344,9 +351,8 @@ export function Importar() {
           />
           <BotonIcono
             icono="refresh-outline"
-            variante="fantasma"
-            alPresionar={() => void cargarArchivos()}
-            etiquetaAccesible="Refrescar lista de archivos"
+            onPress={() => void cargarArchivos()}
+            accessibilityLabel="Refrescar lista de archivos"
           />
           {cargandoArchivos && (
             <ActivityIndicator size="small" color={tokens.primario} />
@@ -696,6 +702,6 @@ export function Importar() {
           )}
         </View>
       </Tarjeta>
-    </ScrollView>
+    </ContenedorScrollSeccion>
   );
 }

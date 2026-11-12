@@ -29,6 +29,7 @@ import {
   iniciarSesionOAuthCuentaVerificada,
   iniciarSesionConCodigo,
   solicitarCodigoRecuperacion,
+  solicitarRegistroUsuario,
   perfil,
   refrescar
 } from '../servicios/auth.servicio.js';
@@ -77,6 +78,44 @@ const esquemaCambiarPassword = z.object({
   actual: z.string().optional(),
   nueva: z.string().min(8, 'La nueva contraseña debe tener al menos 8 caracteres.')
 });
+
+/** Cuerpo para solicitar creación de usuario desde Inicio de Sesión. */
+const esquemaRegistro = z.object({
+  nombre: z.string().trim().min(1, 'El nombre es obligatorio.'),
+  apellido: z.string().trim().min(1, 'El apellido es obligatorio.'),
+  email: z
+    .string()
+    .trim()
+    .min(1, 'El correo electrónico es obligatorio.')
+    .email('El correo electrónico no es válido.'),
+  telefono: z.string().trim().optional().nullable(),
+  rol: z.enum(['vendedor', 'deposito']).optional().default('vendedor'),
+  password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres.')
+});
+
+router.post(
+  '/registro',
+  limiteAuth,
+  validarBody(esquemaRegistro),
+  asyncHandler(async (req, res) => {
+    const resultado = await solicitarRegistroUsuario(req.body);
+    await registrar({
+      usuarioId: resultado.id,
+      accion: 'solicitar_registro',
+      entidad: 'usuario',
+      entidadId: resultado.id,
+      detalle: {
+        email: resultado.email,
+        nombre: resultado.nombre,
+        apellido: resultado.apellido,
+        rol: resultado.rol?.codigo,
+        estadoAprobacion: 'pendiente'
+      },
+      ip: ipDe(req)
+    });
+    return responder(res, resultado, null, 201);
+  })
+);
 
 router.post(
   '/login',

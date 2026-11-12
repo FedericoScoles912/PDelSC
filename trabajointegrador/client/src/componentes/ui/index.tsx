@@ -30,3 +30,9 @@ export type { ChipProps, BarraProps, CasillaProps, InterruptorProps } from './Ba
 
 export { Selector } from './Selector';
 export type { SelectorProps, OpcionSelector } from './Selector';
+
+export { ContenedorScrollSeccion } from './ContenedorScrollSeccion';
+export type {
+  ContenedorScrollSeccionProps,
+  ConfigBuscadorFlotante
+} from './ContenedorScrollSeccion';

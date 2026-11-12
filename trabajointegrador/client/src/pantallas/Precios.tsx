@@ -18,10 +18,12 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -117,6 +119,10 @@ export function Precios() {
     void cargar();
   }, [cargar]);
 
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
+
   const abrirProducto = async (prod: ProductoItem) => {
     setSeleccionado(prod);
     setNuevoPrecio(prod.precioLista !== null ? String(prod.precioLista) : '');
@@ -208,9 +214,17 @@ export function Precios() {
 
   return (
     <View className="flex-1 bg-fondo">
-      <ScrollView
+      <ContenedorScrollSeccion
         className="flex-1"
-        contentContainerClassName="gap-4 p-5 pb-10"
+        contentContainerClassName="gap-4 p-5 pb-20"
+        buscador={{
+          valor: busqueda,
+          onCambiarTexto: (t) => {
+            setBusqueda(t);
+            setPagina(1);
+          },
+          placeholder: 'Buscar producto por código o descripción…'
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
@@ -219,6 +233,8 @@ export function Precios() {
           />
         }
       >
+        {({ fueraDelTope }) => (
+          <>
         {/* Encabezado */}
         <View className="flex-row flex-wrap items-center justify-between gap-3">
           <View className="flex-row items-center gap-3">
@@ -247,7 +263,12 @@ export function Precios() {
         </View>
 
         {/* Búsqueda y categorías */}
-        <Tarjeta compacta clase="gap-3">
+        <Tarjeta
+          compacta
+          clase="gap-3"
+          style={{ opacity: fueraDelTope ? 0 : 1 }}
+          pointerEvents={fueraDelTope ? 'none' : 'auto'}
+        >
           <Entrada
             icono="search-outline"
             placeholder="Buscar producto por código o descripción…"
@@ -360,7 +381,9 @@ export function Precios() {
             />
           </View>
         )}
-      </ScrollView>
+          </>
+        )}
+      </ContenedorScrollSeccion>
 
       {/* Modal de Historial / Cambio individual */}
       <Modal

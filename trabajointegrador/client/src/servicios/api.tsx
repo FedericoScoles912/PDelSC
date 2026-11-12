@@ -1,11 +1,8 @@
 /**
  * @file Cliente HTTP de la API. Centraliza la URL base, la cabecera de
- *       autorización, el manejo uniforme de errores y la renovación
- *       automática de la sesión con el refresh token.
- *
- * No depende del store de Redux: los tokens viven en memoria del módulo y se
- * replican en el almacenamiento persistente. Cuando el refresco falla, se
- * notifica mediante un callback registrado desde el store.
+ *       autorización, el manejo uniforme de errores, la renovación
+ *       automática de la sesión con el refresh token y el motor de
+ *       sincronización en tiempo real entre dispositivos (celular ↔ PC).
  * @module client/src/servicios/api
  */
 
@@ -13,31 +10,30 @@ import Constants from 'expo-constants';
 
 import { CLAVES, eliminar, guardar, obtener } from './almacenamiento';
 
+const URL_RENDER = 'https://stocker-aqs2.onrender.com/api/v1';
+
 /**
- * Determina la URL base inicial de la API. Cuando corre dentro de Expo Go o un
- * emulador conectado a Metro, toma automáticamente el host de Metro para que
- * funcione aunque cambie la IP Wi-Fi de la PC.
+ * Determina la URL base inicial de la API.
  */
 function resolverUrlApi(): string {
+  const configurada = process.env.EXPO_PUBLIC_API_URL;
+  if (configurada && !/^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.)/.test(configurada)) {
+    return configurada.replace(/\/+$/, '');
+  }
   if (typeof window !== 'undefined' && window.location?.hostname === 'localhost') {
     return 'http://localhost:4000/api/v1';
   }
-  const configurada = process.env.EXPO_PUBLIC_API_URL;
   const hostUri = Constants.expoConfig?.hostUri;
   if (hostUri) {
     const host = hostUri.split(':')[0];
-    if (
-      host &&
-      (!configurada ||
-        /^https?:\/\/(localhost|127\.0\.0\.1|10\.|192\.168\.|172\.)/.test(configurada))
-    ) {
+    if (host) {
       return `http://${host}:4000/api/v1`;
     }
   }
-  return configurada ?? 'http://192.168.100.142:4000/api/v1';
+  return URL_RENDER;
 }
 
-/** Lista de URLs candidatas para autodescubrimiento cuando cambia la red Wi-Fi o se usa emulador. */
+/** Lista de URLs candidatas para autodescubrimiento cuando cambia la red Wi-Fi o se usa 4G/Render. */
 function obtenerUrlsCandidatas(): string[] {
   const lista: string[] = [];
   const agregar = (u?: string | null) => {
@@ -54,19 +50,23 @@ function obtenerUrlsCandidatas(): string[] {
     const host = hostUri.split(':')[0];
     if (host) agregar(`http://${host}:4000/api/v1`);
   }
+  agregar(URL_RENDER);
   agregar(process.env.EXPO_PUBLIC_API_URL);
-  agregar('http://192.168.100.142:4000/api/v1');
   agregar('http://10.0.11.139:4000/api/v1');
+  agregar('http://192.168.100.142:4000/api/v1');
   agregar('http://10.0.2.2:4000/api/v1');
   agregar('http://localhost:4000/api/v1');
   return lista;
 }
 
-/** URL base activa de la API (se actualiza automáticamente si otra IP de la red responde). */
+/** URL base activa de la API (se actualiza automáticamente si otra URL responde). */
 export let URL_API: string = resolverUrlApi();
 
-/** Tiempo máximo (ms) de espera por respuesta. */
-const TIEMPO_LIMITE = Number(process.env.EXPO_PUBLIC_API_TIMEOUT ?? 20000);
+/** Tiempo máximo (ms) de espera por respuesta estándar. */
+const TIEMPO_LIMITE = Number(process.env.EXPO_PUBLIC_API_TIMEOUT ?? 35000);
+
+/** Tiempo máximo (ms) para operaciones pesadas como previsualizar/importar Excel o exportar reportes. */
+const TIEMPO_LIMITE_PESADO = 90000;
 
 /** Métodos HTTP soportados. */
 export type MetodoHttp = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
@@ -97,12 +97,6 @@ export class ErrorApi extends Error {
   /** Detalle opcional (validaciones, conflictos). */
   readonly detalles: unknown;
 
-  /**
-   * @param estado Código HTTP (`0` si no hubo respuesta).
-   * @param codigo Código de negocio.
-   * @param mensaje Mensaje legible para el usuario.
-   * @param detalles Detalle opcional.
-   */
   constructor(estado: number, codigo: string, mensaje: string, detalles: unknown = null) {
     super(mensaje);
     this.name = 'ErrorApi';
@@ -134,36 +128,114 @@ let tokenRefresco: string | null = null;
 let alPerderSesion: (() => void) | null = null;
 let refrescoEnCurso: Promise<boolean> | null = null;
 
+// ---------------------------------------------------------------------------
+//  Motor de Sincronización en Vivo (Celular ↔ Computadora en tiempo real)
+// ---------------------------------------------------------------------------
+type ListenerCambioEnVivo = () => void;
+const suscriptoresCambios = new Set<ListenerCambioEnVivo>();
+let ultimaFirmaConocida: string | null = null;
+let pollingSincronizacionIniciado = false;
+let verificandoSincronizacion = false;
+
 /**
- * Registra el callback que se invoca cuando la sesión deja de ser válida.
- * @param callback Función a llamar (o `null` para desregistrar).
+ * Suscribe una pantalla o componente para actualizarse automáticamente en vivo
+ * cuando cualquier dispositivo (celular o computadora) realiza una modificación.
  */
+export function suscribirCambiosEnVivo(listener: ListenerCambioEnVivo): () => void {
+  suscriptoresCambios.add(listener);
+  iniciarMotorSincronizacion();
+  return () => {
+    suscriptoresCambios.delete(listener);
+  };
+}
+
+/** Dispara todos los listeners registrados en este dispositivo. */
+function emitirCambioEnVivo(): void {
+  for (const listener of Array.from(suscriptoresCambios)) {
+    try {
+      listener();
+    } catch {
+      /* ignorar errores de un suscriptor individual */
+    }
+  }
+}
+
+/** Consulta la firma de estado en el servidor para detectar cambios de otros dispositivos. */
+export async function verificarCambiosRemotos(): Promise<void> {
+  if (verificandoSincronizacion || suscriptoresCambios.size === 0) return;
+  verificandoSincronizacion = true;
+  try {
+    const resp = await Promise.race([
+      fetch(`${URL_API}/sincronizacion`, {
+        method: 'GET',
+        headers: { Accept: 'application/json', 'Cache-Control': 'no-cache' }
+      }),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000))
+    ]);
+
+    if (resp && resp.ok) {
+      const json = (await resp.json()) as SobreRespuesta<{ firma: string; timestamp: number }>;
+      const nuevaFirma = json?.datos?.firma;
+      if (nuevaFirma) {
+        if (ultimaFirmaConocida !== null && ultimaFirmaConocida !== nuevaFirma) {
+          ultimaFirmaConocida = nuevaFirma;
+          emitirCambioEnVivo();
+        } else if (ultimaFirmaConocida === null) {
+          ultimaFirmaConocida = nuevaFirma;
+        }
+      }
+    }
+  } catch {
+    /* silencioso ante microcortes */
+  } finally {
+    verificandoSincronizacion = false;
+  }
+}
+
+function iniciarMotorSincronizacion(): void {
+  if (pollingSincronizacionIniciado) return;
+  pollingSincronizacionIniciado = true;
+
+  setInterval(() => {
+    void verificarCambiosRemotos();
+  }, 2500);
+
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('focus', () => {
+      void verificarCambiosRemotos();
+    });
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          void verificarCambiosRemotos();
+        }
+      });
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+//  Gestión de Tokens y Sesión
+// ---------------------------------------------------------------------------
+
 export function registrarPerdidaSesion(callback: (() => void) | null): void {
   alPerderSesion = callback;
 }
 
-/**
- * Fija los tokens en memoria.
- * @param acceso Token de acceso (o `null`).
- * @param refresco Token de refresco; si se omite, se conserva el actual.
- */
 export function fijarTokens(acceso: string | null, refresco?: string | null): void {
   tokenAcceso = acceso;
   if (refresco !== undefined) tokenRefresco = refresco;
 }
 
-/** Devuelve una copia de los tokens en memoria. */
 export function tokensEnMemoria(): { acceso: string | null; refresco: string | null } {
   return { acceso: tokenAcceso, refresco: tokenRefresco };
 }
 
-/** Carga en memoria los tokens persistidos. */
 export async function cargarTokensGuardados(): Promise<void> {
   tokenAcceso = await obtener(CLAVES.accessToken);
   tokenRefresco = await obtener(CLAVES.refreshToken);
 }
 
-/** Elimina los tokens de memoria y del almacenamiento persistente. */
 export async function limpiarTokens(): Promise<void> {
   tokenAcceso = null;
   tokenRefresco = null;
@@ -172,11 +244,6 @@ export async function limpiarTokens(): Promise<void> {
   await eliminar(CLAVES.usuario);
 }
 
-/**
- * Arma la URL final con la cadena de consulta.
- * @param ruta Ruta relativa al prefijo de la API.
- * @param consulta Parámetros opcionales.
- */
 function construirUrl(ruta: string, consulta?: Record<string, ValorConsulta>): string {
   const base = `${URL_API}${ruta.startsWith('/') ? ruta : `/${ruta}`}`;
   if (!consulta) return base;
@@ -189,47 +256,47 @@ function construirUrl(ruta: string, consulta?: Record<string, ValorConsulta>): s
 }
 
 /**
- * Prueba en paralelo las URLs candidatas de la API y actualiza `URL_API` con la primera que responda.
+ * Prueba las URLs candidatas de la API y actualiza `URL_API` con la primera que responda.
  */
-export async function descubrirUrlDisponible(incluirActual = false): Promise<string | null> {
+export async function descubrirUrlDisponible(incluirActual = true): Promise<string | null> {
   const candidatas = obtenerUrlsCandidatas().filter((u) => incluirActual || u !== URL_API);
   if (!candidatas.length) return URL_API;
 
-  const probarUna = async (base: string): Promise<string> => {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 4000);
+  const probarUna = async (base: string): Promise<boolean> => {
+    const esRender = base.includes('onrender.com');
+    const timeoutMs = esRender ? 7000 : 2200;
     try {
-      const resp = await fetch(`${base}/health`, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        signal: ctrl.signal
-      });
-      if (resp.ok) return base;
-      throw new Error('No disponible');
-    } finally {
-      clearTimeout(timer);
+      const resp = await Promise.race([
+        fetch(`${base}/health`, {
+          method: 'GET',
+          headers: { Accept: 'application/json' }
+        }),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))
+      ]);
+      return Boolean(resp && resp.ok);
+    } catch {
+      return false;
     }
   };
 
-  try {
-    const ganadora = await Promise.any(candidatas.map((base) => probarUna(base)));
-    URL_API = ganadora;
-    return ganadora;
-  } catch {
-    return null;
+  for (const base of candidatas) {
+    if (await probarUna(base)) {
+      URL_API = base;
+      return base;
+    }
   }
+
+  // Si ninguna respondió rápido, usar Render como respaldo garantizado en la nube
+  URL_API = URL_RENDER;
+  return URL_RENDER;
 }
 
 // Autodescubrir el servidor activo apenas inicia la app en segundo plano.
 void descubrirUrlDisponible(true);
 
 /**
- * Ejecuta el fetch con tiempo límite y traduce los fallos de red.
- * Si la URL activa no responde, autodescubre otra IP disponible del backend y reintenta.
- * @param url URL absoluta.
- * @param metodo Método HTTP.
- * @param cabeceras Cabeceras de la petición.
- * @param cuerpo Cuerpo serializable o `undefined`.
+ * Ejecuta el fetch con tiempo límite adecuado según la operación (hasta 90s para importación Excel)
+ * y reintenta contra Render o la URL descubierta si falla la conexión inicial.
  */
 async function enviar(
   url: string,
@@ -237,6 +304,10 @@ async function enviar(
   cabeceras: Record<string, string>,
   cuerpo: unknown
 ): Promise<Response> {
+  const esRutaPesada =
+    url.includes('/importacion') || url.includes('/reportes') || url.includes('/recuperar');
+  const limiteEfectivo = esRutaPesada ? TIEMPO_LIMITE_PESADO : TIEMPO_LIMITE;
+
   const ejecutarFetch = async (urlDestino: string, limiteMs: number): Promise<Response> => {
     const controlador = new AbortController();
     const temporizador = setTimeout(() => controlador.abort(), limiteMs);
@@ -253,43 +324,43 @@ async function enviar(
   };
 
   try {
-    return await ejecutarFetch(url, Math.min(TIEMPO_LIMITE, 6000));
+    return await ejecutarFetch(url, limiteEfectivo);
   } catch (errorInicial) {
     const urlAnterior = URL_API;
-    const nuevaBase = await descubrirUrlDisponible();
-    if (nuevaBase && url.startsWith(urlAnterior)) {
-      const urlReintento = `${nuevaBase}${url.slice(urlAnterior.length)}`;
+    const nuevaBase = await descubrirUrlDisponible(true);
+    const basesReintento: string[] = [];
+    if (nuevaBase) basesReintento.push(nuevaBase);
+    if (!basesReintento.includes(URL_RENDER)) basesReintento.push(URL_RENDER);
+
+    for (const baseCandidata of basesReintento) {
+      const sufijo = url.startsWith(urlAnterior)
+        ? url.slice(urlAnterior.length)
+        : url.replace(/^https?:\/\/[^/]+\/api\/v1/, '');
+      const urlReintento = `${baseCandidata}${sufijo.startsWith('/') ? sufijo : `/${sufijo}`}`;
       try {
-        return await ejecutarFetch(urlReintento, TIEMPO_LIMITE);
-      } catch (errorReintento) {
-        if (errorReintento instanceof Error && errorReintento.name === 'AbortError') {
-          throw new ErrorApi(
-            0,
-            'TIEMPO_AGOTADO',
-            'La conexión tardó demasiado. Revisá tu red e intentá nuevamente.'
-          );
-        }
+        const resp = await ejecutarFetch(urlReintento, limiteEfectivo);
+        URL_API = baseCandidata;
+        return resp;
+      } catch {
+        /* intentar siguiente base candidata */
       }
     }
+
     if (errorInicial instanceof Error && errorInicial.name === 'AbortError') {
       throw new ErrorApi(
         0,
         'TIEMPO_AGOTADO',
-        'La conexión tardó demasiado. Revisá tu red e intentá nuevamente.'
+        'La operación tardó más de lo esperado. Intentá nuevamente en unos segundos.'
       );
     }
     throw new ErrorApi(
       0,
       'SIN_CONEXION',
-      'No se pudo conectar con el servidor. Verificá que el backend esté disponible.'
+      'No se pudo conectar con el servidor. Revisá tu conexión a internet e intentá nuevamente.'
     );
   }
 }
 
-/**
- * Interpreta la respuesta del backend y lanza {@link ErrorApi} si falló.
- * @param respuesta Respuesta cruda del fetch.
- */
 async function interpretar<T>(respuesta: Response): Promise<RespuestaConMeta<T>> {
   let sobre: SobreRespuesta<T> | null = null;
   try {
@@ -311,7 +382,6 @@ async function interpretar<T>(respuesta: Response): Promise<RespuestaConMeta<T>>
   return { datos: sobre?.datos as T, meta: sobre?.meta ?? {} };
 }
 
-/** Intenta renovar la sesión con el refresh token. */
 async function renovarSesion(): Promise<boolean> {
   if (refrescoEnCurso) return refrescoEnCurso;
   if (!tokenRefresco) return false;
@@ -340,22 +410,11 @@ async function renovarSesion(): Promise<boolean> {
   return refrescoEnCurso;
 }
 
-/**
- * Realiza una petición autenticada a la API.
- * @param ruta Ruta relativa (por ejemplo `/productos`).
- * @param opciones Opciones de la petición.
- * @returns Los `datos` de la respuesta.
- */
 export async function peticion<T>(ruta: string, opciones: OpcionesPeticion = {}): Promise<T> {
   const { datos } = await peticionConMeta<T>(ruta, opciones);
   return datos;
 }
 
-/**
- * Realiza una petición y devuelve también los metadatos (paginación).
- * @param ruta Ruta relativa (por ejemplo `/productos`).
- * @param opciones Opciones de la petición.
- */
 export async function peticionConMeta<T>(
   ruta: string,
   opciones: OpcionesPeticion = {}
@@ -381,5 +440,15 @@ export async function peticionConMeta<T>(
     }
   }
 
-  return interpretar<T>(respuesta);
+  const resultado = await interpretar<T>(respuesta);
+
+  // Si fue una mutación exitosa, actualizar la firma y notificar en vivo
+  if (metodo !== 'GET') {
+    setTimeout(() => {
+      void verificarCambiosRemotos();
+      emitirCambioEnVivo();
+    }, 150);
+  }
+
+  return resultado;
 }

@@ -161,6 +161,7 @@ router.delete(
       accion: 'eliminar',
       entidad: 'usuario',
       entidadId: req.params.id,
+      detalle: { email: resultado.email, eliminado: true },
       ip: ipDe(req)
     });
     return responder(res, resultado);

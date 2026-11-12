@@ -10,8 +10,10 @@ import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Insignia, tonoDeStock } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 
@@ -116,6 +118,10 @@ export function Dashboard() {
     void cargar();
   }, [cargar]);
 
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
+
   if (cargando && !datos) {
     return (
       <View className="flex-1 items-center justify-center gap-3 bg-fondo p-6">
@@ -126,9 +132,9 @@ export function Dashboard() {
   }
 
   return (
-    <ScrollView
+    <ContenedorScrollSeccion
       className="flex-1 bg-fondo"
-      contentContainerClassName="gap-5 p-5 pb-10"
+      contentContainerClassName="gap-5 p-5 pb-20"
       refreshControl={
         <RefreshControl
           refreshing={refrescando}
@@ -337,6 +343,6 @@ export function Dashboard() {
           )}
         </View>
       </Tarjeta>
-    </ScrollView>
+    </ContenedorScrollSeccion>
   );
 }

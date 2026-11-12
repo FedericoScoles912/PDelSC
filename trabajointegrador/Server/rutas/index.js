@@ -9,6 +9,7 @@ import { Router } from 'express';
 import { verificarConexion } from '../config/db.js';
 import { env } from '../config/env.js';
 import { autenticar } from '../middlewares/autenticacion.js';
+import { obtenerEstadoSincronizacion } from '../servicios/sincronizacion.servicio.js';
 import { asyncHandler, responder } from '../utils/http.js';
 
 import auditoriaRutas from './auditoria.rutas.js';
@@ -51,6 +52,15 @@ api.get(
       entorno: env.nodeEnv,
       baseDeDatos: 'conectada'
     });
+  })
+);
+
+api.get(
+  '/sincronizacion',
+  asyncHandler(async (_req, res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    const estado = await obtenerEstadoSincronizacion();
+    return responder(res, estado);
   })
 );
 

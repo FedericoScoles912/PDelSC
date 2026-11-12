@@ -21,10 +21,12 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeStock } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -146,6 +148,10 @@ export function Deposito() {
     return () => clearTimeout(temporizador);
   }, [cargarDatos]);
 
+  useSincronizacionEnVivo(() => {
+    void cargarDatos(true);
+  });
+
   const abrirModalMovimiento = (articulo: ArticuloDeposito, tipo: 'ingreso' | 'egreso' | 'ajuste' = 'ingreso') => {
     setArticuloSeleccionado(articulo);
     setTipoMovimiento(tipo);
@@ -215,9 +221,14 @@ export function Deposito() {
   }
 
   return (
-    <ScrollView
+    <ContenedorScrollSeccion
       className="flex-1 bg-fondo"
-      contentContainerClassName="gap-4 p-5 pb-16"
+      contentContainerClassName="gap-4 p-5 pb-20"
+      buscador={{
+        valor: busqueda,
+        onCambiarTexto: setBusqueda,
+        placeholder: 'Buscar en depósito por código, aplicación o medidas…'
+      }}
       refreshControl={
         <RefreshControl
           refreshing={refrescando}
@@ -226,6 +237,8 @@ export function Deposito() {
         />
       }
     >
+      {({ fueraDelTope }) => (
+        <>
       {/* Encabezado de la Sección */}
       <View className="flex-row items-center gap-3">
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
@@ -312,7 +325,11 @@ export function Deposito() {
       </View>
 
       {/* Barra de Filtros y Búsqueda */}
-      <Tarjeta clase="gap-3">
+      <Tarjeta
+        clase="gap-3"
+        style={{ opacity: fueraDelTope ? 0 : 1 }}
+        pointerEvents={fueraDelTope ? 'none' : 'auto'}
+      >
         <Entrada
           etiqueta="Buscar en depósito"
           icono="search-outline"
@@ -395,9 +412,8 @@ export function Deposito() {
           />
           <BotonIcono
             icono="refresh-outline"
-            variante="fantasma"
-            alPresionar={() => void cargarDatos(true)}
-            etiquetaAccesible="Refrescar existencias"
+            onPress={() => void cargarDatos(true)}
+            accessibilityLabel="Refrescar existencias"
           />
         </View>
 
@@ -502,19 +518,19 @@ export function Deposito() {
                       <Boton
                         titulo="+ Ingreso"
                         variante="secundario"
-                        tamano="chico"
+                        tamano="sm"
                         onPress={() => abrirModalMovimiento(art, 'ingreso')}
                       />
                       <Boton
                         titulo="- Egreso"
                         variante="secundario"
-                        tamano="chico"
+                        tamano="sm"
                         onPress={() => abrirModalMovimiento(art, 'egreso')}
                       />
                       <Boton
                         titulo="Ajustar"
                         variante="primario"
-                        tamano="chico"
+                        tamano="sm"
                         onPress={() => abrirModalMovimiento(art, 'ajuste')}
                       />
                     </View>
@@ -548,9 +564,8 @@ export function Deposito() {
               </View>
               <BotonIcono
                 icono="close-outline"
-                variante="fantasma"
-                alPresionar={() => setModalAbierto(false)}
-                etiquetaAccesible="Cerrar modal"
+                onPress={() => setModalAbierto(false)}
+                accessibilityLabel="Cerrar modal"
               />
             </View>
 
@@ -620,7 +635,7 @@ export function Deposito() {
             <View className="flex-row items-center justify-end gap-2 pt-2">
               <Boton
                 titulo="Cancelar"
-                variante="fantasma"
+                variante="secundario"
                 onPress={() => setModalAbierto(false)}
               />
               <Boton
@@ -633,6 +648,8 @@ export function Deposito() {
           </View>
         </View>
       </Modal>
-    </ScrollView>
+        </>
+      )}
+    </ContenedorScrollSeccion>
   );
 }

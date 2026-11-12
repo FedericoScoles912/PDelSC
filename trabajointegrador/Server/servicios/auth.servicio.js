@@ -28,6 +28,20 @@ const CODIGO_MAX_INTENTOS = 5;
 const CODIGO_ESPERA_SEG = 45;
 
 let tablaCodigosLista = false;
+let columnaAprobacionLista = false;
+
+/** Asegura que la tabla `usuarios` tenga la columna `estado_aprobacion`. */
+export async function asegurarColumnaAprobacion() {
+  if (columnaAprobacionLista) return;
+  try {
+    await ejecutar(
+      "ALTER TABLE `usuarios` ADD COLUMN `estado_aprobacion` VARCHAR(20) NOT NULL DEFAULT 'aprobado'"
+    );
+  } catch {
+    /* la columna ya existe */
+  }
+  columnaAprobacionLista = true;
+}
 
 /** Crea la tabla de códigos de recuperación si aún no existe. */
 async function asegurarTablaCodigos() {
@@ -138,7 +152,7 @@ export async function iniciarSesionConCodigo({ email, codigo, userAgent = null, 
 /** Columnas del usuario junto a su rol. */
 const SELECT_USUARIO = `
   SELECT u.\`id\`, u.\`email\`, u.\`password_hash\`, u.\`nombre\`, u.\`apellido\`, u.\`telefono\`,
-         u.\`activo\`, u.\`email_verificado\`, u.\`ultimo_login_en\`, u.\`creado_en\`,
+         u.\`activo\`, u.\`estado_aprobacion\`, u.\`email_verificado\`, u.\`ultimo_login_en\`, u.\`creado_en\`,
          r.\`codigo\` AS rol_codigo, r.\`nombre\` AS rol_nombre
     FROM \`usuarios\` u
     JOIN \`roles\` r ON r.\`id\` = u.\`rol_id\``;
@@ -156,6 +170,7 @@ export function mapearUsuario(fila) {
     apellido: fila.apellido,
     telefono: fila.telefono,
     activo: Boolean(fila.activo),
+    estadoAprobacion: fila.estado_aprobacion ?? (fila.activo ? 'aprobado' : 'pendiente'),
     emailVerificado: Boolean(fila.email_verificado),
     ultimoLoginEn: fila.ultimo_login_en ?? null,
     creadoEn: fila.creado_en,
@@ -169,6 +184,7 @@ export function mapearUsuario(fila) {
  * @returns {Promise<Object|null>}
  */
 async function buscarPorEmail(email) {
+  await asegurarColumnaAprobacion();
   return queryUna(`${SELECT_USUARIO} WHERE u.\`email\` = ?`, [email]);
 }
 
@@ -178,6 +194,7 @@ async function buscarPorEmail(email) {
  * @returns {Promise<Object|null>}
  */
 async function buscarPorId(id) {
+  await asegurarColumnaAprobacion();
   return queryUna(`${SELECT_USUARIO} WHERE u.\`id\` = ?`, [id]);
 }
 
@@ -211,12 +228,21 @@ export async function emitirSesion(usuario, { userAgent = null, ip = null } = {}
  * @returns {Promise<{usuario:Object, accessToken:string, refreshToken:string}>}
  */
 export async function iniciarSesion({ email, password, userAgent = null, ip = null }) {
-  const fila = await buscarPorEmail(email);
-  if (!fila || !fila.activo) throw ApiError.noAutorizado('Credenciales inválidas.');
+  const fila = await buscarPorEmail(String(email).trim().toLowerCase());
+  if (!fila) throw ApiError.noAutorizado('Credenciales inválidas.');
   if (!fila.password_hash) throw ApiError.noAutorizado('Esa cuenta usa inicio de sesión social.');
 
   const coincide = await bcrypt.compare(password, fila.password_hash);
   if (!coincide) throw ApiError.noAutorizado('Credenciales inválidas.');
+
+  if (!fila.activo) {
+    if (fila.estado_aprobacion === 'pendiente') {
+      throw ApiError.prohibido(
+        'Tu cuenta está pendiente de aprobación por el Administrador. Cuando el administrador acepte tu usuario podrás ingresar.'
+      );
+    }
+    throw ApiError.prohibido('Tu cuenta se encuentra desactivada. Contactá al Administrador.');
+  }
 
   await ejecutar('UPDATE `usuarios` SET `ultimo_login_en` = NOW() WHERE `id` = ?', [fila.id]);
   fila.ultimo_login_en = new Date();
@@ -224,6 +250,82 @@ export async function iniciarSesion({ email, password, userAgent = null, ip = nu
   const usuario = mapearUsuario(fila);
   const tokens = await emitirSesion(usuario, { userAgent, ip });
   return { usuario, ...tokens };
+}
+
+/**
+ * Registra una solicitud de nuevo usuario desde la pantalla de inicio de sesión.
+ * La cuenta se crea con `activo = 0` y `estado_aprobacion = 'pendiente'` hasta que
+ * un Administrador la acepte en el panel de Usuarios.
+ * @param {{nombre:string, apellido:string, email:string, telefono?:(string|null), rol?:string, password:string}} datos
+ * @returns {Promise<Object>}
+ */
+export async function solicitarRegistroUsuario({
+  nombre,
+  apellido,
+  email,
+  telefono = null,
+  rol = 'vendedor',
+  password
+}) {
+  await asegurarColumnaAprobacion();
+  const emailLimpio = String(email).trim().toLowerCase();
+  const nombreLimpio = String(nombre).trim();
+  const apellidoLimpio = apellido && String(apellido).trim() ? String(apellido).trim() : null;
+  const telefonoLimpio = telefono && String(telefono).trim() ? String(telefono).trim() : null;
+  const rolCodigo = ['vendedor', 'deposito'].includes(String(rol).trim().toLowerCase())
+    ? String(rol).trim().toLowerCase()
+    : 'vendedor';
+
+  const rolFila = await queryUna('SELECT `id`, `nombre` FROM `roles` WHERE `codigo` = ?', [rolCodigo]);
+  if (!rolFila) {
+    throw ApiError.solicitudInvalida('El rol solicitado no es válido.');
+  }
+
+  const existente = await buscarPorEmail(emailLimpio);
+  const hash = await bcrypt.hash(password, 10);
+
+  if (existente) {
+    if (existente.activo) {
+      throw ApiError.conflicto('Ya existe una cuenta activa registrada con ese correo electrónico.');
+    }
+    await ejecutar(
+      `UPDATE \`usuarios\`
+          SET \`rol_id\` = ?, \`password_hash\` = ?, \`nombre\` = ?, \`apellido\` = ?,
+              \`telefono\` = ?, \`activo\` = 0, \`estado_aprobacion\` = 'pendiente'
+        WHERE \`id\` = ?`,
+      [rolFila.id, hash, nombreLimpio, apellidoLimpio, telefonoLimpio, existente.id]
+    );
+    return {
+      id: existente.id,
+      email: emailLimpio,
+      nombre: nombreLimpio,
+      apellido: apellidoLimpio,
+      telefono: telefonoLimpio,
+      rol: { codigo: rolCodigo, nombre: rolFila.nombre },
+      pendienteAprobacion: true,
+      mensaje:
+        'Solicitud actualizada. El Administrador debe aceptar tu usuario para habilitar el ingreso.'
+    };
+  }
+
+  const resultado = await ejecutar(
+    `INSERT INTO \`usuarios\`
+       (\`rol_id\`, \`email\`, \`password_hash\`, \`nombre\`, \`apellido\`, \`telefono\`, \`activo\`, \`estado_aprobacion\`, \`email_verificado\`)
+     VALUES (?, ?, ?, ?, ?, ?, 0, 'pendiente', 0)`,
+    [rolFila.id, emailLimpio, hash, nombreLimpio, apellidoLimpio, telefonoLimpio]
+  );
+
+  return {
+    id: resultado.insertId,
+    email: emailLimpio,
+    nombre: nombreLimpio,
+    apellido: apellidoLimpio,
+    telefono: telefonoLimpio,
+    rol: { codigo: rolCodigo, nombre: rolFila.nombre },
+    pendienteAprobacion: true,
+    mensaje:
+      'Solicitud de usuario enviada correctamente. Necesita permiso del Administrador para poder iniciar sesión.'
+  };
 }
 
 /**

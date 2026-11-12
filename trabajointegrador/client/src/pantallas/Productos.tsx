@@ -16,15 +16,18 @@ import {
   RefreshControl,
   ScrollView,
   Text,
+  TextInput,
   View
 } from 'react-native';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeEstado, tonoDeStock } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -200,6 +203,11 @@ export function Productos() {
     void cargarProductos();
   }, [cargarProductos]);
 
+  useSincronizacionEnVivo(() => {
+    void cargarCategorias();
+    void cargarProductos(true);
+  });
+
   const abrirDetalle = async (prod: ProductoItem) => {
     setSeleccionado(prod);
     setEquivalencias([]);
@@ -368,9 +376,64 @@ export function Productos() {
 
   return (
     <View style={{ backgroundColor: tokens.fondo }} className="flex-1 bg-fondo">
-      <ScrollView
+      <ContenedorScrollSeccion
         className="flex-1"
-        contentContainerClassName="gap-4 p-5 pb-10"
+        contentContainerClassName="gap-4 p-5 pb-20"
+        buscador={
+          !modoMedidas
+            ? {
+                valor: busqueda,
+                onCambiarTexto: (texto) => {
+                  setBusqueda(texto);
+                  setPagina(1);
+                },
+                placeholder: 'Buscar por código, aplicación (marca/modelo/motor) o medida…'
+              }
+            : undefined
+        }
+        contenidoFlotante={
+          modoMedidas ? (
+            <View className="flex-row items-center gap-2">
+              <Ionicons name="resize-outline" size={18} color={tokens.primario} />
+              <TextInput
+                style={{ color: tokens.texto, minWidth: 0, flex: 1, outlineStyle: 'none' } as any}
+                className="min-h-[34px] flex-1 rounded-lg border border-borde bg-superficie-alt px-2 text-xs text-texto"
+                placeholder="Eje"
+                placeholderTextColor={tokens.textoSuave}
+                keyboardType="numeric"
+                value={eje}
+                onChangeText={setEje}
+              />
+              <TextInput
+                style={{ color: tokens.texto, minWidth: 0, flex: 1, outlineStyle: 'none' } as any}
+                className="min-h-[34px] flex-1 rounded-lg border border-borde bg-superficie-alt px-2 text-xs text-texto"
+                placeholder="Aloj"
+                placeholderTextColor={tokens.textoSuave}
+                keyboardType="numeric"
+                value={aloj}
+                onChangeText={setAloj}
+              />
+              <TextInput
+                style={{ color: tokens.texto, minWidth: 0, flex: 1, outlineStyle: 'none' } as any}
+                className="min-h-[34px] flex-1 rounded-lg border border-borde bg-superficie-alt px-2 text-xs text-texto"
+                placeholder="Alt"
+                placeholderTextColor={tokens.textoSuave}
+                keyboardType="numeric"
+                value={alt}
+                onChangeText={setAlt}
+              />
+              <TextInput
+                style={{ color: tokens.texto, minWidth: 0, width: 52, outlineStyle: 'none' } as any}
+                className="min-h-[34px] rounded-lg border border-borde bg-superficie-alt px-2 text-xs text-texto"
+                placeholder="±Tol"
+                placeholderTextColor={tokens.textoSuave}
+                keyboardType="numeric"
+                value={tolerancia}
+                onChangeText={setTolerancia}
+              />
+            </View>
+          ) : undefined
+        }
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
@@ -379,6 +442,8 @@ export function Productos() {
           />
         }
       >
+        {({ fueraDelTope }) => (
+          <>
         {/* Encabezado */}
         <View className="flex-row flex-wrap items-center justify-between gap-3">
           <View className="flex-row items-center gap-3">
@@ -414,8 +479,13 @@ export function Productos() {
           </View>
         </View>
 
-        {/* Panel de búsqueda */}
-        <Tarjeta compacta clase="gap-3">
+        {/* Panel de búsqueda normal (en el tope) */}
+        <Tarjeta
+          compacta
+          clase="gap-3"
+          style={{ opacity: fueraDelTope ? 0 : 1 }}
+          pointerEvents={fueraDelTope ? 'none' : 'auto'}
+        >
           {!modoMedidas ? (
             <Entrada
               icono="search-outline"
@@ -715,7 +785,9 @@ export function Productos() {
             />
           </View>
         )}
-      </ScrollView>
+          </>
+        )}
+      </ContenedorScrollSeccion>
 
       {/* Modal de Detalle y Equivalencias */}
       <Modal
@@ -905,7 +977,7 @@ export function Productos() {
             >
               <EncabezadoTarjeta
                 titulo={editandoId ? `Editar Producto (${formCodigo})` : 'Nuevo Producto'}
-                subtitulo="Completá las medidas y detalles técnicos del artículo"
+                descripcion="Completá las medidas y detalles técnicos del artículo"
                 icono="pricetags-outline"
               />
               {!editandoId && (

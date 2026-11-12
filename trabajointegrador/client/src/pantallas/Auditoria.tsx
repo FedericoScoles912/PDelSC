@@ -16,8 +16,11 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
+import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia } from '../componentes/ui/Insignia';
 import { Tarjeta } from '../componentes/ui/Tarjeta';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -56,6 +59,7 @@ export function Auditoria() {
   const { avisar } = usePopUps();
 
   const [registros, setRegistros] = useState<AuditoriaFila[]>([]);
+  const [busqueda, setBusqueda] = useState('');
   const [entidad, setEntidad] = useState('');
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
@@ -93,10 +97,38 @@ export function Auditoria() {
     void cargar();
   }, [cargar]);
 
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
+
+  const q = busqueda.trim().toLowerCase();
+  const registrosFiltrados = registros.filter((reg) => {
+    if (!q) return true;
+    const detalleStr =
+      typeof reg.detalle === 'string'
+        ? reg.detalle
+        : reg.detalle
+          ? JSON.stringify(reg.detalle)
+          : '';
+    return (
+      reg.accion.toLowerCase().includes(q) ||
+      reg.entidad.toLowerCase().includes(q) ||
+      (reg.entidad_id ?? '').toLowerCase().includes(q) ||
+      (reg.usuario_nombre ?? '').toLowerCase().includes(q) ||
+      (reg.usuario_email ?? '').toLowerCase().includes(q) ||
+      detalleStr.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <ScrollView
+    <ContenedorScrollSeccion
       className="flex-1 bg-fondo"
-      contentContainerClassName="gap-4 p-5 pb-10"
+      contentContainerClassName="gap-4 p-5 pb-20"
+      buscador={{
+        valor: busqueda,
+        onCambiarTexto: setBusqueda,
+        placeholder: 'Buscar en auditoría por acción, operador o detalle…'
+      }}
       refreshControl={
         <RefreshControl
           refreshing={refrescando}
@@ -105,6 +137,8 @@ export function Auditoria() {
         />
       }
     >
+      {({ fueraDelTope }) => (
+        <>
       <View className="flex-row items-center gap-3">
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
           <Ionicons name="shield-checkmark-outline" size={24} color={tokens.primario} />
@@ -116,6 +150,20 @@ export function Auditoria() {
           </Text>
         </View>
       </View>
+
+      {/* Buscador normal */}
+      <Tarjeta
+        compacta
+        style={{ opacity: fueraDelTope ? 0 : 1 }}
+        pointerEvents={fueraDelTope ? 'none' : 'auto'}
+      >
+        <Entrada
+          icono="search-outline"
+          placeholder="Buscar en auditoría por acción, operador o detalle…"
+          value={busqueda}
+          onChangeText={setBusqueda}
+        />
+      </Tarjeta>
 
       {/* Filtro por entidad */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
@@ -150,14 +198,14 @@ export function Auditoria() {
         <View className="items-center py-12">
           <ActivityIndicator size="large" color={tokens.primario} />
         </View>
-      ) : registros.length === 0 ? (
+      ) : registrosFiltrados.length === 0 ? (
         <Tarjeta clase="items-center py-10">
           <Ionicons name="shield-outline" size={32} color={tokens.textoSuave} />
           <Text className="mt-2 text-base font-bold text-texto">Sin eventos registrados</Text>
         </Tarjeta>
       ) : (
         <View className="gap-2.5">
-          {registros.map((reg) => (
+          {registrosFiltrados.map((reg) => (
             <Tarjeta key={reg.id} compacta clase="gap-1.5">
               <View className="flex-row flex-wrap items-center justify-between gap-2">
                 <View className="flex-row items-center gap-2">
@@ -209,6 +257,8 @@ export function Auditoria() {
           />
         </View>
       )}
-    </ScrollView>
+        </>
+      )}
+    </ContenedorScrollSeccion>
   );
 }

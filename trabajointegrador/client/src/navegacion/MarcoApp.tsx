@@ -60,7 +60,7 @@ export function MarcoApp({ activa, onNavegar, children }: MarcoAppProps) {
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right']}
+      edges={['top', 'bottom', 'left', 'right']}
       style={{ backgroundColor: tokens.fondo }}
       className="flex-1 bg-fondo"
     >

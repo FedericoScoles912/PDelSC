@@ -7,6 +7,7 @@
 import { crearApp } from './Server/app.js';
 import { cerrarPool, ejecutar, verificarConexion } from './Server/config/db.js';
 import { env, validarEntorno } from './Server/config/env.js';
+import { asegurarColumnaAprobacion } from './Server/servicios/auth.servicio.js';
 
 const problemas = validarEntorno();
 if (problemas.length) {
@@ -22,6 +23,7 @@ const servidor = app.listen(env.puerto, '0.0.0.0', async () => {
   if (db.ok) {
     console.log(`[db] Conectado a la base (${db.version})`);
     try {
+      await asegurarColumnaAprobacion();
       await ejecutar("UPDATE IGNORE `equivalencias` SET `tipo` = 'AJUSA' WHERE `tipo` = 'A'");
       await ejecutar("UPDATE IGNORE `equivalencias` SET `tipo` = 'SABO' WHERE `tipo` = 'S'");
       await ejecutar("DELETE FROM `equivalencias` WHERE `tipo` IN ('A', 'S')");

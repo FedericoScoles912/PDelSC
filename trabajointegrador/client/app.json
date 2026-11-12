@@ -26,6 +26,11 @@
         "backgroundColor": "#E87E44"
       }
     },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive",
+      "barStyle": "light-content",
+      "backgroundColor": "#14100E"
+    },
     "web": {
       "bundler": "metro",
       "output": "single",

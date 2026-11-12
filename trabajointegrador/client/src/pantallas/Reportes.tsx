@@ -10,6 +10,7 @@ import { Platform, ScrollView, Text, View } from 'react-native';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
@@ -126,7 +127,7 @@ export function Reportes() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-fondo" contentContainerClassName="gap-4 p-5 pb-10">
+    <ContenedorScrollSeccion className="flex-1 bg-fondo" contentContainerClassName="gap-4 p-5 pb-20">
       <View className="flex-row items-center gap-3">
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
           <Ionicons name="document-text-outline" size={24} color={tokens.primario} />
@@ -192,6 +193,6 @@ export function Reportes() {
           </Tarjeta>
         ))}
       </View>
-    </ScrollView>
+    </ContenedorScrollSeccion>
   );
 }

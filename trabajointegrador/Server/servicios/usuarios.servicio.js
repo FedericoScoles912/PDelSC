@@ -8,11 +8,12 @@ import bcrypt from 'bcryptjs';
 import { ejecutar, query, queryUna } from '../config/db.js';
 import { ApiError } from '../utils/http.js';
 import { clausulaLimite, leerPaginacion, metaPaginacion } from '../utils/paginacion.js';
+import { asegurarColumnaAprobacion } from './auth.servicio.js';
 
 /** Columnas del usuario junto a su rol (nunca incluye `password_hash`). */
 const SELECT_USUARIO = `
   SELECT u.\`id\`, u.\`email\`, u.\`nombre\`, u.\`apellido\`, u.\`telefono\`,
-         u.\`activo\`, u.\`email_verificado\`, u.\`ultimo_login_en\`, u.\`creado_en\`,
+         u.\`activo\`, u.\`estado_aprobacion\`, u.\`email_verificado\`, u.\`ultimo_login_en\`, u.\`creado_en\`,
          r.\`id\` AS rol_id, r.\`codigo\` AS rol_codigo, r.\`nombre\` AS rol_nombre
     FROM \`usuarios\` u
     JOIN \`roles\` r ON r.\`id\` = u.\`rol_id\``;
@@ -33,6 +34,7 @@ export async function listarRoles() {
  * @returns {Promise<{datos:Array<Object>, meta:Object}>}
  */
 export async function listar(filtros = {}) {
+  await asegurarColumnaAprobacion();
   const { pagina, limite, offset } = leerPaginacion(filtros, { limiteDef: 20, limiteMax: 100 });
 
   const condiciones = [];
@@ -62,7 +64,7 @@ export async function listar(filtros = {}) {
   const datos = await query(
     `${SELECT_USUARIO}
      ${donde}
-     ORDER BY u.\`creado_en\` DESC, u.\`id\` DESC
+     ORDER BY u.\`activo\` ASC, u.\`creado_en\` DESC, u.\`id\` DESC
      ${clausulaLimite(limite, offset)}`,
     parametros
   );
@@ -76,6 +78,7 @@ export async function listar(filtros = {}) {
  * @returns {Promise<Object>}
  */
 export async function obtener(id) {
+  await asegurarColumnaAprobacion();
   const fila = await queryUna(`${SELECT_USUARIO} WHERE u.\`id\` = ?`, [id]);
   if (!fila) throw ApiError.noEncontrado('Usuario no encontrado.');
   return fila;
@@ -95,14 +98,15 @@ export async function crear({
   telefono = null,
   activo = true
 }) {
+  await asegurarColumnaAprobacion();
   const rolFila = await queryUna('SELECT `id` FROM `roles` WHERE `codigo` = ?', [rol]);
   if (!rolFila) throw ApiError.solicitudInvalida('El rol indicado no existe.');
 
   const hash = await bcrypt.hash(password, 10);
   const resultado = await ejecutar(
-    `INSERT INTO \`usuarios\` (\`rol_id\`, \`email\`, \`password_hash\`, \`nombre\`, \`apellido\`, \`telefono\`, \`activo\`, \`email_verificado\`)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-    [rolFila.id, email, hash, nombre, apellido, telefono, activo ? 1 : 0]
+    `INSERT INTO \`usuarios\` (\`rol_id\`, \`email\`, \`password_hash\`, \`nombre\`, \`apellido\`, \`telefono\`, \`activo\`, \`estado_aprobacion\`, \`email_verificado\`)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+    [rolFila.id, email, hash, nombre, apellido, telefono, activo ? 1 : 0, activo ? 'aprobado' : 'pendiente']
   );
 
   return obtener(resultado.insertId);
@@ -173,21 +177,45 @@ export async function actualizar(id, datos = {}) {
  * @returns {Promise<Object>}
  */
 export async function cambiarActivo(id, activo) {
-  await ejecutar('UPDATE `usuarios` SET `activo` = ? WHERE `id` = ?', [activo ? 1 : 0, id]);
+  await asegurarColumnaAprobacion();
+  await ejecutar(
+    'UPDATE `usuarios` SET `activo` = ?, `estado_aprobacion` = ? WHERE `id` = ?',
+    [activo ? 1 : 0, activo ? 'aprobado' : 'desactivado', id]
+  );
   return obtener(id);
 }
 
 /**
- * Desactiva un usuario (no se borra físicamente por las referencias existentes).
+ * Elimina físicamente un usuario de la base de datos (uso exclusivo del Administrador),
+ * limpiando sus tokens/vinculaciones OAuth y desvinculando referencias históricas.
  * @param {number|string} id
  * @param {number|string} usuarioActualId
- * @returns {Promise<{id:number, activo:number}>}
+ * @returns {Promise<{id:number, email:string, eliminado:boolean}>}
  */
 export async function eliminar(id, usuarioActualId) {
-  if (Number(id) === Number(usuarioActualId)) {
-    throw ApiError.solicitudInvalida('No podés desactivar tu propio usuario.');
+  const idNum = Number(id);
+  if (idNum === Number(usuarioActualId)) {
+    throw ApiError.solicitudInvalida('No podés eliminar tu propia cuenta activa.');
   }
 
-  await ejecutar('UPDATE `usuarios` SET `activo` = 0 WHERE `id` = ?', [id]);
-  return { id: Number(id), activo: 0 };
+  const actual = await queryUna(
+    'SELECT `id`, `email`, `nombre`, `apellido` FROM `usuarios` WHERE `id` = ?',
+    [idNum]
+  );
+  if (!actual) {
+    throw ApiError.noEncontrado('Usuario no encontrado.');
+  }
+
+  await ejecutar('DELETE FROM `proveedores_oauth` WHERE `usuario_id` = ?', [idNum]);
+  await ejecutar('DELETE FROM `refresh_tokens` WHERE `usuario_id` = ?', [idNum]);
+  await ejecutar('UPDATE `movimientos_stock` SET `usuario_id` = NULL WHERE `usuario_id` = ?', [idNum]);
+  await ejecutar('UPDATE `historial_precios` SET `usuario_id` = NULL WHERE `usuario_id` = ?', [idNum]);
+  await ejecutar('UPDATE `auditoria` SET `usuario_id` = NULL WHERE `usuario_id` = ?', [idNum]);
+  await ejecutar('DELETE FROM `usuarios` WHERE `id` = ?', [idNum]);
+
+  return {
+    id: idNum,
+    email: actual.email,
+    eliminado: true
+  };
 }

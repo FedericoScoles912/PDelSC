@@ -18,9 +18,11 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeStock } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -70,6 +72,7 @@ export function Stock() {
   const { avisar } = usePopUps();
 
   const [vista, setVista] = useState<'movimientos' | 'alertas'>('movimientos');
+  const [busqueda, setBusqueda] = useState('');
   const [filtroTipo, setFiltroTipo] = useState<'' | 'ingreso' | 'egreso' | 'ajuste'>('');
   const [movimientos, setMovimientos] = useState<MovimientoItem[]>([]);
   const [alertas, setAlertas] = useState<AlertaItem[]>([]);
@@ -120,6 +123,10 @@ export function Stock() {
   useEffect(() => {
     void cargar();
   }, [cargar]);
+
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
 
   const buscarProducto = async (texto: string) => {
     setBusquedaProd(texto);
@@ -187,11 +194,35 @@ export function Stock() {
     }
   };
 
+  const q = busqueda.trim().toLowerCase();
+  const movimientosFiltrados = movimientos.filter((m) => {
+    if (!q) return true;
+    return (
+      (m.producto_codigo ?? '').toLowerCase().includes(q) ||
+      (m.motivo ?? '').toLowerCase().includes(q) ||
+      (m.referencia ?? '').toLowerCase().includes(q) ||
+      (m.usuario_nombre ?? '').toLowerCase().includes(q)
+    );
+  });
+
+  const alertasFiltradas = alertas.filter((a) => {
+    if (!q) return true;
+    return (
+      a.codigo.toLowerCase().includes(q) ||
+      (a.categoria ?? '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <View className="flex-1 bg-fondo">
-      <ScrollView
+      <ContenedorScrollSeccion
         className="flex-1"
-        contentContainerClassName="gap-4 p-5 pb-10"
+        contentContainerClassName="gap-4 p-5 pb-20"
+        buscador={{
+          valor: busqueda,
+          onCambiarTexto: setBusqueda,
+          placeholder: 'Buscar por código, motivo o referencia…'
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
@@ -200,6 +231,8 @@ export function Stock() {
           />
         }
       >
+        {({ fueraDelTope }) => (
+          <>
         {/* Encabezado */}
         <View className="flex-row flex-wrap items-center justify-between gap-3">
           <View className="flex-row items-center gap-3">
@@ -221,17 +254,31 @@ export function Stock() {
           />
         </View>
 
+        {/* Buscador normal */}
+        <Tarjeta
+          compacta
+          style={{ opacity: fueraDelTope ? 0 : 1 }}
+          pointerEvents={fueraDelTope ? 'none' : 'auto'}
+        >
+          <Entrada
+            icono="search-outline"
+            placeholder="Buscar por código, motivo o referencia…"
+            value={busqueda}
+            onChangeText={setBusqueda}
+          />
+        </Tarjeta>
+
         {/* Selector de pestaña */}
         <View className="flex-row gap-2">
           <Boton
-            titulo={`Historial (${movimientos.length})`}
+            titulo={`Historial (${movimientosFiltrados.length})`}
             icono="swap-vertical-outline"
             variante={vista === 'movimientos' ? 'primario' : 'secundario'}
             tamano="sm"
             onPress={() => setVista('movimientos')}
           />
           <Boton
-            titulo={`Alertas bajo mínimo (${alertas.length})`}
+            titulo={`Alertas bajo mínimo (${alertasFiltradas.length})`}
             icono="warning-outline"
             variante={vista === 'alertas' ? 'primario' : 'secundario'}
             tamano="sm"
@@ -280,7 +327,7 @@ export function Stock() {
               <View className="items-center py-10">
                 <ActivityIndicator size="large" color={tokens.primario} />
               </View>
-            ) : movimientos.length === 0 ? (
+            ) : movimientosFiltrados.length === 0 ? (
               <Tarjeta clase="items-center py-10">
                 <Ionicons name="cube-outline" size={32} color={tokens.textoSuave} />
                 <Text className="mt-2 text-base font-bold text-texto">
@@ -292,7 +339,7 @@ export function Stock() {
               </Tarjeta>
             ) : (
               <View className="gap-2.5">
-                {movimientos.map((mov) => (
+                {movimientosFiltrados.map((mov) => (
                   <Tarjeta key={mov.id} compacta clase="gap-1.5">
                     <View className="flex-row items-center justify-between">
                       <View className="flex-row items-center gap-2">
@@ -327,7 +374,7 @@ export function Stock() {
           </>
         ) : (
           <View className="gap-2.5">
-            {alertas.length === 0 ? (
+            {alertasFiltradas.length === 0 ? (
               <Tarjeta clase="items-center py-10">
                 <Ionicons name="checkmark-circle-outline" size={32} color={tokens.exito} />
                 <Text className="mt-2 text-base font-bold text-texto">
@@ -335,7 +382,7 @@ export function Stock() {
                 </Text>
               </Tarjeta>
             ) : (
-              alertas.map((al) => (
+              alertasFiltradas.map((al) => (
                 <Tarjeta
                   key={al.producto_id}
                   compacta
@@ -370,7 +417,9 @@ export function Stock() {
             )}
           </View>
         )}
-      </ScrollView>
+          </>
+        )}
+      </ContenedorScrollSeccion>
 
       {/* Modal para registrar movimiento */}
       <Modal

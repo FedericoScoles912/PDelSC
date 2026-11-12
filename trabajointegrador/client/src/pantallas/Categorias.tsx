@@ -9,10 +9,12 @@ import { ActivityIndicator, Modal, RefreshControl, ScrollView, Text, View } from
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeEstado } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -34,6 +36,7 @@ export function Categorias() {
   const esAdmin = rol === 'admin';
 
   const [categorias, setCategorias] = useState<CategoriaItem[]>([]);
+  const [busqueda, setBusqueda] = useState('');
   const [incluirInactivas, setIncluirInactivas] = useState(true);
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
@@ -69,6 +72,10 @@ export function Categorias() {
   useEffect(() => {
     void cargar();
   }, [cargar]);
+
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
 
   const abrirNueva = () => {
     setEditando(null);
@@ -149,11 +156,25 @@ export function Categorias() {
     }
   };
 
+  const categoriasFiltradas = categorias.filter((cat) => {
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      cat.nombre.toLowerCase().includes(q) ||
+      (cat.slug ?? '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <View style={{ backgroundColor: tokens.fondo }} className="flex-1 bg-fondo">
-      <ScrollView
+      <ContenedorScrollSeccion
         className="flex-1"
-        contentContainerClassName="gap-4 p-5 pb-10"
+        contentContainerClassName="gap-4 p-5 pb-20"
+        buscador={{
+          valor: busqueda,
+          onCambiarTexto: setBusqueda,
+          placeholder: 'Buscar categoría por nombre o slug…'
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
@@ -162,6 +183,8 @@ export function Categorias() {
           />
         }
       >
+        {({ fueraDelTope }) => (
+          <>
         {/* Encabezado */}
         <View className="flex-row flex-wrap items-center justify-between gap-3">
           <View className="flex-row items-center gap-3">
@@ -171,7 +194,7 @@ export function Categorias() {
             <View>
               <Text className="text-xl font-bold text-texto">Categorías del Catálogo</Text>
               <Text className="text-sm text-texto-suave">
-                {categorias.length} familias de productos registradas
+                {categoriasFiltradas.length} familias de productos registradas
               </Text>
             </View>
           </View>
@@ -191,13 +214,27 @@ export function Categorias() {
           </View>
         </View>
 
+        {/* Buscador normal */}
+        <Tarjeta
+          compacta
+          style={{ opacity: fueraDelTope ? 0 : 1 }}
+          pointerEvents={fueraDelTope ? 'none' : 'auto'}
+        >
+          <Entrada
+            icono="search-outline"
+            placeholder="Buscar categoría por nombre o slug…"
+            value={busqueda}
+            onChangeText={setBusqueda}
+          />
+        </Tarjeta>
+
         {cargando ? (
           <View className="items-center py-12">
             <ActivityIndicator size="large" color={tokens.primario} />
           </View>
         ) : (
           <View className="gap-3">
-            {categorias.map((cat) => (
+            {categoriasFiltradas.map((cat) => (
               <Tarjeta
                 key={cat.id}
                 compacta
@@ -241,7 +278,9 @@ export function Categorias() {
             ))}
           </View>
         )}
-      </ScrollView>
+          </>
+        )}
+      </ContenedorScrollSeccion>
 
       <Modal
         visible={modalAbierto}

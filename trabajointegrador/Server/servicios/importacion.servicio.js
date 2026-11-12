@@ -34,20 +34,25 @@ function sanitizarNombreExcel(nombreOriginal) {
  * @returns {Promise<string>}
  */
 export async function resolverArchivoExcel(archivo) {
-  if (!archivo || !String(archivo).trim()) {
-    return resolverRuta(env.importacion.excelPath);
+  const raizNormalizada = path.resolve(env.raizProyecto);
+  const candidatos = [];
+
+  if (archivo && String(archivo).trim()) {
+    const limpio = String(archivo).replace(/\\/g, '/').trim();
+    const baseNombre = path.basename(limpio);
+    candidatos.push(
+      resolverRuta(path.join('imports', baseNombre)),
+      resolverRuta(baseNombre),
+      resolverRuta(limpio)
+    );
   }
 
-  const limpio = String(archivo).replace(/\\/g, '/').trim();
-  const baseNombre = path.basename(limpio);
+  candidatos.push(
+    resolverRuta(env.importacion.excelPath),
+    resolverRuta('Lista de Precios 2025 SAV.xlsx'),
+    resolverRuta(path.join('imports', 'Retenes_EMIC__Lista_de_Precios_-_Vigencia_01_Nov_2025.xlsx'))
+  );
 
-  const candidatos = [
-    resolverRuta(path.join('imports', baseNombre)),
-    resolverRuta(baseNombre),
-    resolverRuta(limpio)
-  ];
-
-  const raizNormalizada = path.resolve(env.raizProyecto);
   for (const rutaCandidata of candidatos) {
     const resuelta = path.resolve(rutaCandidata);
     if (!resuelta.startsWith(raizNormalizada)) {
@@ -63,7 +68,24 @@ export async function resolverArchivoExcel(archivo) {
     }
   }
 
-  throw new ApiError(404, 'ARCHIVO_NO_ENCONTRADO', `No se encontró el archivo Excel seleccionado: "${baseNombre}"`);
+  // Fallback automático: buscar el primer archivo .xlsx disponible en imports/ o en la raíz
+  try {
+    const { archivos } = await listarArchivosExcel();
+    if (archivos.length > 0) {
+      const primero = archivos[0];
+      const rutaFallback = resolverRuta(primero.id);
+      const stat = await fs.stat(rutaFallback);
+      if (stat.isFile()) return rutaFallback;
+    }
+  } catch {
+    /* continuar al error */
+  }
+
+  throw new ApiError(
+    404,
+    'ARCHIVO_NO_ENCONTRADO',
+    `No se encontró el archivo Excel seleccionado. Subí una planilla .xlsx desde el botón "Elegir y Subir Excel".`
+  );
 }
 
 /**

@@ -11,6 +11,7 @@ import { useEffect, useMemo } from 'react';
 
 import { restaurarSesion } from '../estado/sesionSlice';
 import { useDespacho, useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { CargaInicial } from '../pantallas/CargaInicial';
 import { InicioSesion } from '../pantallas/InicioSesion';
 import { useTema } from '../tema/TemaProvider';
@@ -28,6 +29,12 @@ export function NavegacionRaiz() {
   useEffect(() => {
     void despachar(restaurarSesion());
   }, [despachar]);
+
+  useSincronizacionEnVivo(() => {
+    if (estado === 'autenticado') {
+      void despachar(restaurarSesion());
+    }
+  });
 
   const tema = useMemo<Theme>(
     () => ({

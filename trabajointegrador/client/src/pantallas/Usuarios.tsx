@@ -17,9 +17,12 @@ import {
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
+import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Insignia, tonoDeEstado, tonoDeRol } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
+import { useSeleccionar } from '../estado/store';
+import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -31,6 +34,7 @@ interface UsuarioFila {
   apellido: string | null;
   telefono: string | null;
   activo: number;
+  estado_aprobacion?: string;
   rol_codigo: string;
   rol_nombre: string;
   creado_en: string;
@@ -46,7 +50,9 @@ interface RolFila {
 /** Pantalla de administración de usuarios. */
 export function Usuarios() {
   const { tokens, claseRaiz, estiloVariables } = useTema();
-  const { avisar } = usePopUps();
+  const { avisar, confirmar } = usePopUps();
+  const usuarioActual = useSeleccionar((estado) => estado.sesion.usuario);
+  const esAdmin = usuarioActual?.rol.codigo === 'admin';
 
   const [usuarios, setUsuarios] = useState<UsuarioFila[]>([]);
   const [roles, setRoles] = useState<RolFila[]>([]);
@@ -99,6 +105,10 @@ export function Usuarios() {
   useEffect(() => {
     void cargar();
   }, [cargar]);
+
+  useSincronizacionEnVivo(() => {
+    void cargar(true);
+  });
 
   const abrirNuevo = () => {
     setEditando(null);
@@ -174,12 +184,24 @@ export function Usuarios() {
   };
 
   const alternarActivo = async (u: UsuarioFila) => {
+    if (!esAdmin) {
+      avisar('Solo el administrador puede activar o desactivar cuentas.', 'advertencia');
+      return;
+    }
+    if (u.id === usuarioActual?.id) {
+      avisar('No podés desactivar tu propia cuenta activa.', 'advertencia');
+      return;
+    }
     try {
+      const nuevoEstado = Number(u.activo) !== 1;
       await peticion(`/usuarios/${u.id}/activo`, {
         metodo: 'PATCH',
-        cuerpo: { activo: Number(u.activo) !== 1 }
+        cuerpo: { activo: nuevoEstado }
       });
-      avisar('Estado del usuario actualizado.', 'exito');
+      avisar(
+        nuevoEstado ? 'Cuenta activada correctamente.' : 'Cuenta desactivada correctamente.',
+        'exito'
+      );
       await cargar(true);
     } catch (error) {
       avisar(
@@ -189,11 +211,75 @@ export function Usuarios() {
     }
   };
 
+  const eliminarCuenta = async (u: UsuarioFila) => {
+    if (!esAdmin) {
+      avisar('Solo el administrador puede eliminar cuentas.', 'advertencia');
+      return;
+    }
+    if (u.id === usuarioActual?.id) {
+      avisar('No podés eliminar tu propia cuenta activa.', 'advertencia');
+      return;
+    }
+
+    const ok = await confirmar({
+      titulo: 'Eliminar cuenta permanentemente',
+      mensaje: `¿Estás seguro de que querés eliminar la cuenta de "${u.nombre} ${u.apellido ?? ''}" (${u.email})? Se borrará de forma definitiva del proyecto y de la base de datos.`,
+      textoAceptar: 'Sí, eliminar cuenta',
+      textoCancelar: 'Cancelar',
+      peligroso: true,
+      tipo: 'peligro'
+    });
+    if (!ok) return;
+
+    try {
+      await peticion(`/usuarios/${u.id}`, { metodo: 'DELETE' });
+      setUsuarios((prev) => prev.filter((item) => item.id !== u.id));
+      if (editando?.id === u.id) {
+        setModalAbierto(false);
+        setEditando(null);
+      }
+      avisar(`La cuenta ${u.email} fue eliminada permanentemente.`, 'exito');
+    } catch (error) {
+      avisar(
+        error instanceof Error ? error.message : 'No se pudo eliminar la cuenta.',
+        'peligro'
+      );
+    }
+  };
+
+  if (!esAdmin) {
+    return (
+      <View
+        style={{ backgroundColor: tokens.fondo }}
+        className="flex-1 items-center justify-center bg-fondo p-6"
+      >
+        <Tarjeta clase="max-w-md items-center gap-3 p-6">
+          <Ionicons name="lock-closed-outline" size={36} color={tokens.peligro} />
+          <Text className="text-center text-lg font-bold text-texto">
+            Acceso exclusivo para Administrador
+          </Text>
+          <Text className="text-center text-sm text-texto-suave">
+            Solo los usuarios con rol Administrador pueden crear, editar, desactivar o eliminar cuentas.
+          </Text>
+        </Tarjeta>
+      </View>
+    );
+  }
+
+  const pendientesAprobacion = usuarios.filter(
+    (u) => Number(u.activo) !== 1 && (u.estado_aprobacion ?? 'pendiente') === 'pendiente'
+  );
+
   return (
     <View style={{ backgroundColor: tokens.fondo }} className="flex-1 bg-fondo">
-      <ScrollView
+      <ContenedorScrollSeccion
         className="flex-1"
-        contentContainerClassName="gap-4 p-5 pb-10"
+        contentContainerClassName="gap-4 p-5 pb-20"
+        buscador={{
+          valor: busqueda,
+          onCambiarTexto: setBusqueda,
+          placeholder: 'Buscar por nombre, apellido o correo…'
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refrescando}
@@ -202,6 +288,8 @@ export function Usuarios() {
           />
         }
       >
+        {({ fueraDelTope }) => (
+          <>
         {/* Encabezado */}
         <View className="flex-row flex-wrap items-center justify-between gap-3">
           <View className="flex-row items-center gap-3">
@@ -223,8 +311,77 @@ export function Usuarios() {
           />
         </View>
 
+        {/* Solicitudes de nuevos usuarios pendientes de aprobación del Administrador */}
+        {pendientesAprobacion.length > 0 && (
+          <Tarjeta
+            style={{ borderColor: tokens.advertencia }}
+            clase="gap-3 border-2"
+          >
+            <EncabezadoTarjeta
+              titulo={`Solicitudes de Nuevo Usuario Pendientes (${pendientesAprobacion.length})`}
+              descripcion="Usuarios creados desde el inicio de sesión que requieren tu permiso de Administrador para poder ingresar."
+              icono="shield-checkmark-outline"
+            />
+            <View className="gap-2.5">
+              {pendientesAprobacion.map((u) => (
+                <View
+                  key={`pend_${u.id}`}
+                  style={{
+                    backgroundColor: tokens.superficieAlt,
+                    borderColor: tokens.borde
+                  }}
+                  className="flex-row flex-wrap items-center justify-between gap-3 rounded-xl border p-3.5"
+                >
+                  <View className="min-w-[200px] flex-1 gap-1">
+                    <View className="flex-row flex-wrap items-center gap-2">
+                      <Text className="text-base font-bold text-texto">
+                        {u.nombre} {u.apellido ?? ''}
+                      </Text>
+                      <Insignia texto="PENDIENTE DE PERMISO" tono="advertencia" />
+                      <Insignia texto={u.rol_nombre} tono={tonoDeRol(u.rol_codigo)} />
+                    </View>
+                    <Text className="text-xs text-texto-suave">
+                      {u.email}
+                      {u.telefono ? ` · Tel: ${u.telefono}` : ''}
+                    </Text>
+                  </View>
+
+                  <View className="flex-row flex-wrap items-center gap-2">
+                    <Boton
+                      titulo="Aceptar usuario"
+                      icono="checkmark-circle-outline"
+                      variante="exito"
+                      tamano="sm"
+                      onPress={() => void alternarActivo(u)}
+                    />
+                    <Boton
+                      titulo="Editar rol/datos"
+                      icono="create-outline"
+                      variante="secundario"
+                      tamano="sm"
+                      onPress={() => abrirEdicion(u)}
+                    />
+                    <Boton
+                      titulo="Rechazar / Eliminar"
+                      icono="trash-outline"
+                      variante="peligro"
+                      tamano="sm"
+                      onPress={() => void eliminarCuenta(u)}
+                    />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </Tarjeta>
+        )}
+
         {/* Búsqueda y filtro */}
-        <Tarjeta compacta clase="gap-3">
+        <Tarjeta
+          compacta
+          clase="gap-3"
+          style={{ opacity: fueraDelTope ? 0 : 1 }}
+          pointerEvents={fueraDelTope ? 'none' : 'auto'}
+        >
           <Entrada
             icono="search-outline"
             placeholder="Buscar por nombre, apellido o correo…"
@@ -280,30 +437,62 @@ export function Usuarios() {
                   <View className="mt-1 flex-row flex-wrap gap-2">
                     <Insignia texto={u.rol_nombre} tono={tonoDeRol(u.rol_codigo)} />
                     <Insignia
-                      texto={Number(u.activo) === 1 ? 'ACTIVO' : 'INACTIVO'}
-                      tono={tonoDeEstado(u.activo)}
+                      texto={
+                        Number(u.activo) === 1
+                          ? 'ACTIVO'
+                          : u.estado_aprobacion === 'pendiente'
+                            ? 'PENDIENTE DE PERMISO'
+                            : 'INACTIVO'
+                      }
+                      tono={
+                        Number(u.activo) === 1
+                          ? tonoDeEstado(u.activo)
+                          : u.estado_aprobacion === 'pendiente'
+                            ? 'advertencia'
+                            : tonoDeEstado(u.activo)
+                      }
                     />
                   </View>
                 </View>
 
-                <View className="flex-row items-center gap-2">
-                  <BotonIcono
+                <View className="flex-row flex-wrap items-center gap-2">
+                  <Boton
+                    titulo="Editar"
                     icono="create-outline"
+                    variante="secundario"
+                    tamano="sm"
                     onPress={() => abrirEdicion(u)}
-                    accessibilityLabel="Editar usuario"
                   />
-                  <BotonIcono
+                  <Boton
+                    titulo={
+                      Number(u.activo) === 1
+                        ? 'Desactivar'
+                        : u.estado_aprobacion === 'pendiente'
+                          ? 'Aceptar usuario'
+                          : 'Activar'
+                    }
                     icono={Number(u.activo) === 1 ? 'ban-outline' : 'checkmark-circle-outline'}
-                    color={Number(u.activo) === 1 ? tokens.peligro : tokens.exito}
+                    variante={Number(u.activo) === 1 ? 'contorno' : 'exito'}
+                    tamano="sm"
+                    deshabilitado={u.id === usuarioActual?.id}
                     onPress={() => void alternarActivo(u)}
-                    accessibilityLabel="Activar o desactivar usuario"
+                  />
+                  <Boton
+                    titulo="Eliminar"
+                    icono="trash-outline"
+                    variante="peligro"
+                    tamano="sm"
+                    deshabilitado={u.id === usuarioActual?.id}
+                    onPress={() => void eliminarCuenta(u)}
                   />
                 </View>
               </Tarjeta>
             ))}
           </View>
         )}
-      </ScrollView>
+          </>
+        )}
+      </ContenedorScrollSeccion>
 
       <Modal
         visible={modalAbierto}
@@ -387,13 +576,26 @@ export function Usuarios() {
                 onChangeText={setPassword}
               />
 
-              <View className="mt-3 flex-row justify-end gap-2">
-                <Boton
-                  titulo="Cancelar"
-                  variante="secundario"
-                  onPress={() => setModalAbierto(false)}
-                />
-                <Boton titulo="Guardar" cargando={guardando} onPress={() => void guardar()} />
+              <View className="mt-3 flex-row flex-wrap items-center justify-between gap-2">
+                {editando && editando.id !== usuarioActual?.id ? (
+                  <Boton
+                    titulo="Eliminar cuenta"
+                    icono="trash-outline"
+                    variante="peligro"
+                    tamano="sm"
+                    onPress={() => void eliminarCuenta(editando)}
+                  />
+                ) : (
+                  <View />
+                )}
+                <View className="flex-row gap-2">
+                  <Boton
+                    titulo="Cancelar"
+                    variante="secundario"
+                    onPress={() => setModalAbierto(false)}
+                  />
+                  <Boton titulo="Guardar" cargando={guardando} onPress={() => void guardar()} />
+                </View>
               </View>
             </ScrollView>
           </View>
