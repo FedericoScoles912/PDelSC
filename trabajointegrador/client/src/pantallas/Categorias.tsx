@@ -48,19 +48,21 @@ export function Categorias() {
   const [guardando, setGuardando] = useState(false);
 
   const cargar = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
       try {
         const datos = await peticion<CategoriaItem[]>('/categorias', {
           consulta: { incluirInactivas: incluirInactivas ? 'true' : 'false' }
         });
         setCategorias(datos);
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudieron cargar las categorías.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudieron cargar las categorías.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -215,11 +217,7 @@ export function Categorias() {
         </View>
 
         {/* Buscador normal */}
-        <Tarjeta
-          compacta
-          style={{ opacity: fueraDelTope ? 0 : 1 }}
-          pointerEvents={fueraDelTope ? 'none' : 'auto'}
-        >
+        <Tarjeta compacta>
           <Entrada
             icono="search-outline"
             placeholder="Buscar categoría por nombre o slug…"

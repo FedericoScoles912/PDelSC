@@ -5,6 +5,7 @@ import cors from 'cors';
 import { env } from './Server/Config/env.js';
 import { verifyDbConnection } from './Server/Config/db.js';
 import { configurePassport } from './Server/Config/passport.js';
+import { enabledProviderIds } from './Server/Config/providers.js';
 import authRoutes from './Server/Routes/auth.routes.js';
 import userRoutes from './Server/Routes/user.routes.js';
 import oauthRoutes from './Server/Routes/oauth.routes.js';
@@ -24,13 +25,24 @@ app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 // Sin sesiones: el flujo OAuth usa session:false y JWT propio.
 app.use(passport.initialize());
 
-// --- Health check (no depende de la BBDD) -----------------------------
-app.get('/api/health', (req, res) => {
+// --- Raíz e índice de la API + Health check (no dependen de la BBDD) --
+app.get(['/', '/api', '/api/health'], (req, res) => {
   res.json({
     status: 'ok',
     service: 'user-auth-system',
+    message: 'API REST de user-auth-system en ejecución.',
     env: env.nodeEnv,
-    oauthProviders: registered,
+    frontendUrl: env.frontendUrl,
+    oauthProviders: enabledProviderIds(),
+    endpoints: {
+      health: '/api/health',
+      login: 'POST /api/login',
+      register: 'POST /api/register',
+      me: 'GET /api/me',
+      profile: 'PUT /api/profile',
+      oauth: 'GET /api/auth/:provider',
+      linkedAccounts: 'GET /api/auth/linked-accounts',
+    },
   });
 });
 

@@ -52,21 +52,11 @@ const ExtrasScreen: React.FC = () => {
                 },
               ]}
             >
-              <View style={styles.cardHeader}>
-                <View style={styles.titleRow}>
-                  <Icon name="battery-charging-outline" size={24} color={theme.colors.primary} />
-                  <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
-                    Estado de Batería
-                  </Text>
-                </View>
-
-                <Button
-                  label="Actualizar"
-                  variant="ghost"
-                  size="sm"
-                  icon="refresh-outline"
-                  onPress={refreshDeviceInfo}
-                />
+              <View style={styles.titleRow}>
+                <Icon name="battery-charging-outline" size={24} color={theme.colors.primary} />
+                <Text variant="title" weight="bold" style={styles.titleText}>
+                  Estado de Batería
+                </Text>
               </View>
 
               <DataRow
@@ -87,6 +77,16 @@ const ExtrasScreen: React.FC = () => {
                 }
                 divider={false}
               />
+
+              <Button
+                label="Actualizar"
+                variant="secondary"
+                size="sm"
+                icon="refresh-outline"
+                onPress={refreshDeviceInfo}
+                style={{ marginTop: 12 }}
+                fullWidth
+              />
             </View>
           </Col>
 
@@ -105,7 +105,7 @@ const ExtrasScreen: React.FC = () => {
             >
               <View style={styles.titleRow}>
                 <Icon name="wifi-outline" size={24} color={theme.colors.secondary} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                <Text variant="title" weight="bold" style={styles.titleText}>
                   Conectividad de Red
                 </Text>
               </View>
@@ -141,7 +141,7 @@ const ExtrasScreen: React.FC = () => {
             >
               <View style={styles.titleRow}>
                 <Icon name="phone-portrait-outline" size={24} color={theme.colors.accent} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                <Text variant="title" weight="bold" style={styles.titleText}>
                   Información del Equipo
                 </Text>
               </View>
@@ -173,7 +173,7 @@ const ExtrasScreen: React.FC = () => {
             >
               <View style={styles.titleRow}>
                 <Icon name="finger-print-outline" size={24} color={theme.colors.primary} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                <Text variant="title" weight="bold" style={styles.titleText}>
                   Prueba de Motor Háptico
                 </Text>
               </View>
@@ -257,21 +257,11 @@ const ExtrasScreen: React.FC = () => {
                 },
               ]}
             >
-              <View style={styles.cardHeader}>
-                <View style={styles.titleRow}>
-                  <Icon name="clipboard-outline" size={24} color={theme.colors.secondary} />
-                  <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
-                    Portapapeles del Sistema
-                  </Text>
-                </View>
-
-                <Button
-                  label="Leer"
-                  variant="ghost"
-                  size="sm"
-                  icon="refresh-outline"
-                  onPress={refreshClipboard}
-                />
+              <View style={styles.titleRow}>
+                <Icon name="clipboard-outline" size={24} color={theme.colors.secondary} />
+                <Text variant="title" weight="bold" style={styles.titleText}>
+                  Portapapeles del Sistema
+                </Text>
               </View>
 
               <Text variant="bodySm" secondary style={{ marginTop: 4 }}>
@@ -299,6 +289,16 @@ const ExtrasScreen: React.FC = () => {
               </View>
 
               <Button
+                label="Actualizar"
+                variant="secondary"
+                size="sm"
+                icon="refresh-outline"
+                onPress={refreshClipboard}
+                style={{ marginTop: 12 }}
+                fullWidth
+              />
+
+              <Button
                 label="Copiar Texto de Prueba"
                 variant="primary"
                 size="sm"
@@ -308,7 +308,7 @@ const ExtrasScreen: React.FC = () => {
                     `Sensores Hub Test [${new Date().toLocaleTimeString()}]: Verificación de Portapapeles OK`
                   )
                 }
-                style={{ marginTop: 12 }}
+                style={{ marginTop: 8 }}
                 fullWidth
               />
             </View>
@@ -328,12 +328,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 8,
   },
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  titleText: {
+    marginLeft: 8,
+    flex: 1,
+    flexShrink: 1,
   },
   clipboardBox: {
     borderWidth: 1,

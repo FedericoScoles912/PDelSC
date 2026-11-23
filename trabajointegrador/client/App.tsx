@@ -4,6 +4,7 @@
  * @module client/App
  */
 
+import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
@@ -14,11 +15,19 @@ import './global.css';
 import { PopUpsProvider } from './src/componentes/popups/PopUpsProvider';
 import { store } from './src/estado/store';
 import { NavegacionRaiz } from './src/navegacion/NavegacionRaiz';
+import {
+  MonitorActualizacionesOta,
+  iniciarMotorActualizacionesOta
+} from './src/servicios/actualizaciones';
 import { TemaProvider, useTema } from './src/tema/TemaProvider';
 
 /** Contenido interno, ya dentro del contexto de tema. */
 function Contenido() {
   const { esOscuro, claseRaiz, tokens, estiloVariables } = useTema();
+
+  useEffect(() => {
+    iniciarMotorActualizacionesOta();
+  }, []);
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: tokens.fondo }}>
       <View
@@ -28,6 +37,7 @@ function Contenido() {
         <StatusBar style={esOscuro ? 'light' : 'dark'} />
         <SafeAreaProvider>
           <PopUpsProvider>
+            <MonitorActualizacionesOta />
             <NavegacionRaiz />
           </PopUpsProvider>
         </SafeAreaProvider>

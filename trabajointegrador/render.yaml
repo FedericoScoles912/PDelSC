@@ -1,5 +1,5 @@
 # ============================================================
-#  Blueprint de Render  --  Sistema de Control de Stock (Retenes EMIC)
+#  Blueprint de Render  --  Stocker — Sistema de Control de Stock
 #
 #  Despliega la API REST (Node.js + Express) con HTTPS automático.
 #  Cómo usarlo:
@@ -12,7 +12,7 @@
 
 services:
   - type: web
-    name: retenes-stock-api
+    name: stocker-api
     runtime: node
     plan: free
     region: virginia
@@ -61,7 +61,7 @@ services:
       - key: RATE_LIMIT_WINDOW_MS
         value: '900000'
       - key: RATE_LIMIT_MAX
-        value: '300'
+        value: '500000'
 
       # --- Importación del Excel ---
       - key: EXCEL_PATH

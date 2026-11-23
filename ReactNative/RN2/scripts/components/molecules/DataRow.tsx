@@ -53,7 +53,7 @@ export const DataRow: React.FC<DataRowProps> = ({
             style={{ marginRight: theme.spacing.sm }}
           />
         )}
-        <Text variant="body" weight="medium" secondary>
+        <Text variant="body" weight="medium" secondary style={styles.labelText}>
           {label}
         </Text>
       </View>
@@ -62,7 +62,7 @@ export const DataRow: React.FC<DataRowProps> = ({
         {children ? (
           children
         ) : (
-          <Text variant="body" weight="semibold">
+          <Text variant="body" weight="semibold" align="right" style={styles.valueText}>
             {value !== null && value !== undefined ? String(value) : '--'}
           </Text>
         )}
@@ -106,11 +106,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    flexShrink: 1,
+    marginRight: 12,
+  },
+  labelText: {
+    flex: 1,
+    flexShrink: 1,
   },
   rightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
+    flexShrink: 0,
+    maxWidth: '55%',
+  },
+  valueText: {
+    flexShrink: 1,
   },
   copyBtn: {
     minHeight: 44,

@@ -6,7 +6,7 @@
 
 import { Router } from 'express';
 
-import { verificarConexion } from '../config/db.js';
+import { obtenerNegocioActual, verificarConexion } from '../config/db.js';
 import { env } from '../config/env.js';
 import { autenticar } from '../middlewares/autenticacion.js';
 import { obtenerEstadoSincronizacion } from '../servicios/sincronizacion.servicio.js';
@@ -14,12 +14,14 @@ import { asyncHandler, responder } from '../utils/http.js';
 
 import auditoriaRutas from './auditoria.rutas.js';
 import authRutas from './auth.rutas.js';
+import carritoRutas from './carrito.rutas.js';
 import categoriasRutas from './categorias.rutas.js';
 import dashboardRutas from './dashboard.rutas.js';
 import importacionRutas from './importacion.rutas.js';
 import preciosRutas from './precios.rutas.js';
 import productosRutas from './productos.rutas.js';
 import reportesRutas from './reportes.rutas.js';
+import servidoresRutas from './servidores.rutas.js';
 import stockRutas from './stock.rutas.js';
 import usuariosRutas from './usuarios.rutas.js';
 
@@ -31,6 +33,7 @@ const api = Router();
 api.get(
   '/health',
   asyncHandler(async (req, res) => {
+    const negocioActivo = obtenerNegocioActual();
     if (req.query.db === '1') {
       const db = await verificarConexion(2);
       const estado = db.ok ? 'ok' : 'degradado';
@@ -38,7 +41,13 @@ api.get(
         res,
         {
           estado,
-          version: '1.0.0',
+          version: '1.2.0',
+          ota: {
+            habilitado: true,
+            canal: 'production',
+            runtimeVersion: '1.0.0'
+          },
+          negocioId: negocioActivo,
           entorno: env.nodeEnv,
           baseDeDatos: db.ok ? 'conectada' : 'sin conexión'
         },
@@ -48,7 +57,13 @@ api.get(
     }
     return responder(res, {
       estado: 'ok',
-      version: '1.0.0',
+      version: '1.2.0',
+      ota: {
+        habilitado: true,
+        canal: 'production',
+        runtimeVersion: '1.0.0'
+      },
+      negocioId: negocioActivo,
       entorno: env.nodeEnv,
       baseDeDatos: 'conectada'
     });
@@ -65,6 +80,7 @@ api.get(
 );
 
 api.use('/auth', authRutas);
+api.use('/servidores', servidoresRutas);
 
 // ---------------------------------------------------------------------------
 //  Rutas protegidas (requieren access token válido)
@@ -78,6 +94,7 @@ api.use('/stock', stockRutas);
 api.use('/precios', preciosRutas);
 api.use('/dashboard', dashboardRutas);
 api.use('/reportes', reportesRutas);
+api.use('/carrito', carritoRutas);
 api.use('/auditoria', auditoriaRutas);
 api.use('/importacion', importacionRutas);
 

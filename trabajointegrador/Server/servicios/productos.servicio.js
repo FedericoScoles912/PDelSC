@@ -351,6 +351,7 @@ export async function actualizar(id, datos = {}) {
   }
 
   if (asignaciones.length) {
+    asignaciones.push('`actualizado_en` = CURRENT_TIMESTAMP');
     parametros.push(id);
     await ejecutar(`UPDATE \`productos\` SET ${asignaciones.join(', ')} WHERE \`id\` = ?`, parametros);
   }
@@ -368,7 +369,10 @@ export async function cambiarActivo(id, activo) {
   const actual = await queryUna('SELECT `id` FROM `productos` WHERE `id` = ?', [id]);
   if (!actual) throw ApiError.noEncontrado('Producto no encontrado.');
 
-  await ejecutar('UPDATE `productos` SET `activo` = ? WHERE `id` = ?', [activo ? 1 : 0, id]);
+  await ejecutar(
+    'UPDATE `productos` SET `activo` = ?, `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?',
+    [activo ? 1 : 0, id]
+  );
   return obtener(id);
 }
 
@@ -441,6 +445,9 @@ export async function agregarEquivalencia(productoId, { tipo, codigo } = {}) {
     'INSERT IGNORE INTO `equivalencias` (`producto_id`, `tipo`, `codigo`) VALUES (?, ?, ?)',
     [productoId, tipoNormalizado, codigo]
   );
+  await ejecutar('UPDATE `productos` SET `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?', [
+    productoId
+  ]);
 
   return listarEquivalencias(productoId);
 }
@@ -458,5 +465,8 @@ export async function eliminarEquivalencia(productoId, equivId) {
   );
 
   if (!resultado.affectedRows) throw ApiError.noEncontrado('Equivalencia no encontrada.');
+  await ejecutar('UPDATE `productos` SET `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?', [
+    productoId
+  ]);
   return { id: equivId };
 }

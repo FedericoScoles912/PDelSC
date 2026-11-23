@@ -35,7 +35,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({ items, onClear, onSele
       <View style={styles.header}>
         <View style={styles.titleGroup}>
           <Icon name="time-outline" size={22} color={theme.colors.primary} />
-          <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+          <Text variant="title" weight="bold" style={{ marginLeft: 8, flex: 1, flexShrink: 1 }}>
             Historial ({items.length})
           </Text>
         </View>
@@ -125,6 +125,9 @@ const styles = StyleSheet.create({
   titleGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    marginRight: 8,
   },
   emptyState: {
     paddingVertical: 32,

@@ -11,7 +11,7 @@ import Spinner from './Spinner.jsx';
  */
 const VARIANTS = {
   primary:
-    'bg-primary text-primary-on hover:bg-primary-hover border border-transparent shadow-sm',
+    'bg-primary text-primary-on hover:bg-primary-hover border border-transparent shadow-md shadow-primary/25 hover:-translate-y-px',
   accent: 'bg-accent text-accent-on hover:brightness-95 border border-transparent shadow-sm',
   olive: 'bg-olive text-olive-on hover:bg-olive-hover border border-transparent shadow-sm',
   danger: 'bg-danger text-danger-on hover:bg-danger-hover border border-transparent shadow-sm',

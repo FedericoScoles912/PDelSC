@@ -31,10 +31,10 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <header className="border-b border-line bg-surface">
+      <header className="sticky top-0 z-30 border-b border-line bg-surface/80 backdrop-blur-md">
         <div className="container-fluid mx-auto flex max-w-[1200px] flex-wrap items-center gap-4 px-6 py-3">
           <Link to="/dashboard" className="flex flex-col leading-tight">
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+            <span className="text-sm font-bold uppercase tracking-wider text-brand-gradient">
               user-auth-system
             </span>
             <span className="text-xs text-muted">{SYSTEM_LABELS[SYSTEMS.ROUTER]}</span>
@@ -48,7 +48,9 @@ export default function AppLayout() {
                 className={({ isActive }) =>
                   cn(
                     'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                    isActive ? 'bg-surface-alt text-ink' : 'text-muted hover:text-ink'
+                    isActive
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted hover:bg-surface-alt hover:text-ink'
                   )
                 }
               >
@@ -67,7 +69,7 @@ export default function AppLayout() {
                   className="h-8 w-8 rounded-full object-cover"
                 />
               ) : (
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-xs font-semibold text-white">
                   {getInitials(user?.name)}
                 </span>
               )}

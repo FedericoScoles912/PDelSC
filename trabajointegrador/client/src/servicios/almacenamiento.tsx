@@ -10,14 +10,36 @@ import { Platform } from 'react-native';
 
 const ES_WEB = Platform.OS === 'web';
 
+/** Prefijo actual de las claves persistidas y prefijo histórico (versiones previas al renombrado a Stocker). */
+const PREFIJO_ACTUAL = 'stocker.';
+const PREFIJO_LEGADO = 'retenes.';
+
 /** Lee un valor persistido. Devuelve `null` si no existe. */
+async function leerCrudo(clave: string): Promise<string | null> {
+  if (ES_WEB) {
+    if (typeof window === 'undefined') return null;
+    return window.localStorage.getItem(clave);
+  }
+  return SecureStore.getItemAsync(clave);
+}
+
+/**
+ * Lee un valor persistido. Si no existe con el prefijo `stocker.` pero sí con el
+ * prefijo histórico `retenes.`, lo migra de forma transparente para no cerrar
+ * sesiones ni perder la configuración de instalaciones anteriores.
+ */
 export async function obtener(clave: string): Promise<string | null> {
   try {
-    if (ES_WEB) {
-      if (typeof window === 'undefined') return null;
-      return window.localStorage.getItem(clave);
+    const valor = await leerCrudo(clave);
+    if (valor !== null || !clave.startsWith(PREFIJO_ACTUAL)) return valor;
+
+    const claveLegada = PREFIJO_LEGADO + clave.slice(PREFIJO_ACTUAL.length);
+    const heredado = await leerCrudo(claveLegada);
+    if (heredado !== null) {
+      await guardar(clave, heredado);
+      await eliminar(claveLegada);
     }
-    return await SecureStore.getItemAsync(clave);
+    return heredado;
   } catch {
     return null;
   }
@@ -54,11 +76,19 @@ export async function eliminar(clave: string): Promise<void> {
 /** Claves de almacenamiento usadas por la aplicación. */
 export const CLAVES = {
   /** Preferencia de tema (claro/oscuro). */
-  tema: 'retenes.tema',
+  tema: 'stocker.tema',
   /** Token de acceso JWT. */
-  accessToken: 'retenes.access_token',
+  accessToken: 'stocker.access_token',
   /** Token de refresco JWT. */
-  refreshToken: 'retenes.refresh_token',
+  refreshToken: 'stocker.refresh_token',
   /** Datos del usuario autenticado. */
-  usuario: 'retenes.usuario'
+  usuario: 'stocker.usuario',
+  /** Lista de servidores desbloqueados con Código Único (ID) y contraseña en este dispositivo. */
+  servidoresNegocio: 'stocker.servidores_autenticados_v2',
+  /** ID del servidor de negocio actualmente autenticado. */
+  servidorActivoId: 'stocker.servidor_activo_id_v2',
+  /** Carrito de pedido a importadora por bajo stock. */
+  carritoReposicion: 'stocker.carrito_reposicion',
+  /** Preferencia de actualizaciones automáticas OTA. */
+  autoUpdateOta: 'stocker.auto_update_ota'
 } as const;

@@ -327,6 +327,26 @@ async function finishOAuthCallback(req, res, next, stateRecord, payload) {
   }
 }
 
+/** Traduce un error de red o de OAuth en un mensaje legible y redirige al frontend. */
+function redirectWithOAuthError(res, stateRecord, provider, err) {
+  console.error(`[oauth] Error en callback de ${provider}:`, err);
+  const path = stateRecord.mode === 'link' ? '/profile' : '/auth/callback';
+  const providerName = PROVIDERS[provider]?.name || provider;
+  const causeCode = err?.oauthError?.code || err?.cause?.code || err?.code || '';
+  const isNetworkBlock = ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'ENOTFOUND', 'UND_ERR_CONNECT_TIMEOUT'].includes(
+    causeCode
+  );
+
+  const message = isNetworkBlock
+    ? `No se pudo conectar desde el servidor con la API de ${providerName} (${causeCode}: la red o firewall actual bloquea la conexión directa a ${providerName}).`
+    : `No se pudo completar la autenticación con ${providerName}. Volvé a intentarlo.`;
+
+  const code = issueTempCode({ type: 'error', message });
+  return res.redirect(
+    buildFrontendUrl({ system: stateRecord.system, path, params: { code } })
+  );
+}
+
 /** Callback de los proveedores manuales (X, Discord): no pasan por Passport. */
 async function handleManualCallback(req, res, next, stateRecord, provider) {
   const failurePath = stateRecord.mode === 'link' ? '/profile' : '/auth/callback';
@@ -352,7 +372,7 @@ async function handleManualCallback(req, res, next, stateRecord, provider) {
       normalized: strategy.normalize(profile),
     });
   } catch (callbackError) {
-    return next(callbackError);
+    return redirectWithOAuthError(res, stateRecord, provider, callbackError);
   }
 }
 
@@ -370,7 +390,9 @@ export function oauthCallback(req, res, next) {
   }
 
   return passport.authenticate(provider, { session: false }, (err, payload) => {
-    if (err) return next(err);
+    if (err) {
+      return redirectWithOAuthError(res, stateRecord, provider, err);
+    }
 
     const path = stateRecord.mode === 'link' ? '/profile' : '/auth/callback';
 

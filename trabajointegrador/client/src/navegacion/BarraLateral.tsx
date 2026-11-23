@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
+import { SelectorServidorNegocio } from '../componentes/servidores/ModalServidoresNegocio';
 import { BotonIcono } from '../componentes/ui/Boton';
 import { Insignia, tonoDeRol } from '../componentes/ui/Insignia';
 import { cerrarSesion } from '../estado/sesionSlice';
@@ -114,6 +115,11 @@ export function BarraLateral({
           </View>
         )}
         {onCerrar && <BotonIcono icono="close" onPress={onCerrar} color={tokens.textoSuave} />}
+      </View>
+
+      {/* Selector de Servidor único por Negocio (Negocio 1, Negocio 2, etc.) */}
+      <View className="px-2.5 pt-2.5">
+        <SelectorServidorNegocio compacto={compacta} />
       </View>
 
       {/* Menú */}

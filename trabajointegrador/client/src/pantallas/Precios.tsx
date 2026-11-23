@@ -84,9 +84,9 @@ export function Precios() {
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
 
   const cargar = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
       try {
         const [{ datos, meta }, cats] = await Promise.all([
           peticionConMeta<ProductoItem[]>('/productos', {
@@ -102,11 +102,18 @@ export function Precios() {
         setProductos(datos);
         setTotalPaginas(Math.max(1, Number(meta.totalPaginas ?? 1)));
         setCategorias(cats);
+        setSeleccionado((actual) => {
+          if (!actual) return null;
+          const actualizado = datos.find((p) => p.id === actual.id);
+          return actualizado ?? actual;
+        });
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudieron cargar los precios.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudieron cargar los precios.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -120,7 +127,12 @@ export function Precios() {
   }, [cargar]);
 
   useSincronizacionEnVivo(() => {
-    void cargar(true);
+    void cargar(true, false);
+    if (seleccionado?.id) {
+      void peticionConMeta<HistorialPrecioItem[]>(`/precios/productos/${seleccionado.id}/historial`)
+        .then(({ datos }) => setHistorial(datos))
+        .catch(() => {});
+    }
   });
 
   const abrirProducto = async (prod: ProductoItem) => {
@@ -263,12 +275,7 @@ export function Precios() {
         </View>
 
         {/* Búsqueda y categorías */}
-        <Tarjeta
-          compacta
-          clase="gap-3"
-          style={{ opacity: fueraDelTope ? 0 : 1 }}
-          pointerEvents={fueraDelTope ? 'none' : 'auto'}
-        >
+        <Tarjeta compacta clase="gap-3">
           <Entrada
             icono="search-outline"
             placeholder="Buscar producto por código o descripción…"

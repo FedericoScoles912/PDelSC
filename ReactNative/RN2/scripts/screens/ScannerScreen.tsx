@@ -12,10 +12,10 @@ import { HistoryList } from '../components/organisms/HistoryList';
 import { PermissionBanner } from '../components/molecules/PermissionBanner';
 import { Text } from '../components/atoms/Text';
 import { Button } from '../components/atoms/Button';
-import { Icon } from '../components/atoms/Icon';
 import { clipboardService } from '../services/clipboardService';
 import { sanitizeUrl } from '../utils/validators';
 import { ScanHistoryItem } from '../types/history';
+import { PopupAction } from '../types/popup';
 
 /**
  * Pantalla de escaneo de códigos QR y códigos de barra con marco de mira y registro persistente.
@@ -39,7 +39,7 @@ const ScannerScreen: React.FC = () => {
   };
 
   const handleSelectHistoryItem = (item: ScanHistoryItem) => {
-    const actions = [
+    const actions: PopupAction[] = [
       {
         label: 'Copiar',
         variant: 'secondary' as const,

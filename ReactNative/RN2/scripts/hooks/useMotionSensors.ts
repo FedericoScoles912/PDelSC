@@ -36,7 +36,7 @@ export function useMotionSensors(isFocused = true): {
   const accSubRef = useRef<SubscriptionLike | null>(null);
   const gyroSubRef = useRef<SubscriptionLike | null>(null);
   const magSubRef = useRef<SubscriptionLike | null>(null);
-  const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shakeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastShakeTimeRef = useRef<number>(0);
 
   const unsubscribeAll = useCallback(() => {

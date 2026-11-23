@@ -6,7 +6,7 @@ import rateLimit from 'express-rate-limit';
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 30, // 30 intentos por IP + ventana
+  max: 5000, // amplio para evitar bloqueos en uso intensivo
   standardHeaders: true,
   legacyHeaders: false,
   message: {

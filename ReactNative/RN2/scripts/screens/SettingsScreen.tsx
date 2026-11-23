@@ -63,7 +63,7 @@ const SettingsScreen: React.FC = () => {
           >
             <View style={styles.titleRow}>
               <Icon name="color-palette-outline" size={24} color={theme.colors.primary} />
-              <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+              <Text variant="title" weight="bold" style={styles.titleText}>
                 Apariencia Visual
               </Text>
             </View>
@@ -98,21 +98,11 @@ const SettingsScreen: React.FC = () => {
               },
             ]}
           >
-            <View style={styles.cardHeader}>
-              <View style={styles.titleRow}>
-                <Icon name="shield-checkmark-outline" size={24} color={theme.colors.secondary} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
-                  Estado de Permisos
-                </Text>
-              </View>
-
-              <Button
-                label="Abrir Ajustes"
-                variant="outline"
-                size="sm"
-                icon="settings"
-                onPress={handleOpenSettings}
-              />
+            <View style={styles.titleRow}>
+              <Icon name="shield-checkmark-outline" size={24} color={theme.colors.secondary} />
+              <Text variant="title" weight="bold" style={styles.titleText}>
+                Estado de Permisos
+              </Text>
             </View>
 
             <Text variant="bodySm" secondary style={{ marginTop: 4, marginBottom: 12 }}>
@@ -146,6 +136,16 @@ const SettingsScreen: React.FC = () => {
               }}
               fullWidth
             />
+
+            <Button
+              label="Abrir Ajustes"
+              variant="outline"
+              size="sm"
+              icon="settings-outline"
+              style={{ marginTop: 10 }}
+              onPress={handleOpenSettings}
+              fullWidth
+            />
           </View>
 
           {/* Información de la App */}
@@ -163,7 +163,7 @@ const SettingsScreen: React.FC = () => {
           >
             <View style={styles.titleRow}>
               <Icon name="information-circle-outline" size={24} color={theme.colors.accent} />
-              <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+              <Text variant="title" weight="bold" style={styles.titleText}>
                 Acerca de la Aplicación
               </Text>
             </View>
@@ -194,6 +194,11 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  titleText: {
+    marginLeft: 8,
+    flex: 1,
+    flexShrink: 1,
   },
 });
 

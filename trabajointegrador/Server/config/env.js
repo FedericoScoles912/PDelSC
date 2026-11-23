@@ -91,7 +91,7 @@ export const env = {
 
   rateLimit: {
     ventanaMs: aEntero(process.env.RATE_LIMIT_WINDOW_MS, 900000),
-    maximo: aEntero(process.env.RATE_LIMIT_MAX, 300)
+    maximo: aEntero(process.env.RATE_LIMIT_MAX, 50000)
   },
 
   oauth: {

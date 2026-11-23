@@ -32,12 +32,13 @@ export function Tarjeta({ children, clase, style, compacta = false, ...resto }: 
           shadowOpacity: 1,
           shadowRadius: 12,
           shadowOffset: { width: 0, height: 4 },
-          elevation: 2
+          elevation: 2,
+          overflow: 'hidden'
         },
         style
       ]}
       className={cn(
-        'rounded-2xl border border-borde bg-superficie',
+        'overflow-hidden rounded-2xl border border-borde bg-superficie',
         compacta ? 'p-3' : 'p-5',
         clase
       )}
@@ -72,28 +73,46 @@ export function EncabezadoTarjeta({
 }: EncabezadoTarjetaProps) {
   const { tokens } = useTema();
   const contenido = (
-    <View className="mb-4 flex-row items-center justify-between gap-3">
-      <View className="flex-1 flex-row items-center gap-3">
+    <View
+      style={{ width: '100%', minWidth: 0 }}
+      className="mb-4 w-full min-w-0 flex-row items-center justify-between gap-3"
+    >
+      <View
+        style={{ minWidth: 0, flex: 1, flexShrink: 1 }}
+        className="min-w-0 flex-1 flex-shrink flex-row items-center gap-3"
+      >
         {icono && (
           <View
-            style={{ backgroundColor: tokens.superficieAlt }}
-            className="h-10 w-10 items-center justify-center rounded-xl bg-superficie-alt"
+            style={{ backgroundColor: tokens.superficieAlt, flexShrink: 0 }}
+            className="h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-superficie-alt"
           >
             <Ionicons name={icono} size={20} color={tokens.primario} />
           </View>
         )}
-        <View className="flex-1">
-          <Text style={{ color: tokens.texto }} className="text-lg font-bold text-texto">
+        <View style={{ minWidth: 0, flex: 1, flexShrink: 1 }} className="min-w-0 flex-1 flex-shrink">
+          <Text
+            style={{ color: tokens.texto, flexShrink: 1 }}
+            className="text-lg font-bold text-texto"
+            numberOfLines={2}
+          >
             {titulo}
           </Text>
           {descripcion && (
-            <Text style={{ color: tokens.textoSuave }} className="text-sm text-texto-suave">
+            <Text
+              style={{ color: tokens.textoSuave, flexShrink: 1 }}
+              className="text-sm text-texto-suave"
+              numberOfLines={2}
+            >
               {descripcion}
             </Text>
           )}
         </View>
       </View>
-      {acciones && <View className="flex-row items-center gap-2">{acciones}</View>}
+      {acciones && (
+        <View style={{ flexShrink: 0, marginLeft: 8 }} className="flex-shrink-0 flex-row items-center gap-2">
+          {acciones}
+        </View>
+      )}
     </View>
   );
 

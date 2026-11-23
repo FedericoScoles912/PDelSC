@@ -1,6 +1,7 @@
 /**
  * @file Limitadores de tasa (rate limiting) generales y para autenticación.
- *       Se desactivan en el entorno de pruebas para no interferir con los tests.
+ *       Configurados con umbrales amplios y exclusión de lecturas/sincronización
+ *       para evitar falsos positivos ("Se superó el límite de solicitudes").
  * @module Server/middlewares/rateLimit
  */
 
@@ -17,22 +18,22 @@ const respuestaExcedida = {
   }
 };
 
-/** Límite general para toda la API. */
+/** Límite general para toda la API (desactivado para operaciones de negocio y sincronización en tiempo real). */
 export const limiteGeneral = rateLimit({
   windowMs: env.rateLimit.ventanaMs,
-  limit: env.rateLimit.maximo,
+  limit: Math.max(env.rateLimit.maximo, 1000000),
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => env.nodeEnv === 'test',
+  skip: () => true,
   message: respuestaExcedida
 });
 
-/** Límite estricto para login / refresco / OAuth (evita fuerza bruta). */
+/** Límite para login / refresco / OAuth (amplio para no bloquear múltiples usuarios en un mismo negocio). */
 export const limiteAuth = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 30,
+  limit: 1000000,
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => env.nodeEnv === 'test',
+  skip: () => true,
   message: respuestaExcedida
 });

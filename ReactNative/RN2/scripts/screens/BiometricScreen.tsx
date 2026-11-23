@@ -103,21 +103,11 @@ const BiometricScreen: React.FC = () => {
               },
             ]}
           >
-            <View style={styles.cardHeader}>
-              <View style={styles.titleRow}>
-                <Icon name="hardware-chip-outline" size={22} color={theme.colors.primary} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
-                  Diagnóstico de Hardware
-                </Text>
-              </View>
-
-              <Button
-                label="Revisar"
-                variant="ghost"
-                size="sm"
-                icon="refresh-outline"
-                onPress={refreshInfo}
-              />
+            <View style={[styles.titleRow, { marginBottom: 8 }]}>
+              <Icon name="hardware-chip-outline" size={22} color={theme.colors.primary} />
+              <Text variant="title" weight="bold" style={styles.titleText}>
+                Diagnóstico de Hardware
+              </Text>
             </View>
 
             <DataRow label="Soporte en Plataforma">
@@ -150,6 +140,16 @@ const BiometricScreen: React.FC = () => {
               }
               divider={false}
             />
+
+            <Button
+              label="Actualizar Diagnóstico"
+              variant="secondary"
+              size="sm"
+              icon="refresh-outline"
+              onPress={refreshInfo}
+              style={{ marginTop: 12 }}
+              fullWidth
+            />
           </View>
         </View>
       </Container>
@@ -181,6 +181,11 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  titleText: {
+    marginLeft: 8,
+    flex: 1,
+    flexShrink: 1,
   },
 });
 

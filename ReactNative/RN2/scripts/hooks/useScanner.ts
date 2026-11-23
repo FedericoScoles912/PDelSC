@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Linking } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { ScanHistoryItem } from '../types/history';
+import { PopupAction } from '../types/popup';
 import { storageService } from '../services/storageService';
 import { clipboardService } from '../services/clipboardService';
 import { isValidUrl, sanitizeUrl } from '../utils/validators';
@@ -84,7 +85,7 @@ export function useScanner(): UseScannerState {
       const updated = await storageService.addScanHistoryItem(newItem);
       setHistory(updated);
 
-      const actions = [
+      const actions: PopupAction[] = [
         {
           label: 'Copiar',
           variant: 'secondary' as const,

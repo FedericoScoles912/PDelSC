@@ -1,6 +1,6 @@
 -- ============================================================================
 --  01_schema.sql
---  Sistema de Control de Stock - Retenes y Sellos Automotrices (EMIC)
+--  Stocker - Sistema de Control de Stock (Retenes y Sellos Automotrices)
 --  Target: MySQL 8 / TiDB Cloud (Starter / Serverless)
 --  Orden de ejecución: 01 -> 02 (o 02b) -> 03 -> 04 -> 05 -> 06 -> (99 rollback)
 -- ----------------------------------------------------------------------------

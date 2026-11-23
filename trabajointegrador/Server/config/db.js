@@ -8,11 +8,115 @@
  * @module Server/config/db
  */
 
+import { AsyncLocalStorage } from 'node:async_hooks';
 import fs from 'node:fs';
 
 import mysql from 'mysql2/promise';
 
 import { env } from './env.js';
+
+/** Contexto asíncrono para aislar cada servidor de negocio ("negocio_1", "negocio_2", etc.). */
+const contextoNegocio = new AsyncLocalStorage();
+const negociosInicializados = new Map();
+
+const TABLAS_AISLABLES = [
+  'categorias',
+  'productos',
+  'equivalencias',
+  'movimientos_stock',
+  'historial_precios',
+  'usuarios',
+  'proveedores_oauth',
+  'refresh_tokens',
+  'auditoria',
+  'configuracion'
+];
+
+/** Normaliza el identificador del servidor de negocio. */
+export function normalizarIdNegocio(id) {
+  const limpio = String(id || 'negocio_1')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 28);
+  return limpio || 'negocio_1';
+}
+
+/** Devuelve el identificador del servidor de negocio activo en el request actual. */
+export function obtenerNegocioActual() {
+  return contextoNegocio.getStore()?.negocioId || 'negocio_1';
+}
+
+/** Ejecuta una función dentro del contexto de un servidor de negocio específico. */
+export function ejecutarEnContextoNegocio(negocioId, fn) {
+  const id = normalizarIdNegocio(negocioId);
+  return contextoNegocio.run({ negocioId: id }, fn);
+}
+
+/** Asegura que las tablas aisladas de un servidor de negocio secundario existan en la base. */
+export async function asegurarEntornoNegocio(negocioId) {
+  const id = normalizarIdNegocio(negocioId);
+  if (id === 'negocio_1' || env.nodeEnv === 'test') return;
+
+  if (negociosInicializados.has(id)) {
+    await negociosInicializados.get(id);
+    return;
+  }
+
+  const promesa = (async () => {
+    const p = getPool();
+    for (const tabla of TABLAS_AISLABLES) {
+      const destino = `${tabla}__${id}`;
+      await p.execute(`CREATE TABLE IF NOT EXISTS \`${destino}\` LIKE \`${tabla}\``);
+    }
+
+    // Sembrar usuarios base (administrador y roles operativos) y categorías si el negocio recién se crea
+    const [uExistentes] = await p.execute(`SELECT COUNT(*) AS cnt FROM \`usuarios__${id}\``);
+    if (Number(uExistentes?.[0]?.cnt ?? 0) === 0) {
+      await p.execute(
+        `INSERT IGNORE INTO \`usuarios__${id}\`
+         SELECT * FROM \`usuarios\` WHERE \`rol_id\` = 1 OR \`activo\` = 1`
+      );
+    }
+
+    const [cExistentes] = await p.execute(`SELECT COUNT(*) AS cnt FROM \`categorias__${id}\``);
+    if (Number(cExistentes?.[0]?.cnt ?? 0) === 0) {
+      await p.execute(`INSERT IGNORE INTO \`categorias__${id}\` SELECT * FROM \`categorias\``);
+    }
+  })().catch((err) => {
+    negociosInicializados.delete(id);
+    console.warn(`[db] No se pudo inicializar entorno de negocio ${id}:`, err?.message);
+  });
+
+  negociosInicializados.set(id, promesa);
+  await promesa;
+}
+
+/** Reescribe las referencias a tablas y vistas SQL para el servidor de negocio activo. */
+function reescribirSqlNegocio(sql) {
+  const id = obtenerNegocioActual();
+  if (id === 'negocio_1' || env.nodeEnv === 'test') return sql;
+
+  let reescrito = sql;
+
+  // Reemplazar vistas por subconsultas equivalentes sobre las tablas del negocio activo
+  const subBajoMinimo = `(SELECT p.\`id\` AS \`producto_id\`, p.\`codigo\`, COALESCE(c.\`nombre\`, 'Sin categoría') AS \`categoria\`, p.\`eje_texto\` AS \`eje\`, p.\`aloj_texto\` AS \`aloj\`, p.\`alt_texto\` AS \`alt\`, p.\`stock\`, p.\`stock_minimo\`, GREATEST(p.\`stock_minimo\` - p.\`stock\`, 0) AS \`faltante\` FROM \`productos__${id}\` p LEFT JOIN \`categorias__${id}\` c ON c.\`id\` = p.\`categoria_id\` WHERE p.\`activo\` = 1 AND p.\`stock\` <= p.\`stock_minimo\`)`;
+  const subStockActual = `(SELECT p.\`id\` AS \`producto_id\`, p.\`codigo\`, COALESCE(c.\`nombre\`, 'Sin categoría') AS \`categoria\`, p.\`eje_texto\` AS \`eje\`, p.\`aloj_texto\` AS \`aloj\`, p.\`alt_texto\` AS \`alt\`, p.\`stock\`, p.\`stock_minimo\`, (CASE WHEN p.\`stock\` <= p.\`stock_minimo\` THEN 1 ELSE 0 END) AS \`bajo_minimo\`, (p.\`stock\` * COALESCE(p.\`precio_lista\`, 0)) AS \`valor_stock\` FROM \`productos__${id}\` p LEFT JOIN \`categorias__${id}\` c ON c.\`id\` = p.\`categoria_id\` WHERE p.\`activo\` = 1)`;
+  const subResumenCat = `(SELECT c.\`id\` AS \`categoria_id\`, c.\`nombre\` AS \`categoria\`, COUNT(p.\`id\`) AS \`total_productos\`, COALESCE(SUM(p.\`stock\`), 0) AS \`stock_total\`, COALESCE(SUM(p.\`stock\` * COALESCE(p.\`precio_lista\`, 0)), 0) AS \`valor_stock\`, COALESCE(SUM(CASE WHEN p.\`stock\` <= p.\`stock_minimo\` THEN 1 ELSE 0 END), 0) AS \`productos_bajo_minimo\` FROM \`categorias__${id}\` c LEFT JOIN \`productos__${id}\` p ON p.\`categoria_id\` = c.\`id\` AND p.\`activo\` = 1 WHERE c.\`activo\` = 1 GROUP BY c.\`id\`, c.\`nombre\`)`;
+
+  reescrito = reescrito
+    .replace(/`vw_productos_bajo_minimo`/g, `${subBajoMinimo} AS vw_bm`)
+    .replace(/`vw_stock_actual`/g, `${subStockActual} AS vw_sa`)
+    .replace(/`vw_resumen_categoria`/g, `${subResumenCat} AS vw_rc`);
+
+  for (const tabla of TABLAS_AISLABLES) {
+    const regex = new RegExp(`\`${tabla}\``, 'g');
+    reescrito = reescrito.replace(regex, `\`${tabla}__${id}\``);
+  }
+
+  return reescrito;
+}
 
 /** Códigos de error que ameritan reintento. */
 const CODIGOS_REINTENTABLES = new Set([
@@ -98,8 +202,11 @@ export function getPool() {
  * @returns {Promise<Array<Object>>}
  */
 export async function query(sql, parametros = []) {
+  const negocioId = obtenerNegocioActual();
+  await asegurarEntornoNegocio(negocioId);
+  const sqlEfectivo = reescribirSqlNegocio(sql);
   return conReintentos(async () => {
-    const [filas] = await getPool().execute(sql, parametros);
+    const [filas] = await getPool().execute(sqlEfectivo, parametros);
     return filas;
   });
 }
@@ -122,8 +229,11 @@ export async function queryUna(sql, parametros = []) {
  * @returns {Promise<import('mysql2').ResultSetHeader>}
  */
 export async function ejecutar(sql, parametros = []) {
+  const negocioId = obtenerNegocioActual();
+  await asegurarEntornoNegocio(negocioId);
+  const sqlEfectivo = reescribirSqlNegocio(sql);
   return conReintentos(async () => {
-    const [resultado] = await getPool().execute(sql, parametros);
+    const [resultado] = await getPool().execute(sqlEfectivo, parametros);
     return resultado;
   });
 }
@@ -163,7 +273,11 @@ export async function conReintentos(operacion, opciones = {}) {
  * @returns {Promise<T>}
  */
 export async function conTransaccion(trabajo) {
+  const negocioId = obtenerNegocioActual();
+  await asegurarEntornoNegocio(negocioId);
   const conexion = await getPool().getConnection();
+  const executeOriginal = conexion.execute.bind(conexion);
+  conexion.execute = (sql, params) => executeOriginal(reescribirSqlNegocio(sql), params);
   try {
     await conexion.beginTransaction();
     const resultado = await trabajo(conexion);
@@ -177,6 +291,7 @@ export async function conTransaccion(trabajo) {
     }
     throw error;
   } finally {
+    conexion.execute = executeOriginal;
     conexion.release();
   }
 }

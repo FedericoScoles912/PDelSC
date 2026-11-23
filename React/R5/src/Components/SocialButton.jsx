@@ -37,9 +37,9 @@ export default function SocialButton({
       aria-busy={loading || undefined}
       title={`Continuar con ${name}`}
       className={cn(
-        'group inline-flex items-center justify-center gap-2.5 rounded-xl border',
-        'border-line bg-surface px-4 font-medium text-ink',
-        'transition-all duration-150 hover:bg-surface-alt',
+        'group inline-flex items-center justify-center gap-2 rounded-xl border',
+        'border-line bg-surface px-3.5 font-medium text-ink shadow-sm',
+        'transition-all duration-150 hover:-translate-y-px hover:bg-surface-alt hover:shadow',
         'disabled:cursor-not-allowed disabled:opacity-60',
         tone.ring,
         fullWidth && 'w-full',
@@ -52,7 +52,7 @@ export default function SocialButton({
       ) : (
         Icon && <Icon aria-hidden="true" className={cn('shrink-0 text-lg', tone.icon)} />
       )}
-      <span className="truncate">{loading ? 'Redirigiendo…' : `Continuar con ${name}`}</span>
+      <span className="truncate">{loading ? 'Redirigiendo…' : name}</span>
     </button>
   );
 }

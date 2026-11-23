@@ -29,10 +29,10 @@ export default function SystemHeader({ currentView, onNavigate }) {
   };
 
   return (
-    <header className="border-b border-line bg-surface">
+    <header className="sticky top-0 z-30 border-b border-line bg-surface/80 backdrop-blur-md">
       <div className="container-fluid mx-auto flex max-w-[1200px] flex-wrap items-center gap-4 px-6 py-3">
         <div className="flex flex-col leading-tight">
-          <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+          <span className="text-sm font-bold uppercase tracking-wider text-brand-gradient">
             user-auth-system
           </span>
           <span className="text-xs text-muted">{SYSTEM_LABELS[SYSTEMS.STATE]}</span>
@@ -47,7 +47,9 @@ export default function SystemHeader({ currentView, onNavigate }) {
               aria-current={currentView === view ? 'page' : undefined}
               className={cn(
                 'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                currentView === view ? 'bg-surface-alt text-ink' : 'text-muted hover:text-ink'
+                currentView === view
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted hover:bg-surface-alt hover:text-ink'
               )}
             >
               <Icon aria-hidden="true" className="text-base" />
@@ -61,7 +63,7 @@ export default function SystemHeader({ currentView, onNavigate }) {
             {user?.avatar_url ? (
               <img src={user.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover" />
             ) : (
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-xs font-semibold text-white">
                 {getInitials(user?.name)}
               </span>
             )}

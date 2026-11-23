@@ -80,7 +80,7 @@ export default function Register() {
       >
         <SocialButtonGroup
           providers={LOGIN_PROVIDER_IDS}
-          columns={3}
+          columns={1}
           onSelect={handleProvider}
           busyProvider={busyProvider}
           disabled={isBusy}

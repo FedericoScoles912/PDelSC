@@ -112,6 +112,25 @@ export const restaurarSesion = createAsyncThunk<Usuario | null>('sesion/restaura
   }
 });
 
+/**
+ * Sincroniza silenciosamente los datos del usuario autenticado en segundo plano
+ * sin bloquear la UI ni recargar tokens desde el almacenamiento seguro.
+ */
+export const sincronizarPerfilEnVivo = createAsyncThunk<Usuario | null>(
+  'sesion/sincronizarPerfilEnVivo',
+  async () => {
+    const { acceso } = tokensEnMemoria();
+    if (!acceso) return null;
+    try {
+      const perfil = await peticion<Usuario>('/auth/perfil');
+      await persistirUsuario(perfil);
+      return perfil;
+    } catch {
+      return null;
+    }
+  }
+);
+
 /** Inicia sesión con email y contraseña. */
 export const iniciarSesion = createAsyncThunk<
   SesionIniciada,
@@ -283,6 +302,22 @@ const slice = createSlice({
       })
       .addCase(actualizarPerfil.fulfilled, (estado, accion) => {
         estado.usuario = accion.payload;
+      })
+      .addCase(sincronizarPerfilEnVivo.fulfilled, (estado, accion) => {
+        if (!accion.payload) return;
+        const actual = estado.usuario;
+        const nuevo = accion.payload;
+        if (
+          !actual ||
+          actual.id !== nuevo.id ||
+          actual.email !== nuevo.email ||
+          actual.nombre !== nuevo.nombre ||
+          actual.apellido !== nuevo.apellido ||
+          actual.telefono !== nuevo.telefono ||
+          actual.rol?.codigo !== nuevo.rol?.codigo
+        ) {
+          estado.usuario = nuevo;
+        }
       });
   }
 });

@@ -9,11 +9,12 @@ import { DefaultTheme, NavigationContainer, type Theme } from '@react-navigation
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useMemo } from 'react';
 
-import { restaurarSesion } from '../estado/sesionSlice';
+import { restaurarSesion, sincronizarPerfilEnVivo } from '../estado/sesionSlice';
 import { useDespacho, useSeleccionar } from '../estado/store';
 import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { CargaInicial } from '../pantallas/CargaInicial';
 import { InicioSesion } from '../pantallas/InicioSesion';
+import { sincronizarCarritoDesdeServidor } from '../servicios/carrito';
 import { useTema } from '../tema/TemaProvider';
 import { NavegacionApp } from './NavegacionApp';
 import type { RutasRaiz } from './tipos';
@@ -30,9 +31,16 @@ export function NavegacionRaiz() {
     void despachar(restaurarSesion());
   }, [despachar]);
 
+  useEffect(() => {
+    if (estado === 'autenticado') {
+      void sincronizarCarritoDesdeServidor(true);
+    }
+  }, [estado]);
+
   useSincronizacionEnVivo(() => {
     if (estado === 'autenticado') {
-      void despachar(restaurarSesion());
+      void despachar(sincronizarPerfilEnVivo());
+      void sincronizarCarritoDesdeServidor(false);
     }
   });
 

@@ -30,7 +30,7 @@ export const OAUTH_PROVIDERS = [
   { id: 'github', name: 'GitHub', Icon: FaGithub, tone: 'accent' },
   { id: 'microsoft', name: 'Microsoft', Icon: FaMicrosoft, tone: 'olive' },
   { id: 'linkedin', name: 'LinkedIn', Icon: FaLinkedin, tone: 'primary' },
-  { id: 'facebook', name: 'Facebook', Icon: FaFacebook, tone: 'olive' },
+  { id: 'facebook', name: 'Meta', Icon: FaFacebook, tone: 'olive' },
   { id: 'x', name: 'X', Icon: FaXTwitter, tone: 'accent' },
   { id: 'discord', name: 'Discord', Icon: FaDiscord, tone: 'primary' },
   { id: 'twitch', name: 'Twitch', Icon: FaTwitch, tone: 'accent' },
@@ -50,7 +50,7 @@ export const OAUTH_PROVIDER_IDS = OAUTH_PROVIDERS.map((provider) => provider.id)
  * El backend sigue soportando los 8: esto solo cura qué botones se ven.
  * Cambiar esta lista no toca ningún componente.
  */
-export const LOGIN_PROVIDER_IDS = ['google', 'github', 'linkedin'];
+export const LOGIN_PROVIDER_IDS = ['google'];
 
 /** Devuelve la definición completa de un proveedor (o null si no existe). */
 export function getProvider(providerId) {
@@ -79,6 +79,23 @@ export const PROVIDER_TONE_CLASSES = {
   olive: {
     icon: 'text-olive',
     ring: 'group-hover:border-olive/60',
+  },
+  // Colores de marca reconocibles para los proveedores habilitados.
+  google: {
+    icon: 'text-[#EA4335]',
+    ring: 'group-hover:border-[#EA4335]/60',
+  },
+  github: {
+    icon: 'text-ink',
+    ring: 'group-hover:border-ink/50',
+  },
+  discord: {
+    icon: 'text-[#5865F2]',
+    ring: 'group-hover:border-[#5865F2]/60',
+  },
+  facebook: {
+    icon: 'text-[#1877F2]',
+    ring: 'group-hover:border-[#1877F2]/60',
   },
 };
 

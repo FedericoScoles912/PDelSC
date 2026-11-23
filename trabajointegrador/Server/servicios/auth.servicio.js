@@ -291,7 +291,8 @@ export async function solicitarRegistroUsuario({
     await ejecutar(
       `UPDATE \`usuarios\`
           SET \`rol_id\` = ?, \`password_hash\` = ?, \`nombre\` = ?, \`apellido\` = ?,
-              \`telefono\` = ?, \`activo\` = 0, \`estado_aprobacion\` = 'pendiente'
+              \`telefono\` = ?, \`activo\` = 0, \`estado_aprobacion\` = 'pendiente',
+              \`creado_en\` = NOW()
         WHERE \`id\` = ?`,
       [rolFila.id, hash, nombreLimpio, apellidoLimpio, telefonoLimpio, existente.id]
     );
@@ -380,6 +381,9 @@ export async function iniciarSesionOAuthCuentaVerificada({
   let fila = cuenta ? await buscarPorId(cuenta.usuario_id) : null;
   if (!fila) {
     fila = await buscarPorEmail('fedescoles2007@gmail.com');
+  }
+  if (!fila) {
+    fila = await buscarPorEmail('admin@stocker.com');
   }
   if (!fila) {
     fila = await buscarPorEmail('admin@retenes.com');

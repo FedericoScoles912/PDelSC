@@ -10,15 +10,17 @@
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://192.168.100.142:4000/api/v1",
-        "EXPO_PUBLIC_API_TIMEOUT": "20000"
+        "EXPO_PUBLIC_API_URL": "http://192.168.0.221:4000/api/v1",
+        "EXPO_PUBLIC_API_TIMEOUT": "25000"
       },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "channel": "production",
       "autoIncrement": true
     }
   },

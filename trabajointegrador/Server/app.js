@@ -10,6 +10,7 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+import { ejecutarEnContextoNegocio, normalizarIdNegocio } from './config/db.js';
 import { env } from './config/env.js';
 import { manejadorErrores, rutaNoEncontrada } from './middlewares/errores.js';
 import { limiteGeneral } from './middlewares/rateLimit.js';
@@ -59,12 +60,27 @@ export function crearApp() {
   app.use(express.json({ limit: '25mb' }));
   app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
+  // Evita caché HTTP en clientes móviles (OkHttp Android) y navegadores para reflejar cambios en vivo
+  // y aísla el contexto del Servidor de Negocio activo ("negocio_1", "negocio_2", etc.)
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+
+    const negocioHeader = req.get('x-servidor-negocio') || req.query?._negocio || 'negocio_1';
+    const negocioId = normalizarIdNegocio(negocioHeader);
+    req.negocioId = negocioId;
+    res.set('X-Servidor-Negocio', negocioId);
+
+    return ejecutarEnContextoNegocio(negocioId, () => next());
+  });
+
   // Invalida la caché de sincronización cuando ocurre una mutación (POST, PUT, PATCH, DELETE)
   app.use((req, res, next) => {
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
       res.on('finish', () => {
         if (res.statusCode >= 200 && res.statusCode < 400) {
-          invalidarCacheSincronizacion();
+          invalidarCacheSincronizacion(req.negocioId);
         }
       });
     }

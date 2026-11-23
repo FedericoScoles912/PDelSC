@@ -4,10 +4,12 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -71,11 +73,24 @@ export function Usuarios() {
   const [rolCodigo, setRolCodigo] = useState('vendedor');
   const [password, setPassword] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const scrollModalRef = useRef<any>(null);
+
+  const desplazarAPasswordModal = () => {
+    setTimeout(() => {
+      scrollModalRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+    setTimeout(() => {
+      scrollModalRef.current?.scrollToEnd({ animated: true });
+    }, 280);
+    setTimeout(() => {
+      scrollModalRef.current?.scrollToEnd({ animated: true });
+    }, 460);
+  };
 
   const cargar = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
       try {
         const [{ datos }, listaRoles] = await Promise.all([
           peticionConMeta<UsuarioFila[]>('/usuarios', {
@@ -90,10 +105,12 @@ export function Usuarios() {
         setUsuarios(datos);
         setRoles(listaRoles);
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudieron cargar los usuarios.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudieron cargar los usuarios.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -266,9 +283,16 @@ export function Usuarios() {
     );
   }
 
-  const pendientesAprobacion = usuarios.filter(
-    (u) => Number(u.activo) !== 1 && (u.estado_aprobacion ?? 'pendiente') === 'pendiente'
-  );
+  // Mostrar las solicitudes de creación de usuario nuevas pendientes de permiso del Administrador
+  // (excluye cuentas históricas que fueron explícitamente desactivadas).
+  const pendientesAprobacion = usuarios
+    .filter(
+      (u) =>
+        Number(u.activo) !== 1 &&
+        u.estado_aprobacion !== 'desactivado' &&
+        u.estado_aprobacion !== 'aprobado'
+    )
+    .sort((a, b) => Number(b.id) - Number(a.id));
 
   return (
     <View style={{ backgroundColor: tokens.fondo }} className="flex-1 bg-fondo">
@@ -376,12 +400,7 @@ export function Usuarios() {
         )}
 
         {/* Búsqueda y filtro */}
-        <Tarjeta
-          compacta
-          clase="gap-3"
-          style={{ opacity: fueraDelTope ? 0 : 1 }}
-          pointerEvents={fueraDelTope ? 'none' : 'auto'}
-        >
+        <Tarjeta compacta clase="gap-3">
           <Entrada
             icono="search-outline"
             placeholder="Buscar por nombre, apellido o correo…"
@@ -500,15 +519,24 @@ export function Usuarios() {
         animationType="fade"
         onRequestClose={() => setModalAbierto(false)}
       >
-        <View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 48 : 28}
           style={estiloVariables}
           className={cn(claseRaiz, 'flex-1 items-center justify-center bg-black/50 p-4')}
         >
           <View
             style={{ backgroundColor: tokens.superficie, borderColor: tokens.borde }}
-            className="max-h-[90%] w-full max-w-md rounded-2xl border border-borde bg-superficie p-5"
+            className="max-h-[92%] w-full max-w-md rounded-2xl border border-borde bg-superficie p-5"
           >
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="gap-3">
+            <ScrollView
+              ref={scrollModalRef}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              automaticallyAdjustKeyboardInsets
+              contentContainerStyle={{ paddingBottom: 240 }}
+              contentContainerClassName="gap-3"
+            >
               <EncabezadoTarjeta
                 titulo={editando ? 'Editar Usuario' : 'Nuevo Usuario'}
                 icono="person-outline"
@@ -572,8 +600,10 @@ export function Usuarios() {
                     : 'Contraseña inicial (mín. 8 caracteres) *'
                 }
                 secureTextEntry
+                autoCapitalize="none"
                 value={password}
                 onChangeText={setPassword}
+                onFocus={desplazarAPasswordModal}
               />
 
               <View className="mt-3 flex-row flex-wrap items-center justify-between gap-2">
@@ -599,7 +629,7 @@ export function Usuarios() {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

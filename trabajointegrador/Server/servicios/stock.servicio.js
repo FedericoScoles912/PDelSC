@@ -127,7 +127,7 @@ export async function registrarMovimiento(
       );
 
       await conexion.execute(
-        'UPDATE `productos` SET `stock` = ? WHERE `id` = ?',
+        'UPDATE `productos` SET `stock` = ?, `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?',
         [stockResultante, producto_id]
       );
 

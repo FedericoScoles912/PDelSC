@@ -20,6 +20,11 @@ import {
   View
 } from 'react-native';
 
+import {
+  ModalAgregarAlCarrito,
+  ModalCarritoImportador,
+  type ProductoParaCarrito
+} from '../componentes/carrito/ModalCarritoImportador';
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
 import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
@@ -29,6 +34,7 @@ import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
 import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
+import { useCarritoImportador } from '../servicios/carrito';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
 
@@ -118,6 +124,9 @@ export function Productos() {
   const [equivalencias, setEquivalencias] = useState<EquivalenciaItem[]>([]);
   const [cargandoEquiv, setCargandoEquiv] = useState(false);
   const [nuevoTipoEquiv, setNuevoTipoEquiv] = useState<'OEM' | 'AJUSA' | 'SABO'>('OEM');
+  const carrito = useCarritoImportador();
+  const [prodParaCarrito, setProdParaCarrito] = useState<ProductoParaCarrito | null>(null);
+  const [carritoVisible, setCarritoVisible] = useState(false);
   const [nuevoCodigoEquiv, setNuevoCodigoEquiv] = useState('');
 
   // Modal de crear / editar producto
@@ -146,11 +155,12 @@ export function Productos() {
   }, []);
 
   const cargarProductos = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
 
       try {
+        let nuevosProductos: ProductoItem[] = [];
         if (modoMedidas && (eje.trim() || aloj.trim() || alt.trim() || giroFiltro.trim())) {
           const lista = await peticion<ProductoItem[]>('/productos/buscar-medidas', {
             consulta: {
@@ -162,6 +172,7 @@ export function Productos() {
               categoria_id: categoriaId ?? undefined
             }
           });
+          nuevosProductos = lista;
           setProductos(lista);
           setTotalRegistros(lista.length);
           setTotalPaginas(1);
@@ -178,15 +189,25 @@ export function Productos() {
               limite: 25
             }
           });
+          nuevosProductos = datos;
           setProductos(datos);
           setTotalRegistros(Number(meta.total ?? datos.length));
           setTotalPaginas(Math.max(1, Number(meta.totalPaginas ?? 1)));
         }
+
+        // Si hay un producto abierto en el modal de detalle, sincronizarlo también en vivo
+        setSeleccionado((actual) => {
+          if (!actual) return null;
+          const actualizado = nuevosProductos.find((p) => p.id === actual.id);
+          return actualizado ?? actual;
+        });
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudieron cargar los productos.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudieron cargar los productos.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -205,7 +226,12 @@ export function Productos() {
 
   useSincronizacionEnVivo(() => {
     void cargarCategorias();
-    void cargarProductos(true);
+    void cargarProductos(true, false);
+    if (seleccionado?.id) {
+      void peticion<EquivalenciaItem[]>(`/productos/${seleccionado.id}/equivalencias`)
+        .then((lista) => setEquivalencias(lista))
+        .catch(() => {});
+    }
   });
 
   const abrirDetalle = async (prod: ProductoItem) => {
@@ -480,12 +506,7 @@ export function Productos() {
         </View>
 
         {/* Panel de búsqueda normal (en el tope) */}
-        <Tarjeta
-          compacta
-          clase="gap-3"
-          style={{ opacity: fueraDelTope ? 0 : 1 }}
-          pointerEvents={fueraDelTope ? 'none' : 'auto'}
-        >
+        <Tarjeta compacta clase="gap-3">
           {!modoMedidas ? (
             <Entrada
               icono="search-outline"
@@ -734,6 +755,25 @@ export function Productos() {
                   style={{ borderColor: tokens.borde }}
                   className="flex-row flex-wrap items-center justify-end gap-2 border-t border-borde pt-2"
                 >
+                  {prod.stock <= prod.stockMinimo && (
+                    <Boton
+                      titulo="Añadir al carrito"
+                      icono="cart-outline"
+                      variante="primario"
+                      tamano="sm"
+                      onPress={() =>
+                        setProdParaCarrito({
+                          producto_id: prod.id,
+                          codigo: prod.codigo,
+                          categoria: prod.categoriaNombre,
+                          medidas: `${prod.ejeTexto ?? '—'} × ${prod.alojTexto ?? '—'} × ${prod.altTexto ?? '—'}`,
+                          stock: prod.stock,
+                          stock_minimo: prod.stockMinimo,
+                          faltante: Math.max(1, prod.stockMinimo - prod.stock)
+                        })
+                      }
+                    />
+                  )}
                   <Boton
                     titulo="Detalle"
                     icono="eye-outline"
@@ -1092,6 +1132,17 @@ export function Productos() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      <ModalAgregarAlCarrito
+        visible={Boolean(prodParaCarrito)}
+        producto={prodParaCarrito}
+        onCerrar={() => setProdParaCarrito(null)}
+        onAbrirCarrito={() => setCarritoVisible(true)}
+      />
+      <ModalCarritoImportador
+        visible={carritoVisible}
+        onCerrar={() => setCarritoVisible(false)}
+      />
     </View>
   );
 }

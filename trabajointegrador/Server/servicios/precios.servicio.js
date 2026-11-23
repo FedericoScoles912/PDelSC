@@ -35,7 +35,7 @@ export async function cambiarPrecio(productoId, { precioLista, motivo = null } =
       }
 
       await conexion.execute(
-        'UPDATE `productos` SET `precio_lista` = ? WHERE `id` = ?',
+        'UPDATE `productos` SET `precio_lista` = ?, `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?',
         [precioNuevo, productoId]
       );
       await conexion.execute(
@@ -121,7 +121,7 @@ export async function ajusteMasivo({ categoriaId = null, porcentaje, redondearA 
           if (precioNuevo === precioAnterior) continue;
 
           await conexion.execute(
-            'UPDATE `productos` SET `precio_lista` = ? WHERE `id` = ?',
+            'UPDATE `productos` SET `precio_lista` = ?, `actualizado_en` = CURRENT_TIMESTAMP WHERE `id` = ?',
             [precioNuevo, fila.id]
           );
           await conexion.execute(

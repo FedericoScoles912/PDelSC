@@ -264,9 +264,9 @@ h2{margin:0 0 8px 0;color:#F5EDE2}p{color:#BEAD9B;line-height:1.5;margin:6px 0}
 <h2>¡Cuenta verificada!</h2>
 <p>Hola <strong>${resultado.usuario?.nombre ?? ''}</strong> (${resultado.usuario?.email ?? ''}).</p>
 <p>Ya podés volver a la aplicación <strong>Stocker</strong>; tu sesión se activó automáticamente.</p>
-<a class="btn" href="retenesstock://">Volver a Stocker</a>
+<a class="btn" href="stocker://">Volver a Stocker</a>
 </div>
-<script>setTimeout(function(){ window.location.href = 'retenesstock://'; }, 800);</script>
+<script>setTimeout(function(){ window.location.href = 'stocker://'; }, 800);</script>
 </body></html>`);
       } catch {
         /* fallback al flujo de redirección estándar */
@@ -461,6 +461,14 @@ router.patch(
       delete datosBody.rol;
     }
     const datos = await actualizarPerfil(req.usuario.sub, datosBody);
+    await registrar({
+      usuarioId: req.usuario.sub,
+      accion: 'actualizar',
+      entidad: 'usuario',
+      entidadId: req.usuario.sub,
+      detalle: datosBody,
+      ip: ipDe(req)
+    });
     return responder(res, datos);
   })
 );

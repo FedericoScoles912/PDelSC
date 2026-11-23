@@ -18,7 +18,7 @@ import { emailField, loginPasswordField } from '../../Scripts/utils/validators.j
 /**
  * Login del Sistema A.
  *
- * Arriba, los 3 botones sociales (Google, GitHub, LinkedIn): al elegir uno se
+ * Arriba, los 3 botones sociales (Google, Meta, GitHub): al elegir uno se
  * redirige al backend, que a su vez lleva al proveedor y vuelve a
  * /auth/callback, donde se termina la sesión. Abajo, el login tradicional.
  */
@@ -73,7 +73,7 @@ export default function Login() {
       >
         <SocialButtonGroup
           providers={LOGIN_PROVIDER_IDS}
-          columns={3}
+          columns={1}
           onSelect={handleProvider}
           busyProvider={busyProvider}
           disabled={isBusy}

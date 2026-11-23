@@ -1,6 +1,6 @@
 # Guía de TiDB Cloud (Serverless) — paso a paso
 
-Esta guía explica cómo crear la base de datos del **Sistema de Control de Stock (EMIC)**
+Esta guía explica cómo crear la base de datos del **Stocker — Sistema de Control de Stock**
 en **TiDB Cloud Serverless**, conectarla desde **MySQL Workbench**, ejecutar las
 migraciones del proyecto y dejar el importador de Excel operativo.
 
@@ -14,7 +14,7 @@ MySQL Workbench y el backend se conecta con `mysql2` sin cambios de código.
 1. Entrar a <https://tidbcloud.com> y crear una cuenta (plan **Serverless**, gratuito).
 2. En el panel, **Create Cluster** → elegir **Serverless**.
 3. Configurar:
-   - **Cluster Name:** `retenes-stock`
+   - **Cluster Name:** `stocker`
    - **Region:** la más cercana (ej. `us-east-1` / `AWS`).
    - **Capacity:** `Serverless` (se ajusta sola).
 4. Esperar a que el cluster quede en estado **Available** (1-2 minutos).
@@ -79,7 +79,7 @@ Si la conexión es correcta, el script muestra la vista previa sin escribir nada
 
 1. Abrir MySQL Workbench → **+** (New Connection).
 2. Completar:
-   - **Connection Name:** `TiDB retenes`
+   - **Connection Name:** `TiDB Stocker`
    - **Hostname:** el host del paso 2.
    - **Port:** `4000`
    - **Username:** `xxxxxxxxxx.root`

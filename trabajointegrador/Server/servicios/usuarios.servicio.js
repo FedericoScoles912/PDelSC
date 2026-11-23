@@ -64,7 +64,8 @@ export async function listar(filtros = {}) {
   const datos = await query(
     `${SELECT_USUARIO}
      ${donde}
-     ORDER BY u.\`activo\` ASC, u.\`creado_en\` DESC, u.\`id\` DESC
+     ORDER BY (CASE WHEN u.\`activo\` = 0 AND u.\`estado_aprobacion\` = 'pendiente' THEN 0 ELSE 1 END) ASC,
+              u.\`id\` DESC
      ${clausulaLimite(limite, offset)}`,
     parametros
   );

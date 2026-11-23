@@ -65,7 +65,7 @@ export function useDeviceInfo(): UseDeviceInfoResult {
     }
   };
 
-  const getNetworkTypeName = (type: Network.NetworkStateType): string => {
+  const getNetworkTypeName = (type?: Network.NetworkStateType): string => {
     switch (type) {
       case Network.NetworkStateType.WIFI:
         return 'Wi-Fi';

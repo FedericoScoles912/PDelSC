@@ -1,5 +1,5 @@
 /**
- * @file Verificación de tokens de proveedores OAuth (Google/Facebook/GitHub)
+ * @file Verificación de tokens de Google OAuth 2.0
  *       y vinculación o creación del usuario local correspondiente.
  * @module Server/servicios/oauth
  */
@@ -8,8 +8,8 @@ import { ejecutar, queryUna } from '../config/db.js';
 import { env } from '../config/env.js';
 import { ApiError } from '../utils/http.js';
 
-/** Proveedores sociales soportados. */
-export const PROVEEDORES = ['google', 'facebook', 'github'];
+/** Proveedores sociales soportados (únicamente Google para uso empresarial interno). */
+export const PROVEEDORES = ['google'];
 
 /** Almacén temporal en memoria para emparejar el callback OAuth con el cliente (TTL 5 min). */
 const estadosPendientes = new Map();
@@ -56,8 +56,8 @@ export function obtenerProveedorDeEstado(state) {
 }
 
 /**
- * Construye la URL de callback registrada para el proveedor.
- * @param {'google'|'facebook'|'github'} proveedor
+ * Construye la URL de callback registrada para Google OAuth 2.0.
+ * @param {'google'} proveedor
  * @returns {string}
  */
 export function obtenerCallbackUrl(proveedor) {
@@ -66,166 +66,69 @@ export function obtenerCallbackUrl(proveedor) {
 }
 
 /**
- * Construye la URL de autorización OAuth 2.0 real del proveedor.
- * @param {'google'|'facebook'|'github'} proveedor
+ * Construye la URL de autorización OAuth 2.0 real de Google.
+ * @param {'google'} proveedor
  * @param {{state:string}} opciones
  * @returns {string}
  */
 export function construirUrlAutorizacion(proveedor, { state }) {
-  const redirectUri = obtenerCallbackUrl(proveedor);
-
-  if (proveedor === 'google') {
-    const clientId = env.oauth.google.clientId;
-    if (!clientId) {
-      throw ApiError.solicitudInvalida('Falta configurar GOOGLE_CLIENT_ID en el archivo .env.');
-    }
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'openid email profile',
-      access_type: 'online',
-      prompt: 'select_account',
-      state
-    });
-    return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  if (proveedor !== 'google') {
+    throw ApiError.solicitudInvalida(
+      'Solo el inicio de sesión empresarial con Google está habilitado.'
+    );
   }
-
-  if (proveedor === 'github') {
-    const clientId = env.oauth.github.clientId;
-    if (!clientId) {
-      throw ApiError.solicitudInvalida('Falta configurar GITHUB_CLIENT_ID en el archivo .env.');
-    }
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      scope: 'read:user user:email',
-      state
-    });
-    return `https://github.com/login/oauth/authorize?${params.toString()}`;
+  const redirectUri = obtenerCallbackUrl('google');
+  const clientId = env.oauth.google.clientId;
+  if (!clientId) {
+    throw ApiError.solicitudInvalida('Falta configurar GOOGLE_CLIENT_ID en el archivo .env.');
   }
-
-  if (proveedor === 'facebook') {
-    const clientId = env.oauth.facebook.clientId;
-    if (!clientId) {
-      throw ApiError.solicitudInvalida('Falta configurar FACEBOOK_CLIENT_ID en el archivo .env.');
-    }
-    // Si FACEBOOK_CLIENT_ID usa credenciales federadas de Google OAuth 2.0,
-    // valida la identidad real contra Google OAuth 2.0 manteniendo el proveedor 'facebook' en `state`.
-    if (clientId.endsWith('.apps.googleusercontent.com')) {
-      const googleRedirectUri = obtenerCallbackUrl('google');
-      const params = new URLSearchParams({
-        client_id: clientId,
-        redirect_uri: googleRedirectUri,
-        response_type: 'code',
-        scope: 'openid email profile',
-        access_type: 'online',
-        prompt: 'select_account',
-        state
-      });
-      return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    }
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      scope: 'public_profile,email',
-      state
-    });
-    return `https://www.facebook.com/v19.0/dialog/oauth?${params.toString()}`;
-  }
-
-  throw ApiError.solicitudInvalida('Proveedor OAuth no soportado.');
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'online',
+    prompt: 'select_account',
+    state
+  });
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 }
 
 /**
- * Intercambia un `code` de autorización OAuth 2.0 por un access_token/id_token del proveedor.
- * @param {'google'|'facebook'|'github'} proveedor
+ * Intercambia un `code` de autorización OAuth 2.0 por un access_token/id_token de Google.
+ * @param {'google'} proveedor
  * @param {string} code
  * @returns {Promise<string>} Token para verificar perfil.
  */
 export async function intercambiarCodigoPorToken(proveedor, code) {
-  const redirectUri = obtenerCallbackUrl(proveedor);
-
-  if (proveedor === 'google') {
-    const { clientId, clientSecret } = env.oauth.google;
-    if (!clientId || !clientSecret) {
-      throw ApiError.solicitudInvalida('Faltan credenciales de Google OAuth en .env.');
-    }
-    const resp = await fetch('https://oauth2.googleapis.com/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code'
-      }).toString()
-    });
-    const datos = await resp.json();
-    if (!resp.ok || (!datos.id_token && !datos.access_token)) {
-      throw ApiError.noAutorizado(
-        datos.error_description || datos.error || 'Error al canjear código con Google.'
-      );
-    }
-    return datos.access_token || datos.id_token;
+  if (proveedor !== 'google') {
+    throw ApiError.solicitudInvalida(
+      'Solo el inicio de sesión empresarial con Google está habilitado.'
+    );
   }
-
-  if (proveedor === 'github') {
-    const { clientId, clientSecret } = env.oauth.github;
-    if (!clientId || !clientSecret) {
-      throw ApiError.solicitudInvalida('Faltan credenciales de GitHub OAuth en .env.');
-    }
-    const resp = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: clientId,
-        client_secret: clientSecret,
-        code,
-        redirect_uri: redirectUri
-      })
-    });
-    const datos = await resp.json();
-    if (!resp.ok || !datos.access_token) {
-      throw ApiError.noAutorizado(
-        datos.error_description || datos.error || 'Error al canjear código con GitHub.'
-      );
-    }
-    return datos.access_token;
+  const redirectUri = obtenerCallbackUrl('google');
+  const { clientId, clientSecret } = env.oauth.google;
+  if (!clientId || !clientSecret) {
+    throw ApiError.solicitudInvalida('Faltan credenciales de Google OAuth en .env.');
   }
-
-  if (proveedor === 'facebook') {
-    const { clientId, clientSecret } = env.oauth.facebook;
-    if (!clientId || !clientSecret) {
-      throw ApiError.solicitudInvalida('Faltan credenciales de Facebook OAuth en .env.');
-    }
-    if (clientId.endsWith('.apps.googleusercontent.com')) {
-      return intercambiarCodigoPorToken('google', code);
-    }
-    const params = new URLSearchParams({
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code,
       client_id: clientId,
       client_secret: clientSecret,
       redirect_uri: redirectUri,
-      code
-    });
-    const resp = await fetch(
-      `https://graph.facebook.com/v19.0/oauth/access_token?${params.toString()}`
+      grant_type: 'authorization_code'
+    }).toString()
+  });
+  const datos = await resp.json();
+  if (!resp.ok || (!datos.id_token && !datos.access_token)) {
+    throw ApiError.noAutorizado(
+      datos.error_description || datos.error || 'Error al canjear código con Google.'
     );
-    const datos = await resp.json();
-    if (!resp.ok || !datos.access_token) {
-      throw ApiError.noAutorizado(
-        datos?.error?.message || 'Error al canjear código con Facebook.'
-      );
-    }
-    return datos.access_token;
   }
-
-  throw ApiError.solicitudInvalida('Proveedor OAuth no soportado.');
+  return datos.access_token || datos.id_token;
 }
 
 /** Columnas públicas del usuario junto a su rol (nunca incluye datos sensibles adicionales). */
@@ -249,85 +152,38 @@ async function pedirJson(url, opciones = {}) {
 }
 
 /**
- * Verifica el token real de un proveedor OAuth y normaliza el perfil del usuario.
- * @param {'google'|'facebook'|'github'} proveedor
- * @param {string} token Token/access token o id_token emitido por el proveedor.
+ * Verifica el token real de Google OAuth y normaliza el perfil del usuario.
+ * @param {'google'} proveedor
+ * @param {string} token Token/access token o id_token emitido por Google.
  * @returns {Promise<{proveedorUserId:string, email:(string|null), nombre:(string|null), avatarUrl:(string|null)}>}
  */
 export async function verificarToken(proveedor, token) {
+  if (proveedor !== 'google') {
+    throw ApiError.noAutorizado('Solo el proveedor Google OAuth está habilitado.');
+  }
   try {
-    if (proveedor === 'google') {
-      // Soportar tanto access_token (userinfo) como id_token (tokeninfo)
-      let datos = null;
-      const respUser = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (respUser.ok) {
-        datos = await respUser.json();
-      } else {
-        datos = await pedirJson(
-          `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(token)}`
-        );
-      }
-      if (!datos?.sub) throw new Error('El proveedor no devolvió el identificador.');
-      return {
-        proveedorUserId: String(datos.sub),
-        email: datos.email ?? null,
-        nombre: datos.name ?? null,
-        avatarUrl: datos.picture ?? null
-      };
-    }
-
-    if (proveedor === 'facebook') {
-      if ((env.oauth.facebook.clientId || '').endsWith('.apps.googleusercontent.com')) {
-        return verificarToken('google', token);
-      }
-      const datos = await pedirJson(
-        `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${encodeURIComponent(token)}`
+    let datos = null;
+    const respUser = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (respUser.ok) {
+      datos = await respUser.json();
+    } else {
+      datos = await pedirJson(
+        `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(token)}`
       );
-      if (!datos?.id) throw new Error('El proveedor no devolvió el identificador.');
-      return {
-        proveedorUserId: String(datos.id),
-        email: datos.email ?? null,
-        nombre: datos.name ?? null,
-        avatarUrl: datos?.picture?.data?.url ?? null
-      };
     }
-
-    if (proveedor === 'github') {
-      const cabeceras = {
-        Authorization: `Bearer ${token}`,
-        'User-Agent': 'retenes-stock',
-        Accept: 'application/vnd.github+json'
-      };
-      const datos = await pedirJson('https://api.github.com/user', { headers: cabeceras });
-      if (!datos?.id) throw new Error('El proveedor no devolvió el identificador.');
-
-      let email = datos.email ?? null;
-      if (!email) {
-        const correos = await pedirJson('https://api.github.com/user/emails', { headers: cabeceras });
-        if (Array.isArray(correos)) {
-          const elegido =
-            correos.find((correo) => correo.primary && correo.verified) ??
-            correos.find((correo) => correo.verified) ??
-            correos[0];
-          email = elegido?.email ?? null;
-        }
-      }
-
-      return {
-        proveedorUserId: String(datos.id),
-        email,
-        nombre: datos.name ?? datos.login ?? null,
-        avatarUrl: datos.avatar_url ?? null
-      };
-    }
+    if (!datos?.sub) throw new Error('El proveedor no devolvió el identificador.');
+    return {
+      proveedorUserId: String(datos.sub),
+      email: datos.email ?? null,
+      nombre: datos.name ?? null,
+      avatarUrl: datos.picture ?? null
+    };
   } catch (error) {
     if (error instanceof ApiError) throw error;
-    throw ApiError.noAutorizado('No se pudo verificar la cuenta del proveedor.');
+    throw ApiError.noAutorizado('No se pudo verificar la cuenta de Google.');
   }
-
-  throw ApiError.noAutorizado('No se pudo verificar la cuenta del proveedor.');
 }
 
 /**

@@ -387,43 +387,57 @@ export function Importar() {
                     setResultado(null);
                     void ejecutarPreview(arch.id);
                   }}
+                  style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}
                   className={cn(
-                    'flex-row items-center justify-between rounded-xl border p-3 transition-colors',
+                    'w-full min-w-0 flex-row items-center gap-3 overflow-hidden rounded-xl border p-3.5 transition-colors',
                     estaSeleccionado
                       ? 'border-primario bg-primario/10'
                       : 'border-borde bg-superficie-alt hover:bg-superficie'
                   )}
                 >
-                  <View className="flex-1 pr-3">
-                    <View className="flex-row items-center gap-2">
-                      <Ionicons
-                        name={estaSeleccionado ? 'radio-button-on' : 'radio-button-off'}
-                        size={18}
-                        color={estaSeleccionado ? tokens.primario : tokens.textoSuave}
-                      />
+                  <View style={{ flexShrink: 0 }}>
+                    <Ionicons
+                      name={estaSeleccionado ? 'radio-button-on' : 'radio-button-off'}
+                      size={20}
+                      color={estaSeleccionado ? tokens.primario : tokens.textoSuave}
+                    />
+                  </View>
+
+                  <View style={{ minWidth: 0, flex: 1, flexShrink: 1 }} className="min-w-0 flex-1 flex-shrink gap-1">
+                    <View
+                      style={{ width: '100%', minWidth: 0 }}
+                      className="w-full min-w-0 flex-row items-center justify-between gap-2"
+                    >
                       <Text
+                        style={{ minWidth: 0, flex: 1, flexShrink: 1 }}
                         className={cn(
-                          'text-sm font-semibold',
-                          estaSeleccionado ? 'text-primario font-bold' : 'text-texto'
+                          'min-w-0 flex-1 flex-shrink text-sm font-semibold',
+                          estaSeleccionado ? 'font-bold text-primario' : 'text-texto'
                         )}
                         numberOfLines={1}
+                        ellipsizeMode="middle"
                       >
                         {arch.nombre}
                       </Text>
                       {arch.esPredeterminado && (
-                        <Insignia texto="Oficial Vigente" tono="info" />
+                        <View style={{ flexShrink: 0 }}>
+                          <Insignia texto="Oficial" tono="info" />
+                        </View>
                       )}
                     </View>
-                    <Text className="mt-1 pl-6 text-xs text-texto-suave">
-                      {arch.ubicacion} • {formatearTamano(arch.tamanoBytes)} • Modificado: {formatearFecha(arch.modificadoEn)}
+                    <Text className="text-xs text-texto-suave" numberOfLines={1}>
+                      {arch.ubicacion} • {formatearTamano(arch.tamanoBytes)} • Modificado:{' '}
+                      {formatearFecha(arch.modificadoEn)}
                     </Text>
                   </View>
 
-                  <Ionicons
-                    name="chevron-forward-outline"
-                    size={16}
-                    color={estaSeleccionado ? tokens.primario : tokens.textoSuave}
-                  />
+                  <View style={{ flexShrink: 0 }}>
+                    <Ionicons
+                      name="chevron-forward-outline"
+                      size={18}
+                      color={estaSeleccionado ? tokens.primario : tokens.textoSuave}
+                    />
+                  </View>
                 </Pressable>
               );
             })
@@ -432,17 +446,27 @@ export function Importar() {
 
         {/* Archivo actualmente activo */}
         {archivoActual && (
-          <View className="rounded-xl border border-primario/30 bg-primario/5 p-3 flex-row items-center justify-between">
-            <View className="flex-1 pr-2">
+          <View
+            style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}
+            className="w-full min-w-0 flex-row items-center justify-between gap-2 overflow-hidden rounded-xl border border-primario/30 bg-primario/5 p-3"
+          >
+            <View style={{ minWidth: 0, flex: 1, flexShrink: 1 }} className="min-w-0 flex-1 flex-shrink pr-2">
               <Text className="text-xs font-bold text-primario">
                 Archivo activo para procesar:
               </Text>
-              <Text className="text-xs text-texto font-medium" numberOfLines={1}>
+              <Text
+                style={{ minWidth: 0, flexShrink: 1 }}
+                className="min-w-0 flex-shrink text-xs font-medium text-texto"
+                numberOfLines={1}
+                ellipsizeMode="middle"
+              >
                 {archivoActual.nombre}
               </Text>
             </View>
             {hojaSeleccionada ? (
-              <Insignia texto={`Hoja: "${hojaSeleccionada}"`} tono="neutro" />
+              <View style={{ flexShrink: 0 }}>
+                <Insignia texto={`Hoja: "${hojaSeleccionada}"`} tono="neutro" />
+              </View>
             ) : null}
           </View>
         )}
@@ -491,28 +515,28 @@ export function Importar() {
             icono="checkmark-circle-outline"
           />
 
-          <View className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            <View className="rounded-xl border border-borde bg-superficie-alt p-3">
+          <View className="flex-row flex-wrap gap-2">
+            <View className="min-w-[130px] flex-1 rounded-xl border border-borde bg-superficie-alt p-3">
               <Text className="text-xs text-texto-suave">Categorías procesadas</Text>
               <Text className="text-lg font-bold text-texto">{resultado.categorias}</Text>
             </View>
-            <View className="rounded-xl border border-exito/30 bg-exito/10 p-3">
-              <Text className="text-xs text-exito font-medium">Productos nuevos</Text>
+            <View className="min-w-[130px] flex-1 rounded-xl border border-exito/30 bg-exito/10 p-3">
+              <Text className="text-xs font-medium text-exito">Productos nuevos</Text>
               <Text className="text-lg font-bold text-exito">+{resultado.productosInsertados}</Text>
             </View>
-            <View className="rounded-xl border border-info/30 bg-info/10 p-3">
-              <Text className="text-xs text-info font-medium">Productos actualizados</Text>
+            <View className="min-w-[130px] flex-1 rounded-xl border border-info/30 bg-info/10 p-3">
+              <Text className="text-xs font-medium text-info">Productos actualizados</Text>
               <Text className="text-lg font-bold text-info">{resultado.productosActualizados}</Text>
             </View>
-            <View className="rounded-xl border border-borde bg-superficie-alt p-3">
+            <View className="min-w-[130px] flex-1 rounded-xl border border-borde bg-superficie-alt p-3">
               <Text className="text-xs text-texto-suave">Sin cambios</Text>
               <Text className="text-lg font-bold text-texto">{resultado.productosSinCambios}</Text>
             </View>
-            <View className="rounded-xl border border-primario/30 bg-primario/10 p-3">
-              <Text className="text-xs text-primario font-medium">Equivalencias cargadas</Text>
+            <View className="min-w-[130px] flex-1 rounded-xl border border-primario/30 bg-primario/10 p-3">
+              <Text className="text-xs font-medium text-primario">Equivalencias cargadas</Text>
               <Text className="text-lg font-bold text-primario">{resultado.equivalencias}</Text>
             </View>
-            <View className="rounded-xl border border-borde bg-superficie-alt p-3">
+            <View className="min-w-[130px] flex-1 rounded-xl border border-borde bg-superficie-alt p-3">
               <Text className="text-xs text-texto-suave">Precios con historial</Text>
               <Text className="text-lg font-bold text-texto">{resultado.preciosActualizados}</Text>
             </View>
@@ -693,10 +717,17 @@ export function Importar() {
             logs.map((nombre) => (
               <View
                 key={nombre}
-                className="flex-row items-center gap-2 rounded-lg bg-superficie-alt px-3 py-2"
+                style={{ minWidth: 0 }}
+                className="min-w-0 flex-row items-center gap-2 rounded-lg bg-superficie-alt px-3 py-2"
               >
                 <Ionicons name="document-text-outline" size={16} color={tokens.primario} />
-                <Text className="text-xs font-medium text-texto">{nombre}</Text>
+                <Text
+                  style={{ minWidth: 0, flex: 1 }}
+                  className="min-w-0 flex-1 text-xs font-medium text-texto"
+                  numberOfLines={1}
+                >
+                  {nombre}
+                </Text>
               </View>
             ))
           )}

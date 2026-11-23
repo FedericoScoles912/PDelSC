@@ -32,7 +32,8 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.USE_BIOMETRIC",
         "android.permission.USE_FINGERPRINT",
-        "android.permission.VIBRATE"
+        "android.permission.VIBRATE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -58,6 +59,12 @@
           "faceIDPermission": "Permite a Sensores Hub validar tu identidad mediante biometría."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "be457c49-5404-401b-a22b-0dff1d2dbcc1"
+      }
+    },
+    "owner": "federicoscoles"
   }
 }

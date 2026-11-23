@@ -19,6 +19,11 @@ import {
   View
 } from 'react-native';
 
+import {
+  ModalAgregarAlCarrito,
+  ModalCarritoImportador,
+  type ProductoParaCarrito
+} from '../componentes/carrito/ModalCarritoImportador';
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
 import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
@@ -28,6 +33,7 @@ import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSeleccionar } from '../estado/store';
 import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion, peticionConMeta } from '../servicios/api';
+import { useCarritoImportador } from '../servicios/carrito';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
 
@@ -97,12 +103,15 @@ export function Deposito() {
   const [motivo, setMotivo] = useState('');
   const [referencia, setReferencia] = useState('');
   const [guardando, setGuardando] = useState(false);
+  const carrito = useCarritoImportador();
+  const [prodParaCarrito, setProdParaCarrito] = useState<ProductoParaCarrito | null>(null);
+  const [carritoVisible, setCarritoVisible] = useState(false);
 
   const cargarDatos = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!esAutorizado) return;
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
 
       try {
         const respuesta = await peticion<{
@@ -125,14 +134,22 @@ export function Deposito() {
             valorEstimado: 0
           }
         );
-        setArticulos(respuesta.articulos ?? []);
+        const lista = respuesta.articulos ?? [];
+        setArticulos(lista);
+        setArticuloSeleccionado((actual) => {
+          if (!actual) return null;
+          const actualizado = lista.find((a) => a.id === actual.id);
+          return actualizado ?? actual;
+        });
       } catch (error) {
-        avisar(
-          error instanceof Error
-            ? error.message
-            : 'No se pudo cargar el inventario del depósito.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error
+              ? error.message
+              : 'No se pudo cargar el inventario del depósito.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -149,7 +166,7 @@ export function Deposito() {
   }, [cargarDatos]);
 
   useSincronizacionEnVivo(() => {
-    void cargarDatos(true);
+    void cargarDatos(true, false);
   });
 
   const abrirModalMovimiento = (articulo: ArticuloDeposito, tipo: 'ingreso' | 'egreso' | 'ajuste' = 'ingreso') => {
@@ -240,21 +257,30 @@ export function Deposito() {
       {({ fueraDelTope }) => (
         <>
       {/* Encabezado de la Sección */}
-      <View className="flex-row items-center gap-3">
-        <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
-          <Ionicons name="file-tray-stacked-outline" size={24} color={tokens.primario} />
+      <View className="flex-row flex-wrap items-center justify-between gap-3">
+        <View className="flex-row items-center gap-3 flex-1 min-w-[220px]">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primario/12">
+            <Ionicons name="file-tray-stacked-outline" size={24} color={tokens.primario} />
+          </View>
+          <View className="flex-1">
+            <Text className="text-xl font-bold text-texto">Depósito de Mercadería</Text>
+            <Text className="text-sm text-texto-suave">
+              Control físico de inventario, existencias reales y ajustes para el Encargado de Depósito
+            </Text>
+          </View>
         </View>
-        <View className="flex-1">
-          <Text className="text-xl font-bold text-texto">Depósito de Mercadería</Text>
-          <Text className="text-sm text-texto-suave">
-            Control físico de inventario, existencias reales y ajustes para el Encargado de Depósito
-          </Text>
-        </View>
+        <Boton
+          titulo={`Carrito Importadora (${carrito.items.length})`}
+          icono="cart-outline"
+          variante={carrito.items.length > 0 ? 'exito' : 'contorno'}
+          tamano="sm"
+          onPress={() => setCarritoVisible(true)}
+        />
       </View>
 
       {/* Tarjetas de Indicadores Clave del Depósito */}
-      <View className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <View className="rounded-2xl border border-primario/30 bg-primario/10 p-3.5">
+      <View className="flex-row flex-wrap gap-3">
+        <View className="min-w-[140px] flex-1 rounded-2xl border border-primario/30 bg-primario/10 p-3.5">
           <View className="flex-row items-center justify-between">
             <Text className="text-xs font-semibold text-primario">Unidades en Depósito</Text>
             <Ionicons name="cube-outline" size={16} color={tokens.primario} />
@@ -267,7 +293,7 @@ export function Deposito() {
           </Text>
         </View>
 
-        <View className="rounded-2xl border border-borde bg-superficie-alt p-3.5">
+        <View className="min-w-[140px] flex-1 rounded-2xl border border-borde bg-superficie-alt p-3.5">
           <View className="flex-row items-center justify-between">
             <Text className="text-xs font-semibold text-texto-suave">Artículos con Stock</Text>
             <Ionicons name="pricetags-outline" size={16} color={tokens.textoSuave} />
@@ -280,7 +306,7 @@ export function Deposito() {
 
         <View
           className={cn(
-            'rounded-2xl border p-3.5',
+            'min-w-[140px] flex-1 rounded-2xl border p-3.5',
             resumen.articulosCriticos > 0
               ? 'border-peligro/30 bg-peligro/10'
               : 'border-borde bg-superficie-alt'
@@ -312,7 +338,7 @@ export function Deposito() {
           <Text className="text-[11px] text-texto-suave">por debajo del mínimo</Text>
         </View>
 
-        <View className="rounded-2xl border border-info/30 bg-info/10 p-3.5">
+        <View className="min-w-[140px] flex-1 rounded-2xl border border-info/30 bg-info/10 p-3.5">
           <View className="flex-row items-center justify-between">
             <Text className="text-xs font-semibold text-info">Próximos Arribos</Text>
             <Ionicons name="boat-outline" size={16} color={tokens.info} />
@@ -325,11 +351,7 @@ export function Deposito() {
       </View>
 
       {/* Barra de Filtros y Búsqueda */}
-      <Tarjeta
-        clase="gap-3"
-        style={{ opacity: fueraDelTope ? 0 : 1 }}
-        pointerEvents={fueraDelTope ? 'none' : 'auto'}
-      >
+      <Tarjeta clase="gap-3">
         <Entrada
           etiqueta="Buscar en depósito"
           icono="search-outline"
@@ -404,18 +426,18 @@ export function Deposito() {
 
       {/* Listado de Artículos con Stock Físico en Depósito */}
       <Tarjeta clase="gap-3">
-        <View className="flex-row items-center justify-between">
-          <EncabezadoTarjeta
-            titulo="Existencias Físicas en Depósito"
-            descripcion={`Mostrando ${articulos.length} artículos con stock positivo`}
-            icono="layers-outline"
-          />
-          <BotonIcono
-            icono="refresh-outline"
-            onPress={() => void cargarDatos(true)}
-            accessibilityLabel="Refrescar existencias"
-          />
-        </View>
+        <EncabezadoTarjeta
+          titulo="Existencias Físicas en Depósito"
+          descripcion={`Mostrando ${articulos.length} artículos con stock positivo`}
+          icono="layers-outline"
+          acciones={
+            <BotonIcono
+              icono="refresh-outline"
+              onPress={() => void cargarDatos(true)}
+              accessibilityLabel="Refrescar existencias"
+            />
+          }
+        />
 
         {cargando ? (
           <View className="py-12 items-center justify-center">
@@ -514,7 +536,26 @@ export function Deposito() {
                       ) : null}
                     </View>
 
-                    <View className="flex-row items-center gap-2">
+                    <View className="flex-row flex-wrap items-center gap-2">
+                      {esBajo && (
+                        <Boton
+                          titulo="Añadir al carrito"
+                          icono="cart-outline"
+                          variante="primario"
+                          tamano="sm"
+                          onPress={() =>
+                            setProdParaCarrito({
+                              producto_id: art.id,
+                              codigo: art.codigo,
+                              categoria: art.categoriaNombre,
+                              medidas: medidas || '—',
+                              stock: art.stock,
+                              stock_minimo: art.stockMinimo,
+                              faltante: Math.max(1, art.stockMinimo - art.stock)
+                            })
+                          }
+                        />
+                      )}
                       <Boton
                         titulo="+ Ingreso"
                         variante="secundario"
@@ -648,6 +689,17 @@ export function Deposito() {
           </View>
         </View>
       </Modal>
+
+      <ModalAgregarAlCarrito
+        visible={Boolean(prodParaCarrito)}
+        producto={prodParaCarrito}
+        onCerrar={() => setProdParaCarrito(null)}
+        onAbrirCarrito={() => setCarritoVisible(true)}
+      />
+      <ModalCarritoImportador
+        visible={carritoVisible}
+        onCerrar={() => setCarritoVisible(false)}
+      />
         </>
       )}
     </ContenedorScrollSeccion>

@@ -29,7 +29,7 @@ Bienvenido al **Manual de Usuario** de **Stocker — Sistema de Control de Stock
 
 ## 1. Descripción General
 
-El sistema permite administrar el catálogo oficial de **Retenes EMIC** (365 productos base distribuidos en 5 categorías y más de 550 códigos de equivalencia OEM/alternativos), brindando:
+El sistema permite administrar el catálogo oficial de retenes del proveedor **EMIC** (365 productos base distribuidos en 5 categorías y más de 550 códigos de equivalencia OEM/alternativos), brindando:
 
 - **Búsqueda técnica dimensional:** localización inmediata de retenes por medidas de **Eje**, **Alojamiento** y **Altura** (con tolerancia en milímetros) y **Sentido de giro**.
 - **Control de inventario en tiempo real:** registro trazable de ingresos, egresos y ajustes con cálculo automático de stock resultante y alertas de stock mínimo.
@@ -93,10 +93,10 @@ A continuación se detalla cómo obtener cada par de claves:
 ### 3.1 Google (`GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`)
 
 1. Ingrese a [Google Cloud Console — Credentials](https://console.cloud.google.com/apis/credentials) con su cuenta de Google.
-2. Cree un proyecto nuevo (ej. `Retenes EMIC`) o seleccione uno existente.
+2. Cree un proyecto nuevo (ej. `Stocker`) o seleccione uno existente.
 3. En el menú lateral, vaya a **APIs y servicios → Pantalla de consentimiento de OAuth**:
    - Seleccione tipo **Externo** → **Crear**.
-   - Complete el nombre de la aplicación (`Retenes EMIC`), correo de asistencia y correo de contacto del desarrollador → **Guardar y continuar**.
+   - Complete el nombre de la aplicación (`Stocker`), correo de asistencia y correo de contacto del desarrollador → **Guardar y continuar**.
 4. Vaya a **APIs y servicios → Credenciales** → presione **+ Crear credenciales** → **ID de cliente de OAuth**.
 5. Seleccione **Aplicación web** como tipo de aplicación:
    - **Orígenes de JavaScript autorizados:**
@@ -112,7 +112,7 @@ A continuación se detalla cómo obtener cada par de claves:
 1. Ingrese a [Meta for Developers — Mis Aplicaciones](https://developers.facebook.com/apps/) e inicie sesión.
 2. Haga clic en **Crear app**:
    - Seleccione el caso de uso **Autenticar y solicitar datos de usuarios con Facebook Login** → **Siguiente**.
-   - Elija tipo **Consumidor** (o **Ninguno**) y asigne el nombre `Retenes EMIC`.
+   - Elija tipo **Consumidor** (o **Ninguno**) y asigne el nombre `Stocker`.
 3. Dentro del panel de la app, diríjase a **Casos de uso → Autenticación y creación de cuentas → Configurar** → **Configuración** de Facebook Login:
    - En **URI de redireccionamiento de OAuth válidos**, agregue:
      - `http://localhost:4000/api/v1/auth/oauth/facebook`
@@ -125,7 +125,7 @@ A continuación se detalla cómo obtener cada par de claves:
 1. Ingrese a [GitHub Developer Settings — OAuth Apps](https://github.com/settings/developers) con su cuenta de GitHub.
 2. Haga clic en **New OAuth App** (o **Register a new application**).
 3. Complete el formulario:
-   - **Application name:** `Retenes EMIC`
+   - **Application name:** `Stocker`
    - **Homepage URL:** `http://localhost:8081`
    - **Authorization callback URL:** `http://localhost:4000/api/v1/auth/oauth/github`
 4. Haga clic en **Register application**.
@@ -375,7 +375,7 @@ El proyecto incluye el perfil `preview` en `client/eas.json` listo para generar 
 2. Abra el archivo `.apk` descargado:
    - Si Android muestra el aviso **"Por motivos de seguridad, tu teléfono no puede instalar aplicaciones desconocidas de esta fuente"**, toque **Configuración** y active **Permitir desde esta fuente**.
    - Si **Google Play Protect** solicita confirmación por tratarse de una app interna de desarrollo, toque **Más detalles → Instalar de todas formas**.
-3. Presione **Instalar** y luego **Abrir**. La aplicación **Retenes EMIC - Stock** quedará instalada en el cajón de aplicaciones de Android.
+3. Presione **Instalar** y luego **Abrir**. La aplicación **Stocker** quedará instalada en el cajón de aplicaciones de Android.
 
 ---
 

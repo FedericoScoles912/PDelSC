@@ -67,9 +67,9 @@ export function Auditoria() {
   const [refrescando, setRefrescando] = useState(false);
 
   const cargar = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
       try {
         const { datos, meta } = await peticionConMeta<AuditoriaFila[]>('/auditoria', {
           consulta: {
@@ -81,10 +81,12 @@ export function Auditoria() {
         setRegistros(datos);
         setTotalPaginas(Math.max(1, Number(meta.totalPaginas ?? 1)));
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudo cargar la bitácora de auditoría.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudo cargar la bitácora de auditoría.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -152,11 +154,7 @@ export function Auditoria() {
       </View>
 
       {/* Buscador normal */}
-      <Tarjeta
-        compacta
-        style={{ opacity: fueraDelTope ? 0 : 1 }}
-        pointerEvents={fueraDelTope ? 'none' : 'auto'}
-      >
+      <Tarjeta compacta>
         <Entrada
           icono="search-outline"
           placeholder="Buscar en auditoría por acción, operador o detalle…"

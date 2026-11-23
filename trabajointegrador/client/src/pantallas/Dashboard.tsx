@@ -8,6 +8,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 
+import {
+  ModalAgregarAlCarrito,
+  ModalCarritoImportador,
+  type ProductoParaCarrito
+} from '../componentes/carrito/ModalCarritoImportador';
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
 import { Boton } from '../componentes/ui/Boton';
 import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
@@ -15,6 +20,7 @@ import { Insignia, tonoDeStock } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { useSincronizacionEnVivo } from '../hooks/useSincronizacionEnVivo';
 import { peticion } from '../servicios/api';
+import { useCarritoImportador } from '../servicios/carrito';
 import { useTema } from '../tema/TemaProvider';
 
 interface ResumenDashboard {
@@ -93,19 +99,24 @@ export function Dashboard() {
   const [datos, setDatos] = useState<ResumenDashboard | null>(null);
   const [cargando, setCargando] = useState(true);
   const [refrescando, setRefrescando] = useState(false);
+  const carrito = useCarritoImportador();
+  const [prodParaCarrito, setProdParaCarrito] = useState<ProductoParaCarrito | null>(null);
+  const [carritoVisible, setCarritoVisible] = useState(false);
 
   const cargar = useCallback(
-    async (silencioso = false) => {
+    async (silencioso = false, mostrarRefresco = false) => {
       if (!silencioso) setCargando(true);
-      else setRefrescando(true);
+      else if (mostrarRefresco) setRefrescando(true);
       try {
         const respuesta = await peticion<ResumenDashboard>('/dashboard/resumen');
         setDatos(respuesta);
       } catch (error) {
-        avisar(
-          error instanceof Error ? error.message : 'No se pudo cargar el panel.',
-          'peligro'
-        );
+        if (!silencioso) {
+          avisar(
+            error instanceof Error ? error.message : 'No se pudo cargar el panel.',
+            'peligro'
+          );
+        }
       } finally {
         setCargando(false);
         setRefrescando(false);
@@ -119,7 +130,7 @@ export function Dashboard() {
   }, [cargar]);
 
   useSincronizacionEnVivo(() => {
-    void cargar(true);
+    void cargar(true, false);
   });
 
   if (cargando && !datos) {
@@ -156,14 +167,23 @@ export function Dashboard() {
             </Text>
           </View>
         </View>
-        <Boton
-          titulo="Actualizar"
-          icono="refresh-outline"
-          variante="secundario"
-          tamano="sm"
-          cargando={refrescando}
-          onPress={() => void cargar(true)}
-        />
+        <View className="flex-row flex-wrap items-center gap-2">
+          <Boton
+            titulo={`Carrito (${carrito.items.length})`}
+            icono="cart-outline"
+            variante={carrito.items.length > 0 ? 'exito' : 'contorno'}
+            tamano="sm"
+            onPress={() => setCarritoVisible(true)}
+          />
+          <Boton
+            titulo="Actualizar"
+            icono="refresh-outline"
+            variante="secundario"
+            tamano="sm"
+            cargando={refrescando}
+            onPress={() => void cargar(true)}
+          />
+        </View>
       </View>
 
       {/* Tarjetas de KPIs principales */}
@@ -270,18 +290,36 @@ export function Dashboard() {
           {(datos?.alertasStock ?? []).map((item) => (
             <View
               key={item.producto_id}
-              className="flex-row items-center justify-between gap-3 rounded-xl border border-borde bg-superficie-alt p-3"
+              className="flex-row flex-wrap items-center justify-between gap-3 rounded-xl border border-borde bg-superficie-alt p-3"
             >
-              <View className="flex-1">
+              <View className="min-w-[160px] flex-1">
                 <Text className="text-sm font-bold text-texto">Código: {item.codigo}</Text>
                 <Text className="text-xs text-texto-suave">
                   {item.categoria} · Medidas: {item.eje ?? '—'} × {item.aloj ?? '—'} ×{' '}
                   {item.alt ?? '—'}
                 </Text>
+                <View className="mt-1">
+                  <Insignia
+                    texto={`Stock: ${item.stock} / Mín: ${item.stock_minimo}`}
+                    tono={tonoDeStock(item.stock, item.stock_minimo)}
+                  />
+                </View>
               </View>
-              <Insignia
-                texto={`Stock: ${item.stock} / Mín: ${item.stock_minimo}`}
-                tono={tonoDeStock(item.stock, item.stock_minimo)}
+              <Boton
+                titulo="Añadir al carrito"
+                icono="cart-outline"
+                tamano="sm"
+                onPress={() =>
+                  setProdParaCarrito({
+                    producto_id: item.producto_id,
+                    codigo: item.codigo,
+                    categoria: item.categoria,
+                    medidas: `${item.eje ?? '—'} × ${item.aloj ?? '—'} × ${item.alt ?? '—'}`,
+                    stock: item.stock,
+                    stock_minimo: item.stock_minimo,
+                    faltante: item.faltante
+                  })
+                }
               />
             </View>
           ))}
@@ -343,6 +381,17 @@ export function Dashboard() {
           )}
         </View>
       </Tarjeta>
+
+      <ModalAgregarAlCarrito
+        visible={Boolean(prodParaCarrito)}
+        producto={prodParaCarrito}
+        onCerrar={() => setProdParaCarrito(null)}
+        onAbrirCarrito={() => setCarritoVisible(true)}
+      />
+      <ModalCarritoImportador
+        visible={carritoVisible}
+        onCerrar={() => setCarritoVisible(false)}
+      />
     </ContenedorScrollSeccion>
   );
 }

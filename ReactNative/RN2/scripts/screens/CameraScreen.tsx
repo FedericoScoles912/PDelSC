@@ -128,7 +128,7 @@ const CameraScreen: React.FC = () => {
                 ]}
               >
                 <View style={styles.galleryHeader}>
-                  <Text variant="title" weight="bold">
+                  <Text variant="title" weight="bold" style={{ flex: 1, flexShrink: 1, marginRight: 8 }}>
                     Fotos de la Sesión ({photos.length})
                   </Text>
                   <Button

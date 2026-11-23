@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
+import { SelectorServidorNegocio } from '../componentes/servidores/ModalServidoresNegocio';
 import { Boton } from '../componentes/ui/Boton';
 import { ContenedorScrollSeccion } from '../componentes/ui/ContenedorScrollSeccion';
 import { Entrada } from '../componentes/ui/Entrada';
@@ -23,6 +24,12 @@ import { Insignia, tonoDeRol } from '../componentes/ui/Insignia';
 import { EncabezadoTarjeta, Tarjeta } from '../componentes/ui/Tarjeta';
 import { actualizarPerfil } from '../estado/sesionSlice';
 import { useDespacho, useSeleccionar } from '../estado/store';
+import {
+  aplicarRecargaOtaInmediata,
+  configurarAutoActualizarOta,
+  useActualizacionesOta,
+  verificarYAplicarActualizacionOta
+} from '../servicios/actualizaciones';
 import { peticion } from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
@@ -52,6 +59,7 @@ export function Perfil() {
   const [nueva, setNueva] = useState('');
   const [confirmarNueva, setConfirmarNueva] = useState('');
   const [guardandoPass, setGuardandoPass] = useState(false);
+  const ota = useActualizacionesOta();
 
   useEffect(() => {
     if (!usuario) return;
@@ -368,6 +376,102 @@ export function Perfil() {
             icono="key-outline"
             cargando={guardandoPass}
             onPress={() => void cambiarPassword()}
+          />
+        </View>
+      </Tarjeta>
+
+      {/* Servidor dedicado por Negocio */}
+      <Tarjeta clase="gap-3">
+        <EncabezadoTarjeta
+          titulo="Servidor Dedicado del Negocio"
+          descripcion="Seleccioná o configurá el servidor exclusivo de tu negocio (Negocio 1, Negocio 2, etc.) para gestionar tu inventario de forma independiente."
+          icono="server-outline"
+        />
+        <SelectorServidorNegocio />
+      </Tarjeta>
+
+      {/* Actualizaciones Automáticas OTA (Sin reinstalar APK) */}
+      <Tarjeta clase="gap-3">
+        <EncabezadoTarjeta
+          titulo="Actualizaciones Automáticas en Vivo (EAS OTA)"
+          descripcion="Detecta, descarga y renderiza actualizaciones desde EAS Update automáticamente con la aplicación abierta, sin cerrar la app ni reinstalar el .apk."
+          icono="cloud-download-outline"
+        />
+        <View
+          style={{
+            backgroundColor: tokens.superficieAlt,
+            borderColor: ota.actualizacionPendienteRecarga ? tokens.exito : tokens.borde
+          }}
+          className="gap-2 rounded-xl border p-3.5"
+        >
+          <View className="flex-row flex-wrap items-center justify-between gap-2">
+            <Text style={{ color: tokens.texto }} className="text-sm font-bold text-texto">
+              Versión v{ota.versionActual} · Runtime v{ota.runtimeVersion}
+            </Text>
+            <View className="flex-row flex-wrap items-center gap-1.5">
+              <Insignia
+                texto={
+                  ota.esBundleOtaDescargado
+                    ? `OTA ACTIVO (${ota.updateIdCorto})`
+                    : `BUNDLE BASE (${ota.updateIdCorto})`
+                }
+                tono={ota.esBundleOtaDescargado ? 'info' : 'primario'}
+              />
+              <Insignia
+                texto={ota.autoActualizar ? 'AUTO-UPDATE EN VIVO' : 'MODO MANUAL'}
+                tono={ota.autoActualizar ? 'exito' : 'advertencia'}
+              />
+            </View>
+          </View>
+
+          <View className="gap-1 pt-1">
+            <Text style={{ color: tokens.texto }} className="text-xs font-semibold text-texto">
+              Canal EAS: <Text className="font-bold text-primario">{ota.canal}</Text>
+              {'  ·  '}ID Update:{' '}
+              <Text className="font-mono font-bold">
+                {ota.updateId ? ota.updateId : 'Bundle integrado en APK'}
+              </Text>
+            </Text>
+            {ota.fechaUpdate && (
+              <Text style={{ color: tokens.textoSuave }} className="text-xs text-texto-suave">
+                Fecha del bundle en ejecución: {ota.fechaUpdate}
+              </Text>
+            )}
+            <Text style={{ color: tokens.textoSuave }} className="text-xs text-texto-suave">
+              Estado: {ota.mensajeEstado}
+            </Text>
+          </View>
+        </View>
+
+        <View className="flex-row flex-wrap justify-end gap-2">
+          <Boton
+            titulo={
+              ota.autoActualizar
+                ? 'Pasar a modo manual'
+                : 'Activar actualización automática en vivo'
+            }
+            variante="secundario"
+            tamano="sm"
+            onPress={() => void configurarAutoActualizarOta(!ota.autoActualizar)}
+          />
+          {ota.actualizacionPendienteRecarga && (
+            <Boton
+              titulo="Aplicar actualización descargada ahora"
+              icono="flash-outline"
+              variante="exito"
+              tamano="sm"
+              onPress={() => void aplicarRecargaOtaInmediata()}
+            />
+          )}
+          <Boton
+            titulo="Buscar y aplicar actualización ahora"
+            icono="sync-outline"
+            tamano="sm"
+            cargando={ota.verificando || ota.descargando}
+            onPress={async () => {
+              const res = await verificarYAplicarActualizacionOta(true);
+              avisar(res.mensaje, res.disponible || res.aplicada ? 'exito' : 'info');
+            }}
           />
         </View>
       </Tarjeta>

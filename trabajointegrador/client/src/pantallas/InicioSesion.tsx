@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -21,18 +22,26 @@ import {
 } from 'react-native';
 
 import { usePopUps } from '../componentes/popups/PopUpsProvider';
+import { SelectorServidorNegocio } from '../componentes/servidores/ModalServidoresNegocio';
 import { Boton, BotonIcono } from '../componentes/ui/Boton';
 import { Entrada } from '../componentes/ui/Entrada';
 import { Tarjeta } from '../componentes/ui/Tarjeta';
 import { completarSesionOAuth, iniciarSesion } from '../estado/sesionSlice';
 import { useDespacho, useSeleccionar } from '../estado/store';
 import type { SesionIniciada } from '../estado/tipos';
-import { URL_API, descubrirUrlDisponible, peticion } from '../servicios/api';
+import {
+  URL_API,
+  autenticarServidorConCredenciales,
+  descubrirUrlDisponible,
+  peticion,
+  registrarNuevoServidorConCredenciales,
+  useServidorNegocio
+} from '../servicios/api';
 import { useTema } from '../tema/TemaProvider';
 import { cn } from '../utils/cn';
 import { RecuperarContrasena } from './RecuperarContrasena';
 
-type ProveedorOAuth = 'google' | 'github' | 'facebook';
+type ProveedorOAuth = 'google';
 
 interface InfoProveedor {
   id: ProveedorOAuth;
@@ -47,18 +56,6 @@ const PROVEEDORES_SOCIALES: InfoProveedor[] = [
     nombre: 'Google',
     icono: 'logo-google',
     color: '#DB4437'
-  },
-  {
-    id: 'github',
-    nombre: 'GitHub',
-    icono: 'logo-github',
-    color: '#24292F'
-  },
-  {
-    id: 'facebook',
-    nombre: 'Facebook',
-    icono: 'logo-facebook',
-    color: '#1877F2'
   }
 ];
 
@@ -85,6 +82,15 @@ export function InicioSesion() {
   const cargando = useSeleccionar((estado) => estado.sesion.cargando);
 
   const [modoVista, setModoVista] = useState<'login' | 'registro' | 'recuperar'>('login');
+  const { servidorActivo, tieneServidorVinculado } = useServidorNegocio();
+
+  // Estado de autenticación previa al Servidor de Negocio (oculto hasta ingresar ID + contraseña)
+  const [modoGateServidor, setModoGateServidor] = useState<'ingresar' | 'crear'>('ingresar');
+  const [srvCodigo, setSrvCodigo] = useState('');
+  const [srvPassword, setSrvPassword] = useState('');
+  const [srvNombreNuevo, setSrvNombreNuevo] = useState('');
+  const [srvUrlOpcional, setSrvUrlOpcional] = useState('');
+  const [autenticandoServidor, setAutenticandoServidor] = useState(false);
 
   // Campos de inicio de sesión
   const [email, setEmail] = useState('');
@@ -104,6 +110,44 @@ export function InicioSesion() {
   const [regConfirmar, setRegConfirmar] = useState('');
   const [registrando, setRegistrando] = useState(false);
   const [mensajePendiente, setMensajePendiente] = useState<string | null>(null);
+  const [tecladoVisible, setTecladoVisible] = useState(false);
+  const scrollRef = useRef<any>(null);
+
+  const desplazarACamposInferiores = () => {
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 280);
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 480);
+  };
+
+  const abrirFormularioRegistro = () => {
+    setRegNombre('');
+    setRegApellido('');
+    setRegEmail('');
+    setRegTelefono('');
+    setRegRol('vendedor');
+    setRegPassword('');
+    setRegConfirmar('');
+    setModoVista('registro');
+  };
+
+  useEffect(() => {
+    const subShow = Keyboard.addListener('keyboardDidShow', () => {
+      setTecladoVisible(true);
+    });
+    const subHide = Keyboard.addListener('keyboardDidHide', () => {
+      setTecladoVisible(false);
+    });
+    return () => {
+      subShow.remove();
+      subHide.remove();
+    };
+  }, []);
 
   const detenerPolling = () => {
     if (intervaloRef.current) {
@@ -132,6 +176,72 @@ export function InicioSesion() {
       detenerPolling();
     };
   }, [despachar, avisar]);
+
+  const ingresarAlServidorOculto = async () => {
+    if (!srvCodigo.trim() || !srvPassword) {
+      avisar(
+        'Ingresá el Código Único (ID) del servidor y su contraseña para acceder a tu negocio.',
+        'advertencia'
+      );
+      return;
+    }
+    setAutenticandoServidor(true);
+    try {
+      const srv = await autenticarServidorConCredenciales({
+        codigoServidor: srvCodigo,
+        password: srvPassword,
+        urlServidor: srvUrlOpcional
+      });
+      setSrvCodigo('');
+      setSrvPassword('');
+      avisar(
+        `Servidor "${srv.nombre}" (${srv.codigoServidor}) verificado. Ahora podés iniciar sesión con tu usuario.`,
+        'exito'
+      );
+    } catch (error) {
+      avisar(
+        error instanceof Error
+          ? error.message
+          : 'Código Único (ID) o contraseña del servidor incorrectos.',
+        'peligro'
+      );
+    } finally {
+      setAutenticandoServidor(false);
+    }
+  };
+
+  const crearNuevoServidorDesdeLogin = async () => {
+    if (!srvNombreNuevo.trim() || !srvCodigo.trim() || srvPassword.length < 4) {
+      avisar(
+        'Completá el nombre del negocio, el Código Único (ID) y una contraseña de al menos 4 caracteres.',
+        'advertencia'
+      );
+      return;
+    }
+    setAutenticandoServidor(true);
+    try {
+      const srv = await registrarNuevoServidorConCredenciales({
+        nombre: srvNombreNuevo,
+        codigoServidor: srvCodigo,
+        password: srvPassword,
+        urlServidor: srvUrlOpcional
+      });
+      setSrvNombreNuevo('');
+      setSrvCodigo('');
+      setSrvPassword('');
+      avisar(
+        `Servidor "${srv.nombre}" (${srv.codigoServidor}) creado y conectado.`,
+        'exito'
+      );
+    } catch (error) {
+      avisar(
+        error instanceof Error ? error.message : 'No se pudo crear el servidor.',
+        'peligro'
+      );
+    } finally {
+      setAutenticandoServidor(false);
+    }
+  };
 
   const validarLogin = (): boolean => {
     const correo = email.trim();
@@ -332,15 +442,24 @@ export function InicioSesion() {
 
       <KeyboardAvoidingView
         className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 36}
       >
         <ScrollView
+          ref={scrollRef}
           className="flex-1"
-          contentContainerClassName="flex-grow items-center justify-center p-6 pb-16"
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: modoVista === 'registro' || tecladoVisible ? 320 : 96
+          }}
+          contentContainerClassName={cn(
+            'flex-grow items-center p-6',
+            modoVista === 'registro' || tecladoVisible ? 'justify-start pt-6' : 'justify-center'
+          )}
           keyboardShouldPersistTaps="handled"
           automaticallyAdjustKeyboardInsets
         >
-          <View className="w-full max-w-md gap-6">
+          <View className="w-full max-w-md gap-5">
             <View className="items-center gap-3">
               <View
                 style={{ backgroundColor: tokens.primario }}
@@ -358,7 +477,162 @@ export function InicioSesion() {
               </View>
             </View>
 
-            <Tarjeta clase="gap-4">
+            {/* Si aún no ingresó a ningún servidor con ID + contraseña, todos los servidores permanecen ocultos */}
+            {!tieneServidorVinculado ? (
+              <Tarjeta clase="gap-4">
+                <View className="flex-row items-center gap-3">
+                  <View
+                    style={{ backgroundColor: `${tokens.primario}18` }}
+                    className="h-11 w-11 items-center justify-center rounded-2xl"
+                  >
+                    <Ionicons name="server-outline" size={22} color={tokens.primario} />
+                  </View>
+                  <View className="flex-1">
+                    <Text style={{ color: tokens.texto }} className="text-lg font-bold text-texto">
+                      Acceso a Servidor del Negocio
+                    </Text>
+                    <Text
+                      style={{ color: tokens.textoSuave }}
+                      className="text-xs text-texto-suave"
+                    >
+                      Todos los servidores están ocultos por seguridad. Ingresá el Código Único (ID) y la contraseña del servidor de tu negocio.
+                    </Text>
+                  </View>
+                </View>
+
+                <View
+                  style={{ backgroundColor: tokens.superficieAlt, borderColor: tokens.borde }}
+                  className="flex-row rounded-xl border p-1"
+                >
+                  <Pressable
+                    onPress={() => setModoGateServidor('ingresar')}
+                    style={{
+                      backgroundColor:
+                        modoGateServidor === 'ingresar' ? tokens.primario : 'transparent'
+                    }}
+                    className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2"
+                  >
+                    <Ionicons
+                      name="key-outline"
+                      size={15}
+                      color={
+                        modoGateServidor === 'ingresar'
+                          ? esOscuro
+                            ? tokens.fondo
+                            : '#FFFFFF'
+                          : tokens.textoSuave
+                      }
+                    />
+                    <Text
+                      style={{
+                        color:
+                          modoGateServidor === 'ingresar'
+                            ? esOscuro
+                              ? tokens.fondo
+                              : '#FFFFFF'
+                            : tokens.textoSuave
+                      }}
+                      className="text-xs font-bold"
+                    >
+                      Ingresar a Servidor
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setModoGateServidor('crear')}
+                    style={{
+                      backgroundColor:
+                        modoGateServidor === 'crear' ? tokens.primario : 'transparent'
+                    }}
+                    className="flex-1 flex-row items-center justify-center gap-1.5 rounded-lg py-2"
+                  >
+                    <Ionicons
+                      name="add-circle-outline"
+                      size={15}
+                      color={
+                        modoGateServidor === 'crear'
+                          ? esOscuro
+                            ? tokens.fondo
+                            : '#FFFFFF'
+                          : tokens.textoSuave
+                      }
+                    />
+                    <Text
+                      style={{
+                        color:
+                          modoGateServidor === 'crear'
+                            ? esOscuro
+                              ? tokens.fondo
+                              : '#FFFFFF'
+                            : tokens.textoSuave
+                      }}
+                      className="text-xs font-bold"
+                    >
+                      Registrar Servidor
+                    </Text>
+                  </Pressable>
+                </View>
+
+                {modoGateServidor === 'crear' && (
+                  <Entrada
+                    etiqueta="Nombre del Negocio / Empresa *"
+                    icono="business-outline"
+                    placeholder="Ej: Mi Negocio / Sucursal"
+                    value={srvNombreNuevo}
+                    onChangeText={setSrvNombreNuevo}
+                  />
+                )}
+
+                <Entrada
+                  etiqueta="Código Único del Servidor (ID) *"
+                  icono="hardware-chip-outline"
+                  placeholder="Ej: SRV-NEGOCIO-01"
+                  autoCapitalize="characters"
+                  value={srvCodigo}
+                  onChangeText={setSrvCodigo}
+                />
+
+                <Entrada
+                  etiqueta="Contraseña del Servidor *"
+                  icono="lock-closed-outline"
+                  placeholder="Contraseña privada del servidor"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  value={srvPassword}
+                  onChangeText={setSrvPassword}
+                  onFocus={desplazarACamposInferiores}
+                  onSubmitEditing={() =>
+                    void (modoGateServidor === 'ingresar'
+                      ? ingresarAlServidorOculto()
+                      : crearNuevoServidorDesdeLogin())
+                  }
+                />
+
+                <Boton
+                  titulo={
+                    modoGateServidor === 'ingresar'
+                      ? 'Conectar al Servidor del Negocio'
+                      : 'Crear y Conectar Servidor'
+                  }
+                  icono={
+                    modoGateServidor === 'ingresar'
+                      ? 'lock-open-outline'
+                      : 'checkmark-circle-outline'
+                  }
+                  anchoCompleto
+                  cargando={autenticandoServidor}
+                  onPress={() =>
+                    void (modoGateServidor === 'ingresar'
+                      ? ingresarAlServidorOculto()
+                      : crearNuevoServidorDesdeLogin())
+                  }
+                />
+              </Tarjeta>
+            ) : (
+              <>
+                <SelectorServidorNegocio />
+
+                <Tarjeta clase="gap-4">
               {/* Pestañas superiores: Iniciar sesión vs Crear Usuario */}
               {modoVista !== 'recuperar' && (
                 <View
@@ -401,7 +675,7 @@ export function InicioSesion() {
 
                   <Pressable
                     accessibilityRole="button"
-                    onPress={() => setModoVista('registro')}
+                    onPress={abrirFormularioRegistro}
                     style={{
                       backgroundColor: modoVista === 'registro' ? tokens.primario : 'transparent'
                     }}
@@ -545,6 +819,7 @@ export function InicioSesion() {
                     autoCapitalize="none"
                     value={regPassword}
                     onChangeText={setRegPassword}
+                    onFocus={desplazarACamposInferiores}
                   />
 
                   <Entrada
@@ -555,6 +830,7 @@ export function InicioSesion() {
                     autoCapitalize="none"
                     value={regConfirmar}
                     onChangeText={setRegConfirmar}
+                    onFocus={desplazarACamposInferiores}
                   />
 
                   <View
@@ -615,7 +891,7 @@ export function InicioSesion() {
                   <Entrada
                     etiqueta="Correo electrónico"
                     icono="mail-outline"
-                    placeholder="admin@retenes.local"
+                    placeholder="usuario@stocker.com"
                     autoCapitalize="none"
                     autoComplete="email"
                     keyboardType="email-address"
@@ -672,7 +948,7 @@ export function InicioSesion() {
                     icono="person-add-outline"
                     variante="contorno"
                     anchoCompleto
-                    onPress={() => setModoVista('registro')}
+                    onPress={abrirFormularioRegistro}
                   />
 
                   {/* Divisor OAuth */}
@@ -753,7 +1029,9 @@ export function InicioSesion() {
                   </View>
                 </>
               )}
-            </Tarjeta>
+                </Tarjeta>
+              </>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

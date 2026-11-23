@@ -2,10 +2,19 @@
   "expo": {
     "name": "Stocker",
     "slug": "retenes-emic-stock",
-    "version": "1.0.0",
+    "version": "1.2.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/77ad2c15-b031-48aa-bff6-373bd0324f85"
+    },
     "orientation": "default",
     "icon": "./assets/icon.png",
-    "scheme": "retenesstock",
+    "scheme": "stocker",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -17,19 +26,24 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.emic.retenesstock"
+      "bundleIdentifier": "com.stocker.app"
     },
     "android": {
-      "package": "com.emic.retenesstock",
+      "package": "com.stocker.app",
+      "versionCode": 12,
+      "permissions": [
+        "android.permission.INTERNET"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#E87E44"
       }
-    },
-    "androidNavigationBar": {
-      "visible": "sticky-immersive",
-      "barStyle": "light-content",
-      "backgroundColor": "#14100E"
     },
     "web": {
       "bundler": "metro",
@@ -43,6 +57,8 @@
         "expo-build-properties",
         {
           "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
             "usesCleartextTraffic": true
           }
         }

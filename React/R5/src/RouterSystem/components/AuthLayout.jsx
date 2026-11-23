@@ -8,7 +8,7 @@ import { useAuth } from '../../Scripts/hooks/useAuth.js';
 /** Puntos que se destacan en el panel de marca (solo desktop). */
 const HIGHLIGHTS = [
   'Login tradicional con email y contraseña, hasheada con bcrypt.',
-  'OAuth 2.0 con Google, GitHub y LinkedIn sobre la misma cuenta.',
+  'OAuth 2.0 empresarial con Google sobre la misma cuenta.',
   'Vinculación de cuentas sociales desde el perfil.',
 ];
 
@@ -29,24 +29,26 @@ export default function AuthLayout() {
   return (
     <div className="min-h-screen bg-canvas lg:grid lg:grid-cols-2">
       {/* Panel de marca */}
-      <aside className="relative hidden overflow-hidden bg-primary p-10 text-primary-on lg:flex lg:flex-col lg:justify-between">
+      <aside className="relative hidden overflow-hidden bg-primary p-12 text-primary-on lg:flex lg:flex-col lg:justify-between">
+        <div aria-hidden="true" className="bg-grid-pattern pointer-events-none absolute inset-0 opacity-60" />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full bg-accent/30 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-24 h-80 w-80 rounded-full bg-accent/30 blur-3xl"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-28 -left-20 h-80 w-80 rounded-full bg-olive/30 blur-3xl"
+          className="pointer-events-none absolute -bottom-28 -left-20 h-96 w-96 rounded-full bg-olive/35 blur-3xl"
         />
 
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] opacity-80">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
             user-auth-system
-          </p>
-          <h2 className="mt-8 max-w-md text-3xl font-semibold leading-snug text-balance">
+          </span>
+          <h2 className="mt-10 max-w-md text-4xl font-bold leading-tight text-balance">
             Una sola API y una sola base de datos, dos formas de construir el frontend.
           </h2>
-          <p className="mt-4 max-w-md text-sm leading-relaxed opacity-90">
+          <p className="mt-5 max-w-md text-base leading-relaxed opacity-90">
             Proyecto educativo de autenticación y gestión de usuarios: sesión tradicional con JWT
             y login social con OAuth 2.0.
           </p>
@@ -54,8 +56,11 @@ export default function AuthLayout() {
 
         <ul className="relative flex flex-col gap-3 text-sm">
           {HIGHLIGHTS.map((item) => (
-            <li key={item} className="flex items-start gap-2.5">
-              <FiCheckCircle aria-hidden="true" className="mt-0.5 shrink-0 text-lg opacity-90" />
+            <li
+              key={item}
+              className="flex items-start gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur"
+            >
+              <FiCheckCircle aria-hidden="true" className="mt-0.5 shrink-0 text-lg text-accent" />
               <span className="opacity-95">{item}</span>
             </li>
           ))}

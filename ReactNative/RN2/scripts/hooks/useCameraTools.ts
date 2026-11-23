@@ -9,7 +9,7 @@ export interface CameraToolsState {
   photos: string[];
   lastPhoto: string | null;
   isCapturing: boolean;
-  cameraRef: React.RefObject<CameraView | null>;
+  cameraRef: React.RefObject<CameraView>;
   toggleFacing: () => void;
   toggleTorch: () => void;
   takePicture: () => Promise<string | null>;
@@ -24,7 +24,7 @@ export function useCameraTools(): CameraToolsState {
   const [torch, setTorch] = useState<boolean>(false);
   const [photos, setPhotos] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
-  const cameraRef = useRef<CameraView | null>(null);
+  const cameraRef = useRef<CameraView>(null);
   const { showPopup } = usePopup();
 
   const toggleFacing = useCallback(() => {

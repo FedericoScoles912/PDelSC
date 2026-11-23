@@ -49,3 +49,75 @@ export async function enviarCodigoRecuperacion({ to, codigo, nombre = '' }) {
     );
   }
 }
+
+/**
+ * Envía el pedido de reposición (carrito bajo stock) al correo de la importadora
+ * mediante el Web App de Google Apps Script con una plantilla exclusiva de Orden de Compra
+ * (totalmente separada del correo de recuperación de contraseña).
+ * @param {{to:string, importador:string, negocioNombre:string, ordenId?:string, notas?:string, items:Array<Object>, pdfBase64?:string, nombreArchivo?:string}} datos
+ * @returns {Promise<{enviado:boolean, detalle:string}>}
+ */
+export async function enviarCorreoPedidoImportador({
+  to,
+  importador,
+  negocioNombre = 'Stocker',
+  ordenId = '',
+  notas = '',
+  items = [],
+  pdfBase64 = '',
+  nombreArchivo = 'pedido_reposicion.pdf'
+}) {
+  const { appsScriptUrl, appsScriptSecret } = env.mail;
+  if (!appsScriptUrl || !appsScriptSecret) {
+    return {
+      enviado: false,
+      detalle: 'APPS_SCRIPT_MAIL_URL no configurado; el PDF fue generado para envío directo.'
+    };
+  }
+
+  const totalUnidades = items.reduce((acc, it) => acc + (Number(it.cantidad) || 0), 0);
+  const resumenTexto = items
+    .map(
+      (it, idx) =>
+        `${idx + 1}. Código: ${it.codigo} — Cantidad solicitada: ${it.cantidad} u.${it.detalle ? ` (${it.detalle})` : ''}`
+    )
+    .join('\n');
+
+  try {
+    const respuesta = await fetch(appsScriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        secret: appsScriptSecret,
+        tipo: 'pedido_importador',
+        to,
+        subject: `Orden de Compra ${ordenId ? `${ordenId} ` : ''}— ${negocioNombre} para ${importador}`,
+        ordenId: ordenId || `OC-${Date.now().toString().slice(-6)}`,
+        importador,
+        negocioNombre,
+        notas,
+        totalCodigos: items.length,
+        totalUnidades,
+        items,
+        resumenTexto,
+        pdfBase64,
+        nombreArchivo
+      }),
+      redirect: 'follow',
+      signal: AbortSignal.timeout(20000)
+    });
+    const datos = await respuesta.json().catch(() => null);
+    if (respuesta.ok && datos?.ok) {
+      return { enviado: true, detalle: `Orden de compra con PDF enviada a ${to}` };
+    }
+    return {
+      enviado: false,
+      detalle: datos?.error || `El servicio de correo devolvió HTTP ${respuesta.status}`
+    };
+  } catch (err) {
+    return {
+      enviado: false,
+      detalle: err?.message || 'No se pudo contactar con el Web App de correo.'
+    };
+  }
+}

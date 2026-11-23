@@ -6,8 +6,8 @@ import { cn } from '../Scripts/utils/helpers.js';
  * - variant: solid (fondo surface) | muted (surface-alt) | outline (borde fino)
  */
 const VARIANTS = {
-  solid: 'bg-surface border border-line shadow-card',
-  muted: 'bg-surface-alt border border-line/70',
+  solid: 'bg-surface border border-line/80 shadow-card',
+  muted: 'bg-surface-alt/70 border border-line/70 backdrop-blur-sm',
   outline: 'bg-transparent border border-line',
 };
 

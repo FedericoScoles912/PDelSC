@@ -96,7 +96,7 @@ function interpretarArgumentos(argv) {
  */
 function mostrarAyuda() {
   console.log(`
-Importador de lista de precios EMIC — Sistema de Control de Stock
+Stocker — Importador de lista de precios EMIC
 
   node Scripts/importar_excel.js [opciones]
 

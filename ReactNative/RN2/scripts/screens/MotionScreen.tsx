@@ -100,7 +100,7 @@ const MotionScreen: React.FC = () => {
               <View style={styles.controlsHeader}>
                 <View style={styles.titleRow}>
                   <Icon name="pulse-outline" size={22} color={theme.colors.primary} />
-                  <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                  <Text variant="title" weight="bold" style={{ marginLeft: 8, flex: 1, flexShrink: 1 }}>
                     Flujo de Datos
                   </Text>
                 </View>
@@ -184,7 +184,7 @@ const MotionScreen: React.FC = () => {
             >
               <View style={styles.titleRow}>
                 <Icon name="compass-outline" size={24} color={theme.colors.accent} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                <Text variant="title" weight="bold" style={{ marginLeft: 8, flex: 1, flexShrink: 1 }}>
                   Brújula Digital (Magnetómetro)
                 </Text>
               </View>
@@ -312,6 +312,9 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    marginRight: 8,
   },
   intervalGroup: {
     flexDirection: 'row',

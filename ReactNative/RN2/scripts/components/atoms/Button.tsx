@@ -109,6 +109,8 @@ export const Button: React.FC<ButtonProps> = ({
             variant={size === 'sm' ? 'bodySm' : 'body'}
             weight="semibold"
             color={disabled ? theme.colors.textSecondary : textColor}
+            numberOfLines={1}
+            style={{ flexShrink: 1 }}
           >
             {label}
           </Text>

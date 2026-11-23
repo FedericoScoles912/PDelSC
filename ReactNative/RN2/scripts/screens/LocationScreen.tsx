@@ -67,7 +67,7 @@ const LocationScreen: React.FC = () => {
               <View style={styles.cardHeader}>
                 <View style={styles.titleRow}>
                   <Icon name="navigate-circle-outline" size={26} color={theme.colors.primary} />
-                  <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                  <Text variant="title" weight="bold" style={{ marginLeft: 8, flex: 1, flexShrink: 1 }}>
                     Seguimiento GPS
                   </Text>
                 </View>
@@ -193,7 +193,7 @@ const LocationScreen: React.FC = () => {
             >
               <View style={styles.titleRow}>
                 <Icon name="map-outline" size={22} color={theme.colors.secondary} />
-                <Text variant="title" weight="bold" style={{ marginLeft: 8 }}>
+                <Text variant="title" weight="bold" style={{ marginLeft: 8, flex: 1, flexShrink: 1 }}>
                   Dirección Estimada (Geocodificación)
                 </Text>
               </View>
@@ -255,6 +255,9 @@ const styles = StyleSheet.create({
   titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    flexShrink: 1,
+    marginRight: 8,
   },
 });
 

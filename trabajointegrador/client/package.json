@@ -9,7 +9,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "update:ota": "eas update --channel preview --environment preview --message \"Actualizacion OTA automatica\"",
+    "build:apk": "eas build --platform android --profile preview"
   },
   "dependencies": {
     "@expo/metro-runtime": "~58.0.15",
@@ -26,6 +28,7 @@
     "expo-linking": "~58.0.16",
     "expo-secure-store": "~58.0.2",
     "expo-status-bar": "~58.0.4",
+    "expo-updates": "~58.0.22",
     "nativewind": "^4.2.7",
     "react": "19.3.0",
     "react-dom": "19.3.0",
